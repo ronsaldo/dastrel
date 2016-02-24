@@ -27,14 +27,6 @@ Class {
 		'leftParent',
 		'rightParent',
 		'semicolon',
-		'primitiveType',
-		'kwVoid',
-		'kwChar',
-		'kwShort',
-		'kwInt',
-		'kwLong',
-		'kwFloat',
-		'kwDouble',
 		'globalBlocks',
 		'interface',
 		'kwUniform',
@@ -76,7 +68,21 @@ Class {
 		'accessExpression',
 		'subscriptExpression',
 		'leftBracket',
-		'rightBracket'
+		'rightBracket',
+		'function',
+		'kwFunction',
+		'functionArgumentDecl',
+		'arrow',
+		'functionReturnTypes',
+		'functionPrototype',
+		'callExpression',
+		'callArguments',
+		'returnStatement',
+		'equalAssign',
+		'localVariable',
+		'functionArgumentsDecl',
+		'kwReturn',
+		'varInitialValue'
 	],
 	#classVars : [
 		'Keywords'
@@ -95,16 +101,20 @@ DASLGrammar class >> initialize [
 		in out
 		uniform
 		interface semantic implements
-		void char short int long float double
 		sizeof alignof
-		code_block graph_block
+		function code_block graph_block
 		using discard return
 	).
 ]
 
 { #category : #grammar }
 DASLGrammar >> accessExpression [
-	^ memberExpression / subscriptExpression
+	^ memberExpression / subscriptExpression / callExpression
+]
+
+{ #category : #tokens }
+DASLGrammar >> arrow [
+	^ '->' asParser token trim: ignorable
 ]
 
 { #category : #grammar }
@@ -183,6 +193,16 @@ DASLGrammar >> blockVariable [
 ]
 
 { #category : #grammar }
+DASLGrammar >> callArguments [
+	^ expression , (comma , expression) star
+]
+
+{ #category : #grammar }
+DASLGrammar >> callExpression [
+	^ leftParent , callArguments , rightParent
+]
+
+{ #category : #grammar }
 DASLGrammar >> codeBlock [
 	^ kwCodeBlock , identifier , interfaceImplementations optional, leftCBracket, codeBody , rightCBracket
 ]
@@ -194,7 +214,7 @@ DASLGrammar >> codeBody [
 
 { #category : #grammar }
 DASLGrammar >> codeStatement [
-	^ usingStatement / discardStatement / expressionStatement
+	^ usingStatement / discardStatement / returnStatement / localVariable / expressionStatement
 ]
 
 { #category : #tokens }
@@ -220,6 +240,11 @@ DASLGrammar >> discardStatement [
 { #category : #tokens }
 DASLGrammar >> dot [
 	^ $. asParser token trim: ignorable
+]
+
+{ #category : #tokens }
+DASLGrammar >> equalAssign [
+	^ $= asParser token trim: ignorable
 ]
 
 { #category : #grammar }
@@ -253,8 +278,33 @@ DASLGrammar >> floatScientfic [
 ]
 
 { #category : #grammar }
+DASLGrammar >> function [
+	^ functionPrototype , leftCBracket , codeBody  , rightCBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> functionArgumentDecl [
+	^ type , identifier
+]
+
+{ #category : #grammar }
+DASLGrammar >> functionArgumentsDecl [
+	^ functionArgumentDecl, (comma, functionArgumentDecl) star
+]
+
+{ #category : #grammar }
+DASLGrammar >> functionPrototype [
+	^ kwFunction , identifier , leftParent , functionArgumentsDecl , rightParent , arrow , functionReturnTypes
+]
+
+{ #category : #grammar }
+DASLGrammar >> functionReturnTypes [
+	^ type , (comma , type) star
+]
+
+{ #category : #grammar }
 DASLGrammar >> globalBlocks [
-	^ interface / uniform / semantic / codeBlock
+	^ interface / uniform / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -308,11 +358,6 @@ DASLGrammar >> kwAlignOf [
 ]
 
 { #category : #keywords }
-DASLGrammar >> kwChar [
-	^ self keywordParser: 'char'
-]
-
-{ #category : #keywords }
 DASLGrammar >> kwCodeBlock [
 	^ self keywordParser: 'code_block'
 ]
@@ -323,13 +368,8 @@ DASLGrammar >> kwDiscard [
 ]
 
 { #category : #keywords }
-DASLGrammar >> kwDouble [
-	^ self keywordParser: 'double'
-]
-
-{ #category : #keywords }
-DASLGrammar >> kwFloat [
-	^ self keywordParser: 'float'
+DASLGrammar >> kwFunction [
+	^ self keywordParser: 'function'
 ]
 
 { #category : #keywords }
@@ -348,18 +388,8 @@ DASLGrammar >> kwIn [
 ]
 
 { #category : #keywords }
-DASLGrammar >> kwInt [
-	^ self keywordParser: 'int'
-]
-
-{ #category : #keywords }
 DASLGrammar >> kwInterface [
 	^ self keywordParser: 'interface'
-]
-
-{ #category : #keywords }
-DASLGrammar >> kwLong [
-	^ self keywordParser: 'long'
 ]
 
 { #category : #keywords }
@@ -368,13 +398,13 @@ DASLGrammar >> kwOut [
 ]
 
 { #category : #keywords }
-DASLGrammar >> kwSemantic [
-	^ self keywordParser: 'semantic'
+DASLGrammar >> kwReturn [
+	^ self keywordParser: 'return'
 ]
 
 { #category : #keywords }
-DASLGrammar >> kwShort [
-	^ self keywordParser: 'short'
+DASLGrammar >> kwSemantic [
+	^ self keywordParser: 'semantic'
 ]
 
 { #category : #keywords }
@@ -390,11 +420,6 @@ DASLGrammar >> kwUniform [
 { #category : #keywords }
 DASLGrammar >> kwUsing [
 	^ self keywordParser: 'using'
-]
-
-{ #category : #keywords }
-DASLGrammar >> kwVoid [
-	^ self keywordParser: 'void'
 ]
 
 { #category : #tokens }
@@ -415,6 +440,11 @@ DASLGrammar >> leftParent [
 { #category : #grammar }
 DASLGrammar >> literalExpression [
 	^ number
+]
+
+{ #category : #grammar }
+DASLGrammar >> localVariable [
+	^ varFlowDirection optional , type , identifier , varInitialValue optional, semicolon
 ]
 
 { #category : #grammar }
@@ -467,14 +497,14 @@ DASLGrammar >> prefix: operation operate: operand [
 	^ { operation . operand }
 ]
 
-{ #category : #grammar }
-DASLGrammar >> primitiveType [
-	^ kwVoid / kwChar / kwShort / kwInt / kwLong / kwFloat / kwDouble
-]
-
 { #category : #tokens }
 DASLGrammar >> questionMark [
 	^ $? asParser token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> returnStatement [
+	^ kwReturn , callArguments , semicolon
 ]
 
 { #category : #tokens }
@@ -529,7 +559,7 @@ DASLGrammar >> termExpression [
 
 { #category : #grammar }
 DASLGrammar >> type [
-	^ primitiveType / identifier
+	^ identifier
 ]
 
 { #category : #grammar }
@@ -560,4 +590,9 @@ DASLGrammar >> varFlowDirection [
 { #category : #grammar }
 DASLGrammar >> varFlowLocation [
 	^ leftParent , integer , rightParent
+]
+
+{ #category : #grammar }
+DASLGrammar >> varInitialValue [
+	^ equalAssign , expression
 ]

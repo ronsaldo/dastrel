@@ -16,3 +16,8 @@ DASLExpressionStatement >> expression [
 DASLExpressionStatement >> expression: anObject [
 	expression := anObject
 ]
+
+{ #category : #printing }
+DASLExpressionStatement >> printOn: aStream [
+	expression printOn: aStream.
+]

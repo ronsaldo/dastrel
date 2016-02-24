@@ -28,6 +28,19 @@ DASLParser >> blockVariable [
 ]
 
 { #category : #grammar }
+DASLParser >> callArguments [
+	^ super callArguments ==> [ :args | { args first } , (args second collect: #second) ]
+]
+
+{ #category : #grammar }
+DASLParser >> callExpression [
+	^ super callExpression ==> [ :expr | DASLCallExpression new
+			setPositionFromToken: expr first;
+			arguments: expr second;
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> codeBlock [
 	^ super codeBlock ==> [ :block | DASLCodeBlock new
 			setPositionFromToken: block first;
@@ -69,6 +82,45 @@ DASLParser >> float [
 	^ super float ==> [ :token | DASLFloat token: token ]
 ]
 
+{ #category : #grammar }
+DASLParser >> function [
+	^ super function ==> [ :tokens | DASLFunction new
+			position: tokens first position;
+			prototype: tokens first;
+			name: tokens first name;
+			body: tokens third;
+			yourself]
+]
+
+{ #category : #grammar }
+DASLParser >> functionArgumentDecl [
+	^ super functionArgumentDecl ==> [ :decl | DASLFunctionArgument new
+			position: decl first position;
+			type: decl first;
+			name: decl second value;
+			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> functionArgumentsDecl [
+	^ super functionArgumentsDecl ==> [ :decls | {decls first } , decls second ]
+]
+
+{ #category : #grammar }
+DASLParser >> functionPrototype [
+	^ super functionPrototype ==> [ :tokens | DASLFunctionPrototype new
+			setPositionFromToken: tokens first;
+			name: tokens second value;
+			arguments: tokens fourth;
+			returnType: tokens seventh;
+			yourself]
+]
+
+{ #category : #grammar }
+DASLParser >> functionReturnTypes [
+	^ super functionReturnTypes ==> [ :types | {types first } , types second ]
+]
+
 { #category : #tokens }
 DASLParser >> identifier [
 	^ super identifier ==> [ :token | DASLIdentifier token: token ]
@@ -92,6 +144,17 @@ DASLParser >> interface [
 { #category : #grammar }
 DASLParser >> interfaceImplementations [
 	^ super interfaceImplementations ==> [ :implements | { implements second } , (implements third collect: #second) ]
+]
+
+{ #category : #grammar }
+DASLParser >> localVariable [
+	^ super localVariable ==> [ :local | DASLLocalDeclStatement new
+			position: local second position;
+			flow: local first;
+			type: local second;
+			name:  local third value;
+			initialValue: local fourth;
+			yourself]
 ]
 
 { #category : #grammar }
@@ -132,6 +195,14 @@ DASLParser >> prefix: operation operate: operand [
 ]
 
 { #category : #grammar }
+DASLParser >> returnStatement [
+	^ super returnStatement ==> [ :tokens | DASLReturnStatement new
+			setPositionFromToken: tokens first;
+			value: tokens second;
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> semantic [
 	^ super semantic ==> [ :block | DASLSemanticBlock new
 			setPositionFromToken: block first;
@@ -139,6 +210,11 @@ DASLParser >> semantic [
 			interfaceList: block third;
 			body: block fifth;
 			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> start [
+	^ super start ==> [ :modules | DASLTranslationUnit new modules: modules ]
 ]
 
 { #category : #grammar }
@@ -189,4 +265,9 @@ DASLParser >> varFlowDirection [
 { #category : #grammar }
 DASLParser >> varFlowLocation [
 	^ super varFlowLocation ==> [ :location | location second value ]
+]
+
+{ #category : #grammar }
+DASLParser >> varInitialValue [
+	^ super varInitialValue ==> [ :initialValue |  initialValue second ]
 ]

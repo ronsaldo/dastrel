@@ -18,6 +18,15 @@ DASLSubscriptExpression >> index: anObject [
 	index := anObject
 ]
 
+{ #category : #printing }
+DASLSubscriptExpression >> printOn: aStream [
+	aStream nextPutAll: '(at '.
+	reference printOn: aStream.
+	aStream space.
+	index printOn: aStream.
+	aStream nextPut: $).
+]
+
 { #category : #accessing }
 DASLSubscriptExpression >> reference [
 	^ reference

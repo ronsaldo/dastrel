@@ -19,6 +19,17 @@ DASLAssignmentExpression >> operation: anObject [
 	operation := anObject
 ]
 
+{ #category : #printing }
+DASLAssignmentExpression >> printOn: aStream [
+	aStream nextPut: $(.
+	aStream nextPutAll: operation.
+	aStream space.
+	reference printOn: aStream.
+	aStream space.
+	value printOn: aStream.
+	aStream nextPut: $).
+]
+
 { #category : #accessing }
 DASLAssignmentExpression >> reference [
 	^ reference

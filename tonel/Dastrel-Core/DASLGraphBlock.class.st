@@ -1,5 +1,5 @@
 Class {
-	#name : #DASLGraphModule,
+	#name : #DASLGraphBlock,
 	#superclass : #DASLModule,
 	#category : #'Dastrel-Core'
 }

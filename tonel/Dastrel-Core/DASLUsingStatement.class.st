@@ -16,3 +16,10 @@ DASLUsingStatement >> identifier [
 DASLUsingStatement >> identifier: anObject [
 	identifier := anObject
 ]
+
+{ #category : #printing }
+DASLUsingStatement >> printOn: aStream [
+	aStream nextPutAll: '(using '.
+	identifier printOn: aStream.
+	aStream nextPut: $).
+]

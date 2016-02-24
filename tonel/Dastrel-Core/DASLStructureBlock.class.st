@@ -25,5 +25,5 @@ DASLStructureBlock >> interfaceList [
 
 { #category : #accessing }
 DASLStructureBlock >> interfaceList: anObject [
-	interfaceList := anObject
+	interfaceList := anObject ifNil: [ #() ].
 ]

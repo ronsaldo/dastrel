@@ -18,6 +18,15 @@ DASLMemberAccessExpression >> memberName: anObject [
 	memberName := anObject
 ]
 
+{ #category : #printing }
+DASLMemberAccessExpression >> printOn: aStream [
+	aStream nextPutAll: '(member-access '.
+	reference printOn: aStream.
+	aStream space.
+	memberName printOn: aStream.
+	aStream nextPut: $).
+]
+
 { #category : #accessing }
 DASLMemberAccessExpression >> reference [
 	^ reference

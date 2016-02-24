@@ -8,6 +8,6 @@ Class {
 DASLFloat >> parse: aValue [
 	| prefixSuffix |
 	prefixSuffix := self splitLetterSuffix: aValue.
-	self value: prefixSuffix first asFloat.
+	self value: (Float readFromString: prefixSuffix first).
 	self suffix: prefixSuffix second.
 ]

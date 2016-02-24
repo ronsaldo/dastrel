@@ -1,29 +1,29 @@
 Class {
-	#name : #DASLInterface,
+	#name : #DASLFunction,
 	#superclass : #DASLModule,
 	#instVars : [
-		'interfaceList',
+		'prototype',
 		'body'
 	],
 	#category : #'Dastrel-Core'
 }
 
 { #category : #accessing }
-DASLInterface >> body [
+DASLFunction >> body [
 	^ body
 ]
 
 { #category : #accessing }
-DASLInterface >> body: anObject [
+DASLFunction >> body: anObject [
 	body := anObject
 ]
 
 { #category : #accessing }
-DASLInterface >> interfaceList [
-	^ interfaceList
+DASLFunction >> prototype [
+	^ prototype
 ]
 
 { #category : #accessing }
-DASLInterface >> interfaceList: anObject [
-	interfaceList := anObject ifNil: [ #() ].
+DASLFunction >> prototype: anObject [
+	prototype := anObject
 ]

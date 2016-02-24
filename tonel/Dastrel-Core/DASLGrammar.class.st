@@ -46,7 +46,37 @@ Class {
 		'semantic',
 		'semanticBody',
 		'uniformBody',
-		'varFlowLocation'
+		'varFlowLocation',
+		'kwCodeBlock',
+		'codeBody',
+		'usingStatement',
+		'discardStatement',
+		'kwUsing',
+		'kwDiscard',
+		'codeBlock',
+		'keywordEnd',
+		'codeStatement',
+		'binaryExpression',
+		'unaryExpression',
+		'literalExpression',
+		'parentExpression',
+		'expression',
+		'expressionStatement',
+		'asignmentExpression',
+		'assignmentOperator',
+		'conditionalExpression',
+		'questionMark',
+		'colon',
+		'kwSizeOf',
+		'kwAlignOf',
+		'memberExpression',
+		'termExpression',
+		'dot',
+		'nullaryExpression',
+		'accessExpression',
+		'subscriptExpression',
+		'leftBracket',
+		'rightBracket'
 	],
 	#classVars : [
 		'Keywords'
@@ -67,7 +97,84 @@ DASLGrammar class >> initialize [
 		interface semantic implements
 		void char short int long float double
 		sizeof alignof
+		code_block graph_block
+		using discard return
 	).
+]
+
+{ #category : #grammar }
+DASLGrammar >> accessExpression [
+	^ memberExpression / subscriptExpression
+]
+
+{ #category : #grammar }
+DASLGrammar >> asignmentExpression [
+	^ conditionalExpression , (assignmentOperator , asignmentExpression) optional
+]
+
+{ #category : #tokens }
+DASLGrammar >> assignmentOperator [
+	^ (($+ asParser / $- asParser /
+		$* asParser / $/ asParser / $% asParser /
+		'<<' asParser / '>>' asParser /
+		$& asParser / $^ asParser / $| asParser) optional, $= asParser) token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> binaryExpression [
+	| binExpr binOpDo prefixOpDo postfixOpDo |
+	binExpr := PPExpressionParser new.
+	binExpr term: unaryExpression.
+	binOpDo := [ :left :operation :right | self operate: left with: right do: operation. ].
+	prefixOpDo := [ :operation :operand | self prefix: operation operate: operand ].
+	postfixOpDo := [ :operand :operation | self postfix: operation operate: operand ].
+	
+	binExpr
+		group: [ :g |
+			g postfix: ('++' asParser token trim: ignorable) do: postfixOpDo.
+			g postfix: ('--' asParser token trim: ignorable) do: postfixOpDo.
+			];
+		group: [ :g |
+			g prefix: ('++' asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ('--' asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($+ asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($- asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($! asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($~ asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($* asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: ($& asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: kwSizeOf do: prefixOpDo.
+			g prefix: kwAlignOf do: prefixOpDo.
+			];
+		group: [ :g |
+			g left: ($* asParser token trim: ignorable) do: binOpDo. 
+			g left: ($/ asParser token trim: ignorable) do: binOpDo. 
+			g left: ($% asParser token trim: ignorable) do: binOpDo.];
+		group: [ :g |
+			g left: ($+ asParser token trim: ignorable) do: binOpDo.
+			g left: ($- asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ('<<' asParser token trim: ignorable) do: binOpDo.
+			g left: ('>>' asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ($< asParser token trim: ignorable) do: binOpDo.
+			g left: ($> asParser token trim: ignorable) do: binOpDo.
+			g left: ('<=' asParser token trim: ignorable) do: binOpDo.
+			g left: ('>=' asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ('==' asParser token trim: ignorable) do: binOpDo.
+			g left: ('!=' asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ($& asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ($^ asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ($| asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ('&&' asParser token trim: ignorable) do: binOpDo. ];
+		group: [ :g |
+			g left: ('||' asParser token trim: ignorable) do: binOpDo. ].
+	^ binExpr
 ]
 
 { #category : #grammar }
@@ -75,9 +182,54 @@ DASLGrammar >> blockVariable [
 	^ varFlowDirection optional , type , identifier , semicolon
 ]
 
+{ #category : #grammar }
+DASLGrammar >> codeBlock [
+	^ kwCodeBlock , identifier , interfaceImplementations optional, leftCBracket, codeBody , rightCBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> codeBody [
+	^ codeStatement star
+]
+
+{ #category : #grammar }
+DASLGrammar >> codeStatement [
+	^ usingStatement / discardStatement / expressionStatement
+]
+
+{ #category : #tokens }
+DASLGrammar >> colon [
+	^ $: asParser token trim: ignorable
+]
+
 { #category : #tokens }
 DASLGrammar >> comma [
 	^ $, asParser token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> conditionalExpression [
+	^ binaryExpression , (questionMark , binaryExpression , colon , binaryExpression ) optional
+]
+
+{ #category : #grammar }
+DASLGrammar >> discardStatement [
+	^ kwDiscard , semicolon
+]
+
+{ #category : #tokens }
+DASLGrammar >> dot [
+	^ $. asParser token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> expression [
+	^ asignmentExpression
+]
+
+{ #category : #grammar }
+DASLGrammar >> expressionStatement [
+	^ expression , semicolon
 ]
 
 { #category : #tokens }
@@ -102,7 +254,7 @@ DASLGrammar >> floatScientfic [
 
 { #category : #grammar }
 DASLGrammar >> globalBlocks [
-	^ interface / uniform / semantic
+	^ interface / uniform / semantic / codeBlock
 ]
 
 { #category : #tokens }
@@ -140,69 +292,109 @@ DASLGrammar >> interfaceImplementations [
 	^ kwImplements , identifier , (comma , identifier) star
 ]
 
+{ #category : #tokens }
+DASLGrammar >> keywordEnd [
+	^ (identStart / #digit asParser ) not
+]
+
+{ #category : #keywords }
+DASLGrammar >> keywordParser: aKeyword [
+	^ (aKeyword asParser , keywordEnd) token trim: ignorable
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwAlignOf [
+	^ self keywordParser: 'alignof'
+]
+
 { #category : #keywords }
 DASLGrammar >> kwChar [
-	^ 'char' asParser token trim: ignorable
+	^ self keywordParser: 'char'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwCodeBlock [
+	^ self keywordParser: 'code_block'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwDiscard [
+	^ self keywordParser: 'discard'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwDouble [
-	^ 'double' asParser token trim: ignorable
+	^ self keywordParser: 'double'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwFloat [
-	^ 'float' asParser token trim: ignorable
+	^ self keywordParser: 'float'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwGraphBlock [
+	^ self keywordParser: 'graph_block'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwImplements [
-	^ 'implements' asParser token trim: ignorable
+	^ self keywordParser: 'implements'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwIn [
-	^ 'in' asParser token trim: ignorable
+	^ self keywordParser: 'in'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwInt [
-	^ 'int' asParser token trim: ignorable
+	^ self keywordParser: 'int'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwInterface [
-	^ 'interface' asParser token trim: ignorable
+	^ self keywordParser: 'interface'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwLong [
-	^ 'long' asParser token trim: ignorable
+	^ self keywordParser: 'long'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwOut [
-	^ 'out' asParser token trim: ignorable
+	^ self keywordParser: 'out'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwSemantic [
-	^ 'semantic' asParser token trim: ignorable
+	^ self keywordParser: 'semantic'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwShort [
-	^ 'short' asParser token trim: ignorable
+	^ self keywordParser: 'short'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwSizeOf [
+	^ self keywordParser: 'sizeof'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwUniform [
-	^ 'uniform' asParser token trim: ignorable
+	^ self keywordParser: 'uniform'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwUsing [
+	^ self keywordParser: 'using'
 ]
 
 { #category : #keywords }
 DASLGrammar >> kwVoid [
-	^ 'void' asParser token trim: ignorable
+	^ self keywordParser: 'void'
 ]
 
 { #category : #tokens }
@@ -220,6 +412,16 @@ DASLGrammar >> leftParent [
 	^ $( asParser token trim: ignorable
 ]
 
+{ #category : #grammar }
+DASLGrammar >> literalExpression [
+	^ number
+]
+
+{ #category : #grammar }
+DASLGrammar >> memberExpression [
+	^ dot , identifier
+]
+
 { #category : #ignorables }
 DASLGrammar >> multiLineComment [
 	^ '/*' asParser , '*/' asParser negate star , '*/' asParser
@@ -228,6 +430,11 @@ DASLGrammar >> multiLineComment [
 { #category : #ignorables }
 DASLGrammar >> newline [
 	^ String crlf asParser / String cr asParser / String lf asParser
+]
+
+{ #category : #grammar }
+DASLGrammar >> nullaryExpression [
+	^ identifier / literalExpression / parentExpression 
 ]
 
 { #category : #grammar }
@@ -241,8 +448,33 @@ DASLGrammar >> numberSign [
 ]
 
 { #category : #grammar }
+DASLGrammar >> operate: left with: right do: operation [
+	^ { operation . left . right }
+]
+
+{ #category : #grammar }
+DASLGrammar >> parentExpression [
+	^ leftParent , expression , rightParent 
+]
+
+{ #category : #grammar }
+DASLGrammar >> postfix: operation operate: operand [
+	^ { operation . operand }
+]
+
+{ #category : #grammar }
+DASLGrammar >> prefix: operation operate: operand [
+	^ { operation . operand }
+]
+
+{ #category : #grammar }
 DASLGrammar >> primitiveType [
 	^ kwVoid / kwChar / kwShort / kwInt / kwLong / kwFloat / kwDouble
+]
+
+{ #category : #tokens }
+DASLGrammar >> questionMark [
+	^ $? asParser token trim: ignorable
 ]
 
 { #category : #tokens }
@@ -286,8 +518,23 @@ DASLGrammar >> start [
 ]
 
 { #category : #grammar }
+DASLGrammar >> subscriptExpression [
+	^ leftBracket , expression , rightBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> termExpression [
+	^ nullaryExpression , accessExpression star
+]
+
+{ #category : #grammar }
 DASLGrammar >> type [
 	^ primitiveType / identifier
+]
+
+{ #category : #grammar }
+DASLGrammar >> unaryExpression [
+	^ termExpression
 ]
 
 { #category : #grammar }
@@ -298,6 +545,11 @@ DASLGrammar >> uniform [
 { #category : #grammar }
 DASLGrammar >> uniformBody [
 	^ blockVariable star
+]
+
+{ #category : #grammar }
+DASLGrammar >> usingStatement [
+	^ kwUsing , identifier , semicolon
 ]
 
 { #category : #grammar }

@@ -2,6 +2,7 @@ Class {
 	#name : #DASLModule,
 	#superclass : #DASLAstNode,
 	#instVars : [
+		'name',
 		'inputs',
 		'outputs'
 	],
@@ -16,6 +17,16 @@ DASLModule >> inputs [
 { #category : #accessing }
 DASLModule >> inputs: anObject [
 	inputs := anObject
+]
+
+{ #category : #accessing }
+DASLModule >> name [
+	^ name
+]
+
+{ #category : #accessing }
+DASLModule >> name: anObject [
+	name := anObject
 ]
 
 { #category : #accessing }

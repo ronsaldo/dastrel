@@ -7,7 +7,7 @@ Class {
 	#category : #'Dastrel-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 DASLAstNode >> initialize [
 	super initialize.
 	position := DASLCodePosition  default.
@@ -21,4 +21,9 @@ DASLAstNode >> position [
 { #category : #accessing }
 DASLAstNode >> position: anObject [
 	position := anObject
+]
+
+{ #category : #accessing }
+DASLAstNode >> setPositionFromToken: aPPToken [
+	self position: (DASLCodePosition fromToken: aPPToken)
 ]

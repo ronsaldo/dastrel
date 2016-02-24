@@ -9,6 +9,16 @@ Class {
 	#category : #'Dastrel-Core'
 }
 
+{ #category : #default }
+DASLCodePosition class >> default [
+	^ self new fileName: 'unknown'; line: 1; column: 1; yourself
+]
+
+{ #category : #'instance creation' }
+DASLCodePosition class >> fromToken: aPPToken [
+	^ self new line: aPPToken line; column: aPPToken column; yourself
+]
+
 { #category : #accessing }
 DASLCodePosition >> column [
 	^ column

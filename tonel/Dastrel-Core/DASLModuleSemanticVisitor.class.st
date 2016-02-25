@@ -42,8 +42,9 @@ DASLModuleSemanticVisitor >> visitSemanticBlock: semanticBlock [
 
 { #category : #visitor }
 DASLModuleSemanticVisitor >> visitTranslationUnit: translationUnit [
-	| packageScope |
-	packageScope := DASLPackageScope new node: translationUnit.
+	| builtInScope packageScope |
+	builtInScope := DASLBuiltInScope new.
+	packageScope := DASLPackageScope new parentScope: builtInScope; node: translationUnit.
 	translationUnit package: packageScope.
 	self withScope: packageScope do: [
 		translationUnit modules do: [ :module | module accept: self ]

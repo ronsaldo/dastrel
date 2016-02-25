@@ -11,7 +11,7 @@ DASLAstVisitor class >> passOn: ast [
 
 { #category : #'error messages' }
 DASLAstVisitor >> error: errorMessage at: position [
-	self error: position printString , ': ' , errorMessage
+	self error: position position printString , ': ' , errorMessage
 ]
 
 { #category : #compilation }

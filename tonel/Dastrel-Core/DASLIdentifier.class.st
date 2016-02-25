@@ -34,6 +34,11 @@ DASLIdentifier >> printOn: aStream [
 ]
 
 { #category : #accessing }
+DASLIdentifier >> type [
+	^ binding type
+]
+
+{ #category : #accessing }
 DASLIdentifier >> value [
 	^ value
 ]

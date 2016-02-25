@@ -25,7 +25,25 @@ DASLBlockSemanticVisitor >> visitFieldDefinition: fieldDefinition [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitFunction: function [
+	function prototype accept: self.
+	
+]
 
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitFunctionArgument: argument [
+	self resolveTypeOf: argument.
+	
+	currentScope at: argument name put: argument ifPresent: [
+		self error: 'argument overrides a previously defined symbol' at: argument
+	].
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitFunctionPrototype: functionPrototype [
+	functionPrototype scope: (DASLModuleScope new parentScope: currentScope; node: functionPrototype).
+	self withScope: functionPrototype scope do: [ 
+		functionPrototype arguments do: [ :arg | arg accept: self ]
+	]
 ]
 
 { #category : #visitor }

@@ -18,6 +18,11 @@ DASLAstNode >> initialize [
 	position := DASLCodePosition  default.
 ]
 
+{ #category : #testing }
+DASLAstNode >> isType [
+	^ false
+]
+
 { #category : #accessing }
 DASLAstNode >> position [
 	^ position

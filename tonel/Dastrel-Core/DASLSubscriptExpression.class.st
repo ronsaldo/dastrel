@@ -5,8 +5,13 @@ Class {
 		'reference',
 		'index'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLSubscriptExpression >> accept: aVisitor [
+	^ aVisitor visitSubscriptExpression: self
+]
 
 { #category : #accessing }
 DASLSubscriptExpression >> index [

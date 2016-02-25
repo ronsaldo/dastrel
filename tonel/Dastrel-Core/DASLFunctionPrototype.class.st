@@ -5,8 +5,13 @@ Class {
 		'arguments',
 		'returnType'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLFunctionPrototype >> accept: aVisitor [
+	^ aVisitor visitFunctionPrototype: self
+]
 
 { #category : #accessing }
 DASLFunctionPrototype >> arguments [

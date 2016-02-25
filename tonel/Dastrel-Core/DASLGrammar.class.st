@@ -87,7 +87,7 @@ Class {
 	#classVars : [
 		'Keywords'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-Parser'
 }
 
 { #category : #'class initialization' }

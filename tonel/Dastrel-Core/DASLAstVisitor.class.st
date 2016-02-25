@@ -1,7 +1,7 @@
 Class {
 	#name : #DASLAstVisitor,
 	#superclass : #Object,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #visitor }
@@ -91,11 +91,6 @@ DASLAstVisitor >> visitInteger: integer [
 
 { #category : #visitor }
 DASLAstVisitor >> visitInterface: interface [
-	self subclassResponsibility
-]
-
-{ #category : #visitor }
-DASLAstVisitor >> visitLocalDeclStatement: localDeclStatement [
 	self subclassResponsibility
 ]
 

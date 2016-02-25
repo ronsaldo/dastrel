@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'position'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #visitor }

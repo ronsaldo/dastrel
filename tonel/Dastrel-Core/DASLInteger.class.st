@@ -1,8 +1,13 @@
 Class {
 	#name : #DASLInteger,
 	#superclass : #DASLLiteral,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLInteger >> accept: aVisitor [
+	^ aVisitor visitInteger: self
+]
 
 { #category : #parsing }
 DASLInteger >> parse: aValue [

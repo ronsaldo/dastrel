@@ -7,8 +7,13 @@ Class {
 		'type',
 		'initialValue'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLLocalDeclStatement >> accept: aVisitor [
+	^ aVisitor visitLocalDeclaration: self
+]
 
 { #category : #accessing }
 DASLLocalDeclStatement >> flow [

@@ -5,8 +5,13 @@ Class {
 		'prototype',
 		'body'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLFunction >> accept: aVisitor [
+	^ aVisitor visitFunction: self
+]
 
 { #category : #accessing }
 DASLFunction >> body [

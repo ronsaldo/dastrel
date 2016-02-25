@@ -1,5 +1,5 @@
 Class {
 	#name : #DASLStatement,
 	#superclass : #DASLAstNode,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }

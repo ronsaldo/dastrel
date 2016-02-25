@@ -5,7 +5,7 @@ Class {
 		'value',
 		'suffix'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #accessing }
@@ -18,7 +18,7 @@ DASLLiteral >> parse: aString [
 	self subclassResponsibility
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLLiteral >> printOn: aStream [
 	value printOn: aStream
 ]

@@ -1,5 +1,5 @@
 Class {
 	#name : #DASLExpression,
 	#superclass : #DASLAstNode,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #'instance creation' }
@@ -12,7 +12,12 @@ DASLIdentifier class >> token: aPPToken [
 	^ self new setPositionFromToken: aPPToken; value: aPPToken inputValue asSymbol; yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
+DASLIdentifier >> accept: aVisitor [
+	^ aVisitor visitIdentifier: self
+]
+
+{ #category : #printing }
 DASLIdentifier >> printOn: aStream [
 	value printOn: aStream
 ]

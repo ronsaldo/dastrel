@@ -5,8 +5,13 @@ Class {
 		'interfaceList',
 		'body'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLCodeBlock >> accept: aVisitor [
+	^ aVisitor visitCodeBlock: self
+]
 
 { #category : #accessing }
 DASLCodeBlock >> body [

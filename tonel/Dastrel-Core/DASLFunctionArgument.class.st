@@ -5,8 +5,13 @@ Class {
 		'name',
 		'type'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLFunctionArgument >> accept: aVisitor [
+	^ aVisitor visitFunctionArgument: self
+]
 
 { #category : #accessing }
 DASLFunctionArgument >> name [

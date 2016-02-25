@@ -5,8 +5,13 @@ Class {
 		'reference',
 		'arguments'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLCallExpression >> accept: aVisitor [
+	^ aVisitor visitCallExpression: self
+]
 
 { #category : #accessing }
 DASLCallExpression >> arguments [
@@ -18,7 +23,7 @@ DASLCallExpression >> arguments: anObject [
 	arguments := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLCallExpression >> printOn: aStream [
 	aStream nextPutAll: '(apply '.
 	reference printOn: aStream.

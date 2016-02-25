@@ -4,8 +4,13 @@ Class {
 	#instVars : [
 		'expression'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLExpressionStatement >> accept: aVisitor [
+	^ aVisitor visitExpressionStatement: self
+]
 
 { #category : #accessing }
 DASLExpressionStatement >> expression [

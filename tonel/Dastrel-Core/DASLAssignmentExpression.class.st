@@ -6,8 +6,13 @@ Class {
 		'reference',
 		'value'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLAssignmentExpression >> accept: aVisitor [
+	^ aVisitor visitAssignment: self
+]
 
 { #category : #accessing }
 DASLAssignmentExpression >> operation [

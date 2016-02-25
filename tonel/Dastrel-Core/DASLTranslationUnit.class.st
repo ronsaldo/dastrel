@@ -4,8 +4,13 @@ Class {
 	#instVars : [
 		'modules'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLTranslationUnit >> accept: aVisitor [
+	^ aVisitor visitTranslationUnit: self
+]
 
 { #category : #accessing }
 DASLTranslationUnit >> modules [
@@ -17,7 +22,7 @@ DASLTranslationUnit >> modules: anObject [
 	modules := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLTranslationUnit >> printOn: aStream [
 	modules do: [ :module | module printOn: aStream. aStream lf ]
 ]

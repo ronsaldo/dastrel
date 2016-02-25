@@ -6,8 +6,13 @@ Class {
 		'trueValue',
 		'falseValue'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLConditionalExpression >> accept: aVisitor [
+	^ aVisitor visitConditionalExpression: self
+]
 
 { #category : #accessing }
 DASLConditionalExpression >> condition [

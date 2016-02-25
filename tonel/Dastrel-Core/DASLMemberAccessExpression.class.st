@@ -5,8 +5,13 @@ Class {
 		'reference',
 		'memberName'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLMemberAccessExpression >> accept: aVisitor [
+	^ aVisitor visitMemberAccessExpression: self
+]
 
 { #category : #accessing }
 DASLMemberAccessExpression >> memberName [

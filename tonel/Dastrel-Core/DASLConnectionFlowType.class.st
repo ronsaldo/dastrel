@@ -5,8 +5,13 @@ Class {
 		'direction',
 		'location'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLConnectionFlowType >> accept: aVisitor [
+	^ aVisitor visitConnectionFlowType: self
+]
 
 { #category : #accessing }
 DASLConnectionFlowType >> direction [

@@ -4,8 +4,13 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLReturnStatement >> accept: aVisitor [
+	^ aVisitor visitReturnStatement: self
+]
 
 { #category : #printing }
 DASLReturnStatement >> printOn: aStream [

@@ -5,7 +5,7 @@ Class {
 		'interfaceList',
 		'body'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #accessing }

@@ -1,7 +1,7 @@
 Class {
 	#name : #DASLParser,
 	#superclass : #DASLGrammar,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-Parser'
 }
 
 { #category : #grammar }

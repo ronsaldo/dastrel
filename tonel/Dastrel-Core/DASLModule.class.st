@@ -6,7 +6,7 @@ Class {
 		'inputs',
 		'outputs'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #accessing }

@@ -6,7 +6,7 @@ Class {
 		'line',
 		'column'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #default }

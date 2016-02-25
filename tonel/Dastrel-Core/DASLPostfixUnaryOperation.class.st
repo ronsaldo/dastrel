@@ -1,8 +1,13 @@
 Class {
 	#name : #DASLPostfixUnaryOperation,
 	#superclass : #DASLUnaryOperation,
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLPostfixUnaryOperation >> accept: aVisitor [
+	^ aVisitor visitPostfixUnaryOperation: self
+]
 
 { #category : #printing }
 DASLPostfixUnaryOperation >> printOn: aStream [

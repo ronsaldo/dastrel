@@ -6,8 +6,13 @@ Class {
 		'type',
 		'name'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLFieldDefinition >> accept: aVisitor [
+	^ aVisitor visitFieldDefinition: self
+]
 
 { #category : #accessing }
 DASLFieldDefinition >> flow [

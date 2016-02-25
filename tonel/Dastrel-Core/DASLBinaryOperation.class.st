@@ -6,8 +6,13 @@ Class {
 		'left',
 		'right'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLBinaryOperation >> accept: aVisitor [
+	^ aVisitor visitBinaryOperation: self
+]
 
 { #category : #accessing }
 DASLBinaryOperation >> left [

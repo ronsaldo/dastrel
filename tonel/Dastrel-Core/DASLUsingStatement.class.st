@@ -4,8 +4,13 @@ Class {
 	#instVars : [
 		'identifier'
 	],
-	#category : #'Dastrel-Core'
+	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #visitor }
+DASLUsingStatement >> accept: aVisitor [
+	^ aVisitor visitUsingStatement: self
+]
 
 { #category : #accessing }
 DASLUsingStatement >> identifier [

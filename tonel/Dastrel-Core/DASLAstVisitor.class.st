@@ -4,6 +4,21 @@ Class {
 	#category : #'Dastrel-Core-AST'
 }
 
+{ #category : #compilation }
+DASLAstVisitor class >> passOn: ast [
+	^ self new passOn: ast
+]
+
+{ #category : #'error messages' }
+DASLAstVisitor >> error: errorMessage at: position [
+	self error: position printString , ': ' , errorMessage
+]
+
+{ #category : #compilation }
+DASLAstVisitor >> passOn: ast [
+	^ ast accept: self.
+]
+
 { #category : #visitor }
 DASLAstVisitor >> visitAssignment: assignment [
 	self subclassResponsibility

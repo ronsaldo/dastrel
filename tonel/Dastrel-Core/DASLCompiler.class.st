@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'sourceCode',
-		'ast'
+		'ast',
+		'parser'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -18,9 +19,28 @@ DASLCompiler >> ast: anObject [
 	ast := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'public access' }
+DASLCompiler >> compile [
+	self parse;
+		semanticAnalysis
+]
+
+{ #category : #initialization }
 DASLCompiler >> initialize [
+	super initialize.
 	
+	parser := DASLParser new.
+]
+
+{ #category : #parsing }
+DASLCompiler >> parse [
+	ast := parser parse: sourceCode.
+]
+
+{ #category : #'public access' }
+DASLCompiler >> semanticAnalysis [
+	DASLModuleSemanticVisitor passOn: ast.
+	DASLBlockSemanticVisitor passOn: ast.
 ]
 
 { #category : #accessing }

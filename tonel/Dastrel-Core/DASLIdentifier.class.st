@@ -2,7 +2,8 @@ Class {
 	#name : #DASLIdentifier,
 	#superclass : #DASLExpression,
 	#instVars : [
-		'value'
+		'value',
+		'binding'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -15,6 +16,16 @@ DASLIdentifier class >> token: aPPToken [
 { #category : #visitor }
 DASLIdentifier >> accept: aVisitor [
 	^ aVisitor visitIdentifier: self
+]
+
+{ #category : #accessing }
+DASLIdentifier >> binding [
+	^ binding
+]
+
+{ #category : #accessing }
+DASLIdentifier >> binding: anObject [
+	binding := anObject
 ]
 
 { #category : #printing }

@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'name',
 		'inputs',
-		'outputs'
+		'outputs',
+		'scope'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -37,4 +38,14 @@ DASLModule >> outputs [
 { #category : #accessing }
 DASLModule >> outputs: anObject [
 	outputs := anObject
+]
+
+{ #category : #accessing }
+DASLModule >> scope [
+	^ scope
+]
+
+{ #category : #accessing }
+DASLModule >> scope: anObject [
+	scope := anObject
 ]

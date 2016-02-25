@@ -48,3 +48,8 @@ DASLCodePosition >> line [
 DASLCodePosition >> line: anObject [
 	line := anObject
 ]
+
+{ #category : #accessing }
+DASLCodePosition >> position [
+	^ self
+]

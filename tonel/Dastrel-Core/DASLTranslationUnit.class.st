@@ -2,7 +2,8 @@ Class {
 	#name : #DASLTranslationUnit,
 	#superclass : #DASLAstNode,
 	#instVars : [
-		'modules'
+		'modules',
+		'package'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -20,6 +21,16 @@ DASLTranslationUnit >> modules [
 { #category : #accessing }
 DASLTranslationUnit >> modules: anObject [
 	modules := anObject
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> package [
+	^ package
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> package: anObject [
+	package := anObject
 ]
 
 { #category : #printing }

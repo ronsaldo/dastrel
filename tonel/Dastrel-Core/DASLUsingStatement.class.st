@@ -2,6 +2,7 @@ Class {
 	#name : #DASLUsingStatement,
 	#superclass : #DASLStatement,
 	#instVars : [
+		'expression',
 		'identifier'
 	],
 	#category : #'Dastrel-Core-AST'
@@ -10,6 +11,16 @@ Class {
 { #category : #visitor }
 DASLUsingStatement >> accept: aVisitor [
 	^ aVisitor visitUsingStatement: self
+]
+
+{ #category : #accessing }
+DASLUsingStatement >> expression [
+	^ expression
+]
+
+{ #category : #accessing }
+DASLUsingStatement >> expression: anObject [
+	expression := anObject
 ]
 
 { #category : #accessing }

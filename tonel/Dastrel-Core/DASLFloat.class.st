@@ -15,4 +15,6 @@ DASLFloat >> parse: aValue [
 	prefixSuffix := self splitLetterSuffix: aValue.
 	self value: (Float readFromString: prefixSuffix first).
 	self suffix: prefixSuffix second.
+	type := self findTypeForSuffix: self suffix defaultType: DASLType doubleType.
+	type isFloatType ifFalse: [ self error: 'expected a suffix for a float type.' at: self ].
 ]

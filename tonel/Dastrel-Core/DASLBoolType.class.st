@@ -1,10 +1,10 @@
 Class {
-	#name : #DASLBooleanType,
+	#name : #DASLBoolType,
 	#superclass : #DASLPrimitiveType,
 	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #testing }
-DASLBooleanType >> isBooleanType [
+DASLBoolType >> isBooleanType [
 	^ true
 ]

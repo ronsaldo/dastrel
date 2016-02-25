@@ -1,10 +1,10 @@
 Class {
-	#name : #DASLVoidType,
+	#name : #DASLAutoType,
 	#superclass : #DASLOpaqueType,
 	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #testing }
-DASLVoidType >> isVoidType [
+DASLAutoType >> isAutoType [
 	^ true
 ]

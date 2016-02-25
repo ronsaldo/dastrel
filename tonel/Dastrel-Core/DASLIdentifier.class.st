@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #'instance creation' }
-DASLIdentifier class >> token: aPPToken [
-	^ self new setPositionFromToken: aPPToken; value: aPPToken inputValue asSymbol; yourself
+DASLIdentifier class >> position: aPosition token: aString [
+	^ self new position: aPosition; value: aString asSymbol; yourself
 ]
 
 { #category : #visitor }

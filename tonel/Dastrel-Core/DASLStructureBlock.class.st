@@ -27,3 +27,8 @@ DASLStructureBlock >> interfaceList [
 DASLStructureBlock >> interfaceList: anObject [
 	interfaceList := anObject ifNil: [ #() ].
 ]
+
+{ #category : #accessing }
+DASLStructureBlock >> type [
+	^ DASLBlockType new block: self.
+]

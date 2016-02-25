@@ -1,6 +1,6 @@
 Class {
 	#name : #DASLAstNode,
-	#superclass : #Object,
+	#superclass : #DASLObject,
 	#instVars : [
 		'position'
 	],
@@ -44,9 +44,4 @@ DASLAstNode >> printList: aList on: aStream [
 		first := false.
 	].
 	aStream nextPut: $).
-]
-
-{ #category : #accessing }
-DASLAstNode >> setPositionFromToken: aPPToken [
-	self position: (DASLCodePosition fromToken: aPPToken)
 ]

@@ -15,4 +15,6 @@ DASLInteger >> parse: aValue [
 	prefixSuffix := self splitLetterSuffix: aValue.
 	self value: prefixSuffix first asInteger.
 	self suffix: prefixSuffix second.
+	type := self findTypeForSuffix: self suffix defaultType: DASLType intType.
+	type isIntegerType ifFalse: [ self error: 'expected a suffix for an integer type.' at: self ].
 ]

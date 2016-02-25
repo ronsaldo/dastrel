@@ -8,3 +8,8 @@ Class {
 DASLGraphBlock >> accept: aVisitor [
 	^ aVisitor visitGraphBlock: self
 ]
+
+{ #category : #accessing }
+DASLGraphBlock >> type [
+	^ DASLBlockType new block: self.
+]

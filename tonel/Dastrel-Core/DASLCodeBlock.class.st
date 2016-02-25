@@ -43,3 +43,8 @@ DASLCodeBlock >> printOn: aStream [
 	self printList: body on: aStream.
 	aStream nextPut: $).
 ]
+
+{ #category : #accessing }
+DASLCodeBlock >> type [
+	^ DASLBlockType new block: self.
+]

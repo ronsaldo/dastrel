@@ -25,6 +25,11 @@ DASLCompiler >> compile [
 		semanticAnalysis
 ]
 
+{ #category : #accessing }
+DASLCompiler >> fileName: fileName [
+	parser fileName: fileName
+]
+
 { #category : #initialization }
 DASLCompiler >> initialize [
 	super initialize.
@@ -51,4 +56,10 @@ DASLCompiler >> sourceCode [
 { #category : #accessing }
 DASLCompiler >> sourceCode: anObject [
 	sourceCode := anObject
+]
+
+{ #category : #accessing }
+DASLCompiler >> sourceFromFileNamed: aFileName [
+	self fileName: aFileName;
+		sourceCode: aFileName asFileReference contents
 ]

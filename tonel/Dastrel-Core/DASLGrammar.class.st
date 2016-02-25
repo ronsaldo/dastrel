@@ -82,7 +82,9 @@ Class {
 		'localVariable',
 		'functionArgumentsDecl',
 		'kwReturn',
-		'varInitialValue'
+		'varInitialValue',
+		'usingAliasStatement',
+		'usingExpressionStatement'
 	],
 	#classVars : [
 		'Keywords'
@@ -578,8 +580,18 @@ DASLGrammar >> uniformBody [
 ]
 
 { #category : #grammar }
+DASLGrammar >> usingAliasStatement [
+	^ kwUsing , identifier , assignmentOperator , expression , semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> usingExpressionStatement [
+	^ kwUsing , expression , semicolon
+]
+
+{ #category : #grammar }
 DASLGrammar >> usingStatement [
-	^ kwUsing , identifier , semicolon
+	^ usingAliasStatement / usingExpressionStatement
 ]
 
 { #category : #grammar }

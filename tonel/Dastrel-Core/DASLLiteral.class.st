@@ -3,14 +3,38 @@ Class {
 	#superclass : #DASLExpression,
 	#instVars : [
 		'value',
-		'suffix'
+		'suffix',
+		'type'
+	],
+	#classVars : [
+		'LiteralSuffixTable'
 	],
 	#category : #'Dastrel-Core-AST'
 }
 
-{ #category : #accessing }
-DASLLiteral class >> token: aPPToken [
-	^ self new setPositionFromToken: aPPToken; parse: aPPToken inputValue; yourself
+{ #category : #'class initialization' }
+DASLLiteral class >> initialize [
+	"
+	self initialize
+	"
+	LiteralSuffixTable := Dictionary newFromPairs: #(
+		s short
+		f float
+		l long
+	).
+]
+
+{ #category : #parsing }
+DASLLiteral class >> position: aPosition token: aString [
+	^ self new position: aPosition; parse: aString; yourself
+]
+
+{ #category : #parsing }
+DASLLiteral >> findTypeForSuffix: aSuffix defaultType: defaultType [
+	| typeName |
+	aSuffix ifEmpty: [ ^ defaultType ].
+	typeName := LiteralSuffixTable at: aSuffix ifAbsent: [ self error: 'invalid literal suffix.' at: self ].
+	^ DASLType builtInTypes at: typeName
 ]
 
 { #category : #parsing }
@@ -44,6 +68,11 @@ DASLLiteral >> suffix [
 { #category : #accessing }
 DASLLiteral >> suffix: anObject [
 	suffix := anObject
+]
+
+{ #category : #accessing }
+DASLLiteral >> type [
+	^ type
 ]
 
 { #category : #accessing }

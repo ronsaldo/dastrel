@@ -1,14 +1,22 @@
 Class {
 	#name : #DASLParser,
 	#superclass : #DASLGrammar,
+	#instVars : [
+		'fileName'
+	],
 	#category : #'Dastrel-Core-Parser'
 }
+
+{ #category : #accessing }
+DASLParser class >> ignoredNames [
+	^ super ignoredNames , DASLParser instVarNames
+]
 
 { #category : #grammar }
 DASLParser >> asignmentExpression [
 	^ super asignmentExpression ==> [ :expr | expr second ifNil: [ expr first ] ifNotNil: [ 
 				DASLAssignmentExpression new
-					setPositionFromToken: expr second first;
+					position: (self positionFromToken: expr second first);
 					operation: expr second first inputValue asSymbol;
 					reference: expr first;
 					value: expr second second;
@@ -35,7 +43,7 @@ DASLParser >> callArguments [
 { #category : #grammar }
 DASLParser >> callExpression [
 	^ super callExpression ==> [ :expr | DASLCallExpression new
-			setPositionFromToken: expr first;
+			position: (self positionFromToken: expr first);
 			arguments: expr second;
 			yourself ]
 ]
@@ -43,7 +51,7 @@ DASLParser >> callExpression [
 { #category : #grammar }
 DASLParser >> codeBlock [
 	^ super codeBlock ==> [ :block | DASLCodeBlock new
-			setPositionFromToken: block first;
+			position: (self positionFromToken: block first);
 			name: block second value;
 			interfaceList: block third;
 			body: block fifth;
@@ -54,7 +62,7 @@ DASLParser >> codeBlock [
 DASLParser >> conditionalExpression [
 	^ super conditionalExpression ==> [ :expr | expr second ifNil: [ expr first ] ifNotNil: [ 
 				DASLConditionalExpression new
-				setPositionFromToken: expr second first;
+				position: (self positionFromToken: expr second first);
 				condition: expr first;
 				trueValue: expr second second;
 				falseValue: expr second fourth;
@@ -65,7 +73,7 @@ DASLParser >> conditionalExpression [
 { #category : #grammar }
 DASLParser >> discardStatement [
 	^ super discardStatement ==> [ :tokens | DASLDiscardStatement new
-			setPositionFromToken: tokens first;
+			position: (self positionFromToken: tokens first);
 			yourself ]
 ]
 
@@ -77,9 +85,19 @@ DASLParser >> expressionStatement [
 			yourself]
 ]
 
+{ #category : #accessing }
+DASLParser >> fileName [
+	^ fileName
+]
+
+{ #category : #accessing }
+DASLParser >> fileName: anObject [
+	fileName := anObject
+]
+
 { #category : #tokens }
 DASLParser >> float [
-	^ super float ==> [ :token | DASLFloat token: token ]
+	^ super float ==> [ :token | DASLFloat position: (self positionFromToken: token) token: token inputValue ]
 ]
 
 { #category : #grammar }
@@ -109,7 +127,7 @@ DASLParser >> functionArgumentsDecl [
 { #category : #grammar }
 DASLParser >> functionPrototype [
 	^ super functionPrototype ==> [ :tokens | DASLFunctionPrototype new
-			setPositionFromToken: tokens first;
+			position: (self positionFromToken: tokens first);
 			name: tokens second value;
 			arguments: tokens fourth;
 			returnType: tokens seventh;
@@ -123,18 +141,24 @@ DASLParser >> functionReturnTypes [
 
 { #category : #tokens }
 DASLParser >> identifier [
-	^ super identifier ==> [ :token | DASLIdentifier token: token ]
+	^ super identifier ==> [ :token | DASLIdentifier position: (self positionFromToken: token) token: token inputValue ]
+]
+
+{ #category : #initialization }
+DASLParser >> initialize [
+	super initialize.
+	fileName := 'unknown'.
 ]
 
 { #category : #tokens }
 DASLParser >> integer [
-	^ super integer ==> [ :token | DASLInteger token: token ]
+	^ super integer ==> [ :token | DASLInteger position: (self positionFromToken: token) token: token inputValue ]
 ]
 
 { #category : #grammar }
 DASLParser >> interface [
 	^ super interface ==> [ :iface | DASLInterface new
-			setPositionFromToken: iface first;
+			position: (self positionFromToken: iface first);
 			name: iface second value;
 			interfaceList: iface third;
 			body: iface fifth;
@@ -160,7 +184,7 @@ DASLParser >> localVariable [
 { #category : #grammar }
 DASLParser >> memberExpression [
 	^ super memberExpression ==> [ :expr | DASLMemberAccessExpression new
-			setPositionFromToken: expr first;
+			position: (self positionFromToken: expr first);
 			memberName: expr second value;
 			yourself ]
 ]
@@ -168,7 +192,7 @@ DASLParser >> memberExpression [
 { #category : #grammar }
 DASLParser >> operate: left with: right do: operation [
 	^ DASLBinaryOperation new
-		setPositionFromToken: operation;
+		position: (self positionFromToken: operation);
 		operation: operation inputValue asSymbol;
 		left: left;
 		right: right;
@@ -176,10 +200,15 @@ DASLParser >> operate: left with: right do: operation [
 		
 ]
 
+{ #category : #utility }
+DASLParser >> positionFromToken: aPPToken [
+	^ (DASLCodePosition fromToken: aPPToken) fileName: fileName; yourself
+]
+
 { #category : #grammar }
 DASLParser >> postfix: operation operate: operand [
 	^ DASLPostfixUnaryOperation new
-		setPositionFromToken: operation;
+		position: (self positionFromToken: operation);
 		operation: operation inputValue asSymbol;
 		operand: operand;
 		yourself
@@ -188,7 +217,7 @@ DASLParser >> postfix: operation operate: operand [
 { #category : #grammar }
 DASLParser >> prefix: operation operate: operand [
 	^ DASLPrefixUnaryOperation new
-		setPositionFromToken: operation;
+		position: (self positionFromToken: operation);
 		operation: operation inputValue asSymbol;
 		operand: operand;
 		yourself
@@ -197,7 +226,7 @@ DASLParser >> prefix: operation operate: operand [
 { #category : #grammar }
 DASLParser >> returnStatement [
 	^ super returnStatement ==> [ :tokens | DASLReturnStatement new
-			setPositionFromToken: tokens first;
+			position: (self positionFromToken: tokens first);
 			value: tokens second;
 			yourself ]
 ]
@@ -205,7 +234,7 @@ DASLParser >> returnStatement [
 { #category : #grammar }
 DASLParser >> semantic [
 	^ super semantic ==> [ :block | DASLSemanticBlock new
-			setPositionFromToken: block first;
+			position: (self positionFromToken: block first);
 			name: block second value;
 			interfaceList: block third;
 			body: block fifth;
@@ -220,7 +249,7 @@ DASLParser >> start [
 { #category : #grammar }
 DASLParser >> subscriptExpression [
 	^ super memberExpression ==> [ :expr | DASLSubscriptExpression new
-			setPositionFromToken: expr first;
+			position: (self positionFromToken: expr first);
 			index: expr second;
 			yourself ]
 ]
@@ -238,7 +267,7 @@ DASLParser >> termExpression [
 { #category : #grammar }
 DASLParser >> uniform [
 	^ super uniform ==> [ :block | DASLUniformBlock new
-			setPositionFromToken: block first;
+			position: (self positionFromToken: block first);
 			name: block second value;
 			interfaceList: block third;
 			body: block fifth;
@@ -246,17 +275,26 @@ DASLParser >> uniform [
 ]
 
 { #category : #grammar }
-DASLParser >> usingStatement [
-	^ super usingStatement ==> [ :tokens | DASLUsingStatement new
-			setPositionFromToken: tokens first;
+DASLParser >> usingAliasStatement [
+	^ super usingAliasStatement ==> [ :tokens | DASLUsingStatement new
+			position: (self positionFromToken: tokens first);
 			identifier: tokens second;
+			expression: tokens fourth;
+			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> usingExpressionStatement [
+	^ super usingExpressionStatement ==> [ :tokens | DASLUsingStatement new
+			position: (self positionFromToken: tokens first);
+			expression: tokens second;
 			yourself ]
 ]
 
 { #category : #grammar }
 DASLParser >> varFlowDirection [
 	^ super varFlowDirection ==> [ :flow | DASLConnectionFlowType new
-			setPositionFromToken: flow first;
+			position: (self positionFromToken: flow first);
 			direction: flow first inputValue asSymbol;
 			location: flow second;
 			yourself ]

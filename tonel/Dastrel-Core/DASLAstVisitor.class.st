@@ -1,17 +1,12 @@
 Class {
 	#name : #DASLAstVisitor,
-	#superclass : #Object,
+	#superclass : #DASLObject,
 	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #compilation }
 DASLAstVisitor class >> passOn: ast [
 	^ self new passOn: ast
-]
-
-{ #category : #'error messages' }
-DASLAstVisitor >> error: errorMessage at: position [
-	self error: position position printString , ': ' , errorMessage
 ]
 
 { #category : #compilation }

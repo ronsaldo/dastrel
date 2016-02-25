@@ -1,21 +1,38 @@
 Class {
 	#name : #DASLType,
-	#superclass : #DASLAstNode,
+	#superclass : #DASLObject,
 	#classVars : [
+		'BoolType',
 		'BuiltInTypes',
 		'CharType',
 		'DoubleType',
 		'FloatType',
 		'IntType',
 		'LongType',
-		'ShortType'
+		'ShortType',
+		'VoidType'
 	],
 	#category : #'Dastrel-Core-AST'
 }
 
 { #category : #'built in types' }
+DASLType class >> boolType [
+	^ BoolType
+]
+
+{ #category : #'built in types' }
 DASLType class >> builtInTypes [
 	^ BuiltInTypes
+]
+
+{ #category : #'built in types' }
+DASLType class >> doubleType [
+	^ DoubleType
+]
+
+{ #category : #'built in types' }
+DASLType class >> floatType [
+	^ FloatType
 ]
 
 { #category : #'class initialization' }
@@ -30,7 +47,15 @@ DASLType class >> initialize [
 ]
 
 { #category : #'built in types' }
+DASLType class >> intType [
+	^ IntType
+]
+
+{ #category : #'built in types' }
 DASLType class >> primitiveTypes [
+	VoidType := DASLVoidType new name: #bool.
+	BoolType := DASLBoolType name: #bool size: 1 alignment: 1.
+	
 	CharType := DASLIntegerType name: #char size: 1 alignment: 1.
 	ShortType := DASLIntegerType name: #short size: 2 alignment: 2.
 	IntType := DASLIntegerType name: #int size: 4 alignment: 4.
@@ -40,6 +65,9 @@ DASLType class >> primitiveTypes [
 	DoubleType := DASLFloatType name: #double size: 8 alignment: 8.
 	
 	^ {
+		VoidType.
+		BoolType.
+		
 		CharType.
 		ShortType.
 		IntType.
@@ -58,9 +86,24 @@ DASLType class >> vectorTypes [
 	}
 ]
 
+{ #category : #'built in types' }
+DASLType class >> voidType [
+	^ VoidType
+]
+
 { #category : #accessing }
 DASLType >> alignment [
 	self subclassResponsibility
+]
+
+{ #category : #testing }
+DASLType >> isAutoType [
+	^ false
+]
+
+{ #category : #accessing }
+DASLType >> isBlockType [
+	^ false
 ]
 
 { #category : #testing }
@@ -111,4 +154,9 @@ DASLType >> size [
 { #category : #accessing }
 DASLType >> type [
 	^ DASLTypeWrapper new wrapped: self
+]
+
+{ #category : #accessing }
+DASLType >> useScope [
+	^ nil
 ]

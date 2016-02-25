@@ -20,6 +20,8 @@ DASLBlockPublicSemanticVisitor >> visitCodeBlock: codeBlock [
 
 { #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitFieldDefinition: fieldDefinition [
+	self resolveTypeOf: fieldDefinition.
+
 	currentScope at: fieldDefinition name put: fieldDefinition ifPresent: [
 		self error: 'field overrides a previously defined symbol' at: fieldDefinition
 	].

@@ -2,6 +2,7 @@ Class {
 	#name : #DASLMatrixType,
 	#superclass : #DASLType,
 	#instVars : [
+		'name',
 		'baseType',
 		'rows',
 		'columns',
@@ -10,6 +11,22 @@ Class {
 	],
 	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #construction }
+DASLMatrixType class >> baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment [
+	^ self new
+		baseType: aBaseType;
+		rows: numRows;
+		columns: numColumns;
+		alignment: anAlignment;
+		size: (aBaseType size * numColumns alignedTo: anAlignment) * numRows;
+		yourself
+]
+
+{ #category : #construction }
+DASLMatrixType class >> name: aName baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment [
+	^ (self baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment) name: aName; yourself
+]
 
 { #category : #accessing }
 DASLMatrixType >> alignment [
@@ -39,6 +56,16 @@ DASLMatrixType >> columns [
 { #category : #accessing }
 DASLMatrixType >> columns: anObject [
 	columns := anObject
+]
+
+{ #category : #accessing }
+DASLMatrixType >> name [
+	^ name
+]
+
+{ #category : #accessing }
+DASLMatrixType >> name: anObject [
+	name := anObject
 ]
 
 { #category : #accessing }

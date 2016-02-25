@@ -49,12 +49,20 @@ DASLType class >> initialize [
 	super initialize.
 	
 	BuiltInTypes := IdentityDictionary new.
-	(self primitiveTypes , self vectorTypes)do: [ :type | BuiltInTypes at: type name put: type ]
+	(self primitiveTypes , self vectorTypes , self matrixTypes )do: [ :type | BuiltInTypes at: type name put: type ]
 ]
 
 { #category : #'built in types' }
 DASLType class >> intType [
 	^ IntType
+]
+
+{ #category : #'built in types' }
+DASLType class >> matrixTypes [
+	^ {
+		DASLMatrixType name: #float3x3 baseType: FloatType rows: 3 columns: 3 alignment: 16.
+		DASLMatrixType name: #float4x4 baseType: FloatType rows: 4 columns: 4 alignment: 16.
+	}
 ]
 
 { #category : #'built in types' }

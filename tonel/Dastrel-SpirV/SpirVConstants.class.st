@@ -309,6 +309,7 @@ Class {
 		'SpvLinkageTypeImport',
 		'SpvLoopControlDontUnroll',
 		'SpvLoopControlUnroll',
+		'SpvMagicNumber',
 		'SpvMemoryAccessAligned',
 		'SpvMemoryAccessNontemporal',
 		'SpvMemoryAccessVolatile',
@@ -361,6 +362,7 @@ Class {
 		'SpvOpBuildNDRange',
 		'SpvOpCapability',
 		'SpvOpCaptureEventProfilingInfo',
+		'SpvOpCodeMask',
 		'SpvOpCommitReadPipe',
 		'SpvOpCommitWritePipe',
 		'SpvOpCompositeConstruct',
@@ -619,6 +621,7 @@ Class {
 		'SpvOpVectorTimesMatrix',
 		'SpvOpVectorTimesScalar',
 		'SpvOpWritePipe',
+		'SpvRevision',
 		'SpvSamplerAddressingModeClamp',
 		'SpvSamplerAddressingModeClampToEdge',
 		'SpvSamplerAddressingModeNone',
@@ -649,7 +652,9 @@ Class {
 		'SpvStorageClassPushConstant',
 		'SpvStorageClassUniform',
 		'SpvStorageClassUniformConstant',
-		'SpvStorageClassWorkgroup'
+		'SpvStorageClassWorkgroup',
+		'SpvVersion',
+		'SpvWordCountShift'
 	],
 	#category : #'Dastrel-SpirV'
 }
@@ -1533,6 +1538,12 @@ SpirVConstants class >> initialize [
 	"
 	| enumData fullName |
 	super initialize.
+	
+	SpvMagicNumber := 16r07230203.
+	SpvVersion := 16r00010000.
+	SpvRevision := 3.
+	SpvOpCodeMask := 16rffff.
+	SpvWordCountShift := 16.
 	
 	self enumNames do: [ :enumName |
 		enumData := self perform: (#dataFor , enumName) asSymbol.

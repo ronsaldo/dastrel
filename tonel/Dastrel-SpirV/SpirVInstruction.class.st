@@ -18,6 +18,12 @@ SpirVInstruction >> emitOn: aWordStream [
 	aWordStream nextPutAll: operands.
 ]
 
+{ #category : #initialization }
+SpirVInstruction >> initialize [
+	super initialize.
+	operands := #()
+]
+
 { #category : #accessing }
 SpirVInstruction >> opcode [
 	^ opcode

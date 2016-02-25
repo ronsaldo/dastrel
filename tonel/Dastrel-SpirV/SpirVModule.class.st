@@ -11,9 +11,22 @@ Class {
 	#category : #'Dastrel-SpirV'
 }
 
+{ #category : #'as yet unclassified' }
+SpirVModule class >> build: aBlock [
+	^ self new build: aBlock
+]
+
 { #category : #building }
 SpirVModule >> addInstruction: anInstruction [
 	instructions add: anInstruction
+]
+
+{ #category : #building }
+SpirVModule >> build: aBlock [
+	| builder |
+	builder := SpirVModuleBuilder new module: self.
+	aBlock value: builder.
+	^ self
 ]
 
 { #category : #building }
@@ -35,6 +48,14 @@ SpirVModule >> initialize [
 	super initialize.
 	idBound := 0.
 	instructions := OrderedCollection new.
+]
+
+{ #category : #'id generation' }
+SpirVModule >> newId [
+	| result |
+	result := idBound.
+	idBound := result + 1.
+	^ result
 ]
 
 { #category : #building }

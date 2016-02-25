@@ -35,6 +35,11 @@ DASLLocalDeclStatement >> initialValue: anObject [
 	initialValue := anObject
 ]
 
+{ #category : #testing }
+DASLLocalDeclStatement >> isLocalDeclaration [
+	^ true
+]
+
 { #category : #accessing }
 DASLLocalDeclStatement >> name [
 	^ name

@@ -67,6 +67,13 @@ DASLSemanticVisitor >> visitFloat: floatLiteral [
 ]
 
 { #category : #visitor }
+DASLSemanticVisitor >> visitIdentifier: identifier [
+	identifier binding ifNotNil: [ ^self  ].
+	identifier binding: (currentScope lookSymbolRecursively: identifier value).
+	identifier binding ifNil: [ self error: 'failed to find symbol "' ,identifier value , '".' at: identifier ]
+]
+
+{ #category : #visitor }
 DASLSemanticVisitor >> visitInteger: integerLiteral [
 ]
 

@@ -19,6 +19,11 @@ DASLAstNode >> initialize [
 ]
 
 { #category : #testing }
+DASLAstNode >> isLocalDeclaration [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isType [
 	^ false
 ]

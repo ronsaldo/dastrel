@@ -36,6 +36,6 @@ DASLUsingStatement >> identifier: anObject [
 { #category : #printing }
 DASLUsingStatement >> printOn: aStream [
 	aStream nextPutAll: '(using '.
-	identifier printOn: aStream.
+	expression printOn: aStream.
 	aStream nextPut: $).
 ]

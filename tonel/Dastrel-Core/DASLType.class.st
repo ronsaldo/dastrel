@@ -2,6 +2,7 @@ Class {
 	#name : #DASLType,
 	#superclass : #DASLObject,
 	#classVars : [
+		'AutoType',
 		'BoolType',
 		'BuiltInTypes',
 		'CharType',
@@ -14,6 +15,11 @@ Class {
 	],
 	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #'built in types' }
+DASLType class >> autoType [
+	^ AutoType
+]
 
 { #category : #'built in types' }
 DASLType class >> boolType [
@@ -53,6 +59,8 @@ DASLType class >> intType [
 
 { #category : #'built in types' }
 DASLType class >> primitiveTypes [
+	AutoType := DASLAutoType new name: #auto.
+	
 	VoidType := DASLVoidType new name: #bool.
 	BoolType := DASLBoolType name: #bool size: 1 alignment: 1.
 	
@@ -65,6 +73,8 @@ DASLType class >> primitiveTypes [
 	DoubleType := DASLFloatType name: #double size: 8 alignment: 8.
 	
 	^ {
+		AutoType.
+		
 		VoidType.
 		BoolType.
 		

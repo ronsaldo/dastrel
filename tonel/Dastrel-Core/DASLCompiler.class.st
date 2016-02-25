@@ -45,6 +45,7 @@ DASLCompiler >> parse [
 { #category : #'public access' }
 DASLCompiler >> semanticAnalysis [
 	DASLModuleSemanticVisitor passOn: ast.
+	DASLBlockPublicSemanticVisitor passOn: ast.
 	DASLBlockSemanticVisitor passOn: ast.
 ]
 

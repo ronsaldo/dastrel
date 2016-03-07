@@ -47,7 +47,8 @@ DASLGLSLCodegenVisitor >> generateCodeBlock: codeBlock [
 		withIndentation: [
 			codeBlock body do: [ :statement | statement accept: self ]
 		];
-		printLine: '}'
+		printLine: '}';
+		newline
 ]
 
 { #category : #'code generation' }
@@ -67,7 +68,8 @@ DASLGLSLCodegenVisitor >> generateFunction: function [
 			function body do: [:statement | statement accept: self ].
 			currentFunction := nil.
 		];
-		printLine: '}'
+		printLine: '}';
+		newline
 ]
 
 { #category : #'code generation' }
@@ -83,6 +85,12 @@ DASLGLSLCodegenVisitor >> generateGraphBlock: uniformBlock [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateGraphBlockPrototype: uniformBlock [
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generatePrologue: translationUnit [
+	self printLine: '#version 410';
+		newline
 ]
 
 { #category : #'code generation' }
@@ -106,15 +114,16 @@ DASLGLSLCodegenVisitor >> generateSemanticVar: semanticVar prefix: prefix [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateUniformBlock: uniformBlock [
-	| prefix |
-	prefix := uniformBlock name , '.'.
+	| prefix instanceName |
+	instanceName := uniformBlock name , '_dastrel_singleton_'.
+	prefix := instanceName , '.'.
 	self
 		printLine: 'uniform ' , uniformBlock name;
 		printLine: '{';
 		withIndentation: [
 			uniformBlock body do: [ :var | self generateUniformVar: var prefix: prefix].
 		];
-		printLine: '} ' , uniformBlock name , ';';
+		printLine: '} ' , instanceName , ';';
 		newline
 ]
 

@@ -36,6 +36,10 @@ DASLHighLevelCodegenVisitor >> generateCodeBlocks: translationUnit [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateEpilogue: translationUnit [
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateFunction: function [
 	self subclassResponsibility.
 ]
@@ -76,6 +80,10 @@ DASLHighLevelCodegenVisitor >> generateGraphBlocks: translationUnit [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generatePrologue: translationUnit [
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateSemanticBlock: block [
 	self subclassResponsibility.
 ]
@@ -88,6 +96,7 @@ DASLHighLevelCodegenVisitor >> generateSemanticBlocks: translationUnit [
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 	self
+		generatePrologue: translationUnit;
 		generateUniformBlocks: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;
@@ -96,7 +105,8 @@ DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 		newline;
 		generateFunctions: translationUnit;
 		generateCodeBlocks: translationUnit;
-		generateGraphBlocks: translationUnit
+		generateGraphBlocks: translationUnit;
+		generateEpilogue: translationUnit
 ]
 
 { #category : #'code generation' }
@@ -204,7 +214,7 @@ DASLHighLevelCodegenVisitor >> visitExpressionStatement: expressionStatement [
 	self
 		printTabs;
 		printString: (expressionStatement expression accept: self);
-		printString: ',';
+		printString: ';';
 		newline
 ]
 

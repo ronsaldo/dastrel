@@ -33,6 +33,11 @@ DASLCodeBlock >> interfaceList: anObject [
 	interfaceList := anObject ifNil: [ #() ].
 ]
 
+{ #category : #testing }
+DASLCodeBlock >> isCodeBlock [
+	^ true
+]
+
 { #category : #printing }
 DASLCodeBlock >> printOn: aStream [
 	aStream nextPutAll: '(code-block '.

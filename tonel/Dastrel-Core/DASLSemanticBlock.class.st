@@ -13,3 +13,8 @@ DASLSemanticBlock >> accept: aVisitor [
 DASLSemanticBlock >> isGlobalConnectionBlock [
 	^ true
 ]
+
+{ #category : #testing }
+DASLSemanticBlock >> isSemanticBlock [
+	^ true
+]

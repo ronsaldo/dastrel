@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'arguments',
 		'returnType',
-		'functionType'
+		'functionType',
+		'codegenReturnVariables'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -22,6 +23,16 @@ DASLFunctionPrototype >> arguments [
 { #category : #accessing }
 DASLFunctionPrototype >> arguments: anObject [
 	arguments := anObject
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> codegenReturnVariables [
+	^ codegenReturnVariables
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> codegenReturnVariables: anObject [
+	codegenReturnVariables := anObject
 ]
 
 { #category : #accessing }

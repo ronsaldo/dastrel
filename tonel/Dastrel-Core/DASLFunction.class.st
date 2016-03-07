@@ -28,6 +28,11 @@ DASLFunction >> functionType [
 	^ prototype functionType
 ]
 
+{ #category : #testing }
+DASLFunction >> isFunction [
+	^ true
+]
+
 { #category : #accessing }
 DASLFunction >> prototype [
 	^ prototype

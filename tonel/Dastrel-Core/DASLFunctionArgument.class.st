@@ -14,6 +14,11 @@ DASLFunctionArgument >> accept: aVisitor [
 ]
 
 { #category : #accessing }
+DASLFunctionArgument >> codegenValue [
+	^ name
+]
+
+{ #category : #accessing }
 DASLFunctionArgument >> name [
 	^ name
 ]

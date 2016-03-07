@@ -13,3 +13,8 @@ DASLUniformBlock >> accept: aVisitor [
 DASLUniformBlock >> isGlobalConnectionBlock [
 	^ true
 ]
+
+{ #category : #testing }
+DASLUniformBlock >> isUniformBlock [
+	^ true
+]

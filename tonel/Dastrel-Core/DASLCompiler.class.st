@@ -5,7 +5,8 @@ Class {
 		'sourceCode',
 		'ast',
 		'parser',
-		'ssaModule'
+		'codeGenerator',
+		'generatedCode'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -20,11 +21,21 @@ DASLCompiler >> ast: anObject [
 	ast := anObject
 ]
 
+{ #category : #accessing }
+DASLCompiler >> codeGenerator [
+	^ codeGenerator
+]
+
+{ #category : #accessing }
+DASLCompiler >> codeGenerator: anObject [
+	codeGenerator := anObject
+]
+
 { #category : #'public access' }
 DASLCompiler >> compile [
 	self parse;
 		semanticAnalysis;
-		generateSSA
+		generateCode
 ]
 
 { #category : #accessing }
@@ -33,11 +44,24 @@ DASLCompiler >> fileName: fileName [
 ]
 
 { #category : #'public access' }
-DASLCompiler >> generateSSA [
-	| codegen |
-	codegen := DASLSSACodegenVisitor new.
-	ssaModule := ast accept: codegen.
+DASLCompiler >> generateCode [
+	generatedCode := ast accept: codeGenerator.
 
+]
+
+{ #category : #accessing }
+DASLCompiler >> generatedCode [
+	^ generatedCode
+]
+
+{ #category : #'public access' }
+DASLCompiler >> glslTarget [
+	codeGenerator := DASLGLSLCodegenVisitor new.
+]
+
+{ #category : #'public access' }
+DASLCompiler >> hlslTarget [
+	codeGenerator := DASLHLSLCodegenVisitor new.
 ]
 
 { #category : #initialization }
@@ -45,6 +69,11 @@ DASLCompiler >> initialize [
 	super initialize.
 	
 	parser := DASLParser new.
+]
+
+{ #category : #'public access' }
+DASLCompiler >> metalTarget [
+	codeGenerator := DASLMetalCodegenVisitor new.
 ]
 
 { #category : #parsing }
@@ -76,6 +105,6 @@ DASLCompiler >> sourceFromFileNamed: aFileName [
 ]
 
 { #category : #'public access' }
-DASLCompiler >> ssaModule [
-	^ ssaModule
+DASLCompiler >> ssaTarget [
+	codeGenerator := DASLSSACodegenVisitor new.
 ]

@@ -32,3 +32,8 @@ DASLInterface >> interfaceList [
 DASLInterface >> interfaceList: anObject [
 	interfaceList := anObject ifNil: [ #() ].
 ]
+
+{ #category : #testing }
+DASLInterface >> isInterface [
+	^ true
+]

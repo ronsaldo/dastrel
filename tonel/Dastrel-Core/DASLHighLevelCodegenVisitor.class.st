@@ -164,6 +164,18 @@ DASLHighLevelCodegenVisitor >> printType: aType [
 	self printString: (self mapType: aType)
 ]
 
+{ #category : #visitor }
+DASLHighLevelCodegenVisitor >> visitAssignment: assignment [
+	^ ByteString streamContents: [ :out |
+		out
+			nextPutAll: (assignment reference accept: self);
+			nextPut: $ ;
+			nextPutAll: assignment operation;
+			nextPut: $ ;
+			nextPutAll: (assignment value accept: self)
+	]
+]
+
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitBinaryOperation: binaryOperation [
 	| leftExpr rightExpr |
@@ -187,12 +199,44 @@ DASLHighLevelCodegenVisitor >> visitCallExpression: callExpression [
 	]
 ]
 
+{ #category : #visitor }
+DASLHighLevelCodegenVisitor >> visitExpressionStatement: expressionStatement [
+	self
+		printTabs;
+		printString: (expressionStatement expression accept: self);
+		printString: ',';
+		newline
+]
+
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitIdentifier: identifier [
 	| binding |
 	binding := identifier binding.
 	binding isType ifTrue: [ ^ self mapType: binding ].
 	^ binding codegenValue
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitLocalDeclaration: localDeclaration [
+	self printTabs;
+		printType: localDeclaration type;
+		printString: ' ';
+		printString: localDeclaration name.
+	localDeclaration codegenValue: localDeclaration name.
+	localDeclaration initialValue ifNotNil: [
+		self printString: ' = ';
+			printString: (localDeclaration initialValue accept: self).
+	].
+	self printString: ';'; newline.
+]
+
+{ #category : #visitor }
+DASLHighLevelCodegenVisitor >> visitMemberAccessExpression: memberAccess [
+	| globalRefValue |
+	globalRefValue := memberAccess globalReferenceValue.
+	globalRefValue ifNotNil: [ ^ globalRefValue codegenValue ].
+	
+	^ (memberAccess reference accept: self) , '.' , memberAccess identifier
 ]
 
 { #category : #'code generation' }

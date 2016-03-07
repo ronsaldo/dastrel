@@ -33,6 +33,11 @@ DASLFunctionGroup >> alternatives: anObject [
 	alternatives := anObject
 ]
 
+{ #category : #accessing }
+DASLFunctionGroup >> codegenValue [
+	^ name
+]
+
 { #category : #initialization }
 DASLFunctionGroup >> initialize [
 	super initialize.

@@ -41,10 +41,20 @@ DASLGLSLCodegenVisitor class >> initialize [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateCodeBlock: codeBlock [
+	self printCodeBlockPrototype: codeBlock;
+		newline;
+		printLine: '{';
+		withIndentation: [
+			codeBlock body do: [ :statement | statement accept: self ]
+		];
+		printLine: '}'
 ]
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateCodeBlockPrototype: codeBlock [
+	self printCodeBlockPrototype: codeBlock;
+		printString: ';';
+		newline 
 ]
 
 { #category : #'code generation' }
@@ -120,6 +130,14 @@ DASLGLSLCodegenVisitor >> generateUniformVar: uniformVariable prefix: prefix [
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> mapType: type [
 	^ TypeDictionary at: type
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> printCodeBlockPrototype: codeBlock [
+	self printTabs;
+		printString: 'void ';
+		printString: codeBlock name;
+		printString: '()'
 ]
 
 { #category : #'as yet unclassified' }

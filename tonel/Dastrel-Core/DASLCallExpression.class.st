@@ -3,7 +3,9 @@ Class {
 	#superclass : #DASLExpression,
 	#instVars : [
 		'reference',
-		'arguments'
+		'arguments',
+		'solvedFunction',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -40,4 +42,24 @@ DASLCallExpression >> reference [
 { #category : #accessing }
 DASLCallExpression >> reference: anObject [
 	reference := anObject
+]
+
+{ #category : #accessing }
+DASLCallExpression >> solvedFunction [
+	^ solvedFunction
+]
+
+{ #category : #accessing }
+DASLCallExpression >> solvedFunction: anObject [
+	solvedFunction := anObject
+]
+
+{ #category : #accessing }
+DASLCallExpression >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLCallExpression >> type: anObject [
+	type := anObject
 ]

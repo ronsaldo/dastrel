@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLModule,
 	#instVars : [
 		'arguments',
-		'returnType'
+		'returnType',
+		'functionType'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -21,6 +22,16 @@ DASLFunctionPrototype >> arguments [
 { #category : #accessing }
 DASLFunctionPrototype >> arguments: anObject [
 	arguments := anObject
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> functionType [
+	^ functionType
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> functionType: anObject [
+	functionType := anObject
 ]
 
 { #category : #accessing }

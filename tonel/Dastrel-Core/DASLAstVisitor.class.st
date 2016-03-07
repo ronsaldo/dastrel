@@ -25,6 +25,11 @@ DASLAstVisitor >> visitBinaryOperation: binaryOperation [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitBuiltInFunction: builtInFunction [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitCallExpression: callExpression [
 	self subclassResponsibility
 ]
@@ -76,6 +81,11 @@ DASLAstVisitor >> visitFunction: function [
 
 { #category : #visitor }
 DASLAstVisitor >> visitFunctionArgument: functionArgument [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
+DASLAstVisitor >> visitFunctionGroup: functionGroup [
 	self subclassResponsibility
 ]
 

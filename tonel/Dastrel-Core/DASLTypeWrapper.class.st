@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'wrapped'
 	],
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #testing }

@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'flow',
 		'type',
-		'name'
+		'name',
+		'codegenValue'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -12,6 +13,16 @@ Class {
 { #category : #visitor }
 DASLFieldDefinition >> accept: aVisitor [
 	^ aVisitor visitFieldDefinition: self
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> codegenValue [
+	^ codegenValue
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> codegenValue: anObject [
+	codegenValue := anObject
 ]
 
 { #category : #accessing }
@@ -32,6 +43,11 @@ DASLFieldDefinition >> name [
 { #category : #accessing }
 DASLFieldDefinition >> name: anObject [
 	name := anObject
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> referenceType [
+	^ DASLReferenceType baseType: self type
 ]
 
 { #category : #accessing }

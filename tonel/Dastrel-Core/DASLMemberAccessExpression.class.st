@@ -3,7 +3,9 @@ Class {
 	#superclass : #DASLExpression,
 	#instVars : [
 		'reference',
-		'memberName'
+		'memberName',
+		'globalReferenceValue',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -11,6 +13,16 @@ Class {
 { #category : #visitor }
 DASLMemberAccessExpression >> accept: aVisitor [
 	^ aVisitor visitMemberAccessExpression: self
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> globalReferenceValue [
+	^ globalReferenceValue
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> globalReferenceValue: anObject [
+	globalReferenceValue := anObject
 ]
 
 { #category : #accessing }
@@ -40,4 +52,14 @@ DASLMemberAccessExpression >> reference [
 { #category : #accessing }
 DASLMemberAccessExpression >> reference: anObject [
 	reference := anObject
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> type: anObject [
+	type := anObject
 ]

@@ -11,9 +11,13 @@ Class {
 		'IntType',
 		'LongType',
 		'ShortType',
+		'UCharType',
+		'UIntType',
+		'ULongType',
+		'UShortType',
 		'VoidType'
 	],
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #'built in types' }
@@ -29,6 +33,11 @@ DASLType class >> boolType [
 { #category : #'built in types' }
 DASLType class >> builtInTypes [
 	^ BuiltInTypes
+]
+
+{ #category : #'built in types' }
+DASLType class >> charType [
+	^ CharType
 ]
 
 { #category : #'built in types' }
@@ -58,6 +67,11 @@ DASLType class >> intType [
 ]
 
 { #category : #'built in types' }
+DASLType class >> longType [
+	^ LongType
+]
+
+{ #category : #'built in types' }
 DASLType class >> matrixTypes [
 	^ {
 		DASLMatrixType name: #float3x3 baseType: FloatType rows: 3 columns: 3 alignment: 16.
@@ -76,6 +90,11 @@ DASLType class >> primitiveTypes [
 	ShortType := DASLIntegerType name: #short size: 2 alignment: 2.
 	IntType := DASLIntegerType name: #int size: 4 alignment: 4.
 	LongType := DASLIntegerType name: #long size: 8 alignment: 8.
+
+	UCharType := DASLIntegerType name: #uchar size: 1 alignment: 1 signed: false.
+	UShortType := DASLIntegerType name: #ushort size: 2 alignment: 2 signed: false.
+	UIntType := DASLIntegerType name: #uint size: 4 alignment: 4 signed: false.
+	ULongType := DASLIntegerType name: #ulong size: 8 alignment: 8 signed: false.
 	
 	FloatType := DASLFloatType name: #float size: 4 alignment: 4.	
 	DoubleType := DASLFloatType name: #double size: 8 alignment: 8.
@@ -90,10 +109,40 @@ DASLType class >> primitiveTypes [
 		ShortType.
 		IntType.
 		LongType.
+
+		UCharType.
+		UShortType.
+		UIntType.
+		ULongType.
 		
 		FloatType.
 		DoubleType.
 	}
+]
+
+{ #category : #'built in types' }
+DASLType class >> shortType [
+	^ ShortType
+]
+
+{ #category : #'built in types' }
+DASLType class >> ucharType [
+	^ UCharType
+]
+
+{ #category : #'built in types' }
+DASLType class >> uintType [
+	^ UIntType
+]
+
+{ #category : #'built in types' }
+DASLType class >> ulongType [
+	^ ULongType
+]
+
+{ #category : #'built in types' }
+DASLType class >> ushortType [
+	^ UShortType
 ]
 
 { #category : #'built in types' }
@@ -135,7 +184,22 @@ DASLType >> isFloatType [
 ]
 
 { #category : #testing }
+DASLType >> isFunctionGroupType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isFunctionType [
+	^ false
+]
+
+{ #category : #testing }
 DASLType >> isIntegerType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isMatrixType [
 	^ false
 ]
 
@@ -145,7 +209,22 @@ DASLType >> isOpaqueType [
 ]
 
 { #category : #testing }
+DASLType >> isPlaceholderType [
+	^ false
+]
+
+{ #category : #testing }
 DASLType >> isPrimitiveType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isReferenceType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isTupleType [
 	^ false
 ]
 
@@ -160,18 +239,23 @@ DASLType >> isTypeWrapper [
 ]
 
 { #category : #testing }
+DASLType >> isVectorType [
+	^ false
+]
+
+{ #category : #testing }
 DASLType >> isVoidType [
 	^ false
 ]
 
 { #category : #accessing }
-DASLType >> size [
-	self subclassResponsibility
+DASLType >> referenceType [
+	^ DASLTypeWrapper new wrapped: self
 ]
 
 { #category : #accessing }
-DASLType >> type [
-	^ DASLTypeWrapper new wrapped: self
+DASLType >> size [
+	self subclassResponsibility
 ]
 
 { #category : #accessing }

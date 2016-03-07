@@ -1,7 +1,7 @@
 Class {
 	#name : #DASLFloatType,
 	#superclass : #DASLPrimitiveType,
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #testing }

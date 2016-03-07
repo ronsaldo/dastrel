@@ -5,7 +5,8 @@ Class {
 		'flow',
 		'name',
 		'type',
-		'initialValue'
+		'initialValue',
+		'codegenValue'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -13,6 +14,16 @@ Class {
 { #category : #visitor }
 DASLLocalDeclStatement >> accept: aVisitor [
 	^ aVisitor visitLocalDeclaration: self
+]
+
+{ #category : #accessing }
+DASLLocalDeclStatement >> codegenValue [
+	^ codegenValue
+]
+
+{ #category : #accessing }
+DASLLocalDeclStatement >> codegenValue: anObject [
+	codegenValue := anObject
 ]
 
 { #category : #accessing }
@@ -60,6 +71,11 @@ DASLLocalDeclStatement >> printOn: aStream [
 	].
 	aStream nextPut: $).
 	
+]
+
+{ #category : #accessing }
+DASLLocalDeclStatement >> referenceType [
+	^ DASLReferenceType baseType: self type
 ]
 
 { #category : #accessing }

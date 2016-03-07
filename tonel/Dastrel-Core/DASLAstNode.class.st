@@ -19,6 +19,11 @@ DASLAstNode >> initialize [
 ]
 
 { #category : #testing }
+DASLAstNode >> isFunctionGroup [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isLocalDeclaration [
 	^ false
 ]

@@ -24,6 +24,11 @@ DASLFunction >> body: anObject [
 ]
 
 { #category : #accessing }
+DASLFunction >> functionType [
+	^ prototype functionType
+]
+
+{ #category : #accessing }
 DASLFunction >> prototype [
 	^ prototype
 ]

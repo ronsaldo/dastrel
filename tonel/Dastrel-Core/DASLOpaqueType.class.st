@@ -4,12 +4,17 @@ Class {
 	#instVars : [
 		'name'
 	],
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #accessing }
 DASLOpaqueType >> alignment [
 	^ 0
+]
+
+{ #category : #testing }
+DASLOpaqueType >> isOpaqueType [
+	^ true
 ]
 
 { #category : #accessing }

@@ -24,6 +24,12 @@ DASLFunctionArgument >> name: anObject [
 ]
 
 { #category : #accessing }
+DASLFunctionArgument >> referenceType [
+	type isReferenceType ifTrue: [ ^ type ].
+	^ DASLReferenceType baseType: type.
+]
+
+{ #category : #accessing }
 DASLFunctionArgument >> type [
 	^ type
 ]

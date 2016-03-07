@@ -47,12 +47,16 @@ DASLBlockPublicSemanticVisitor >> visitFunctionArgument: argument [
 
 { #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitFunctionPrototype: functionPrototype [
+	| argumentTypes |
 	functionPrototype returnType: (self resolveTupleType: functionPrototype returnType).
 	
 	functionPrototype scope: (DASLModuleScope new parentScope: currentScope; node: functionPrototype).
 	self withScope: functionPrototype scope do: [ 
 		functionPrototype arguments do: [ :arg | arg accept: self ]
-	]
+	].
+
+	argumentTypes := functionPrototype arguments collect: #type.
+	functionPrototype functionType: (DASLFunctionType arguments: argumentTypes returnType: functionPrototype returnType).
 ]
 
 { #category : #visitor }

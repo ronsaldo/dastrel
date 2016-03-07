@@ -4,8 +4,13 @@ Class {
 	#instVars : [
 		'block'
 	],
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
+
+{ #category : #comparing }
+DASLBlockType >> = other [
+	^ self class = other class and: [ block == other block]
+]
 
 { #category : #accessing }
 DASLBlockType >> block [
@@ -15,6 +20,11 @@ DASLBlockType >> block [
 { #category : #accessing }
 DASLBlockType >> block: anObject [
 	block := anObject
+]
+
+{ #category : #comparing }
+DASLBlockType >> hash [
+	^ self class hash bitXor: block hash
 ]
 
 { #category : #accessing }

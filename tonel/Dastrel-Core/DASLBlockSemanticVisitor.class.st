@@ -4,25 +4,72 @@ Class {
 	#category : #'Dastrel-Core-Semantic'
 }
 
+{ #category : #'overload lookup' }
+DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes at: position [
+	"Find an exact match first, removing reference types"
+	functionGroup alternatives do: [ :alternative |
+			(self compareAlmostExactTypes: alternative functionType arguments with: checkTypes) ifTrue: [
+			^ alternative
+		]
+	].
+
+	self halt.
+	self error: 'Failed to find suitable function overload for "',  functionGroup ,'".' name at: position.
+]
+
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitAssignment: assignment [
+	| referenceType |
 	assignment reference accept: self.
 	assignment value accept: self.
 
+	referenceType := assignment reference type.
+	referenceType isReferenceType ifFalse: [ self error: 'a variable reference is required to perform the assignment.' at: assignment ].
+	
+	assignment type: referenceType.
+	
 ]
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitBinaryOperation: operation [
+	| functionGroup matchingFunction |
 	operation left accept: self.
 	operation right accept: self.
-	"TODO: Check the types of the operands and compute the return types."
+
+	functionGroup := self lookOperationFunctionGroup: operation operation at: operation.
+	matchingFunction := self findIn: functionGroup bestMatchingType: { operation left type . operation right type} at: operation.
+	operation coercionType: matchingFunction coercionType.
+	operation type: matchingFunction functionType returnType
 ]
 
 { #category : #visitor }
-DASLBlockSemanticVisitor >> visitCallExpression: operation [
-	operation reference accept: self.
-	operation arguments do: [ :arg | arg accept: self ].
-	"TODO: Check the types of the operands and compute the result types."
+DASLBlockSemanticVisitor >> visitCallExpression: expression [
+	| functionType functionGroup argumentTypes matchingFunction castType |
+	expression reference accept: self.
+	expression arguments do: [ :arg | arg accept: self ].
+	
+	argumentTypes := expression arguments collect: #type.
+	functionType := expression reference type.
+		
+	"Overloaded function"
+	functionType isFunctionGroupType ifTrue: [
+		functionGroup := functionType functionGroup.
+		matchingFunction := self findIn: functionGroup bestMatchingType: argumentTypes at: expression.
+		expression solvedFunction: matchingFunction.
+		expression type: matchingFunction functionType returnType.
+		^ self.
+	].
+
+	"Construction or cast"
+	functionType isTypeWrapper ifTrue: [
+		"TODO: Perform type checking with the constructors"
+		castType := functionType wrapped.
+		expression type: castType.
+		^ self
+	].
+
+	self error: 'Cannot call object of type "', functionType printString , '".' at: expression.
+
 ]
 
 { #category : #visitor }
@@ -67,8 +114,25 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
+	| referencedType member |
 	memberAccess reference accept: self.
 	
+	referencedType := memberAccess reference type.
+	referencedType isBlockType ifTrue: [ 
+		| block |
+		block := referencedType block.
+		block isGlobalConnectionBlock ifTrue: [
+			member := block scope lookSymbol: memberAccess memberName.
+			member ifNil: [ self error: 'failed to find member "' ,  memberAccess memberName , '" in block "' , block name, '".' at:  memberAccess ].
+			memberAccess type: member referenceType.
+			memberAccess globalReferenceValue: member.
+			^ self
+		].
+	
+		self error: 'cannot access member of non global connection block.' at: memberAccess.
+	].
+
+	self halt.
 	"TODO: Check the referenced type. Ensure the member exist."
 ]
 
@@ -110,7 +174,9 @@ DASLBlockSemanticVisitor >> visitUsingStatement: usingStatement [
 	| usedType identifier useScope |
 	usingStatement expression accept: self.
 	identifier := usingStatement identifier.
-	identifier ifNotNil: [ self halt.
+	identifier ifNotNil: [
+		"TODO: Implement this"
+		self halt.
 	].
 
 	usedType := usingStatement expression type.

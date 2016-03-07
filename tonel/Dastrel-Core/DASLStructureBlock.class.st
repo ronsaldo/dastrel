@@ -29,6 +29,6 @@ DASLStructureBlock >> interfaceList: anObject [
 ]
 
 { #category : #accessing }
-DASLStructureBlock >> type [
+DASLStructureBlock >> referenceType [
 	^ DASLBlockType new block: self.
 ]

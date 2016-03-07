@@ -8,3 +8,8 @@ Class {
 DASLSemanticBlock >> accept: aVisitor [
 	^ aVisitor visitSemanticBlock: self
 ]
+
+{ #category : #testing }
+DASLSemanticBlock >> isGlobalConnectionBlock [
+	^ true
+]

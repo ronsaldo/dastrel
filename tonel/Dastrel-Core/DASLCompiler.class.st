@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'sourceCode',
 		'ast',
-		'parser'
+		'parser',
+		'ssaModule'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -22,12 +23,21 @@ DASLCompiler >> ast: anObject [
 { #category : #'public access' }
 DASLCompiler >> compile [
 	self parse;
-		semanticAnalysis
+		semanticAnalysis;
+		generateSSA
 ]
 
 { #category : #accessing }
 DASLCompiler >> fileName: fileName [
 	parser fileName: fileName
+]
+
+{ #category : #'public access' }
+DASLCompiler >> generateSSA [
+	| codegen |
+	codegen := DASLSSACodegenVisitor new.
+	ssaModule := ast accept: codegen.
+
 ]
 
 { #category : #initialization }
@@ -63,4 +73,9 @@ DASLCompiler >> sourceCode: anObject [
 DASLCompiler >> sourceFromFileNamed: aFileName [
 	self fileName: aFileName;
 		sourceCode: aFileName asFileReference contents
+]
+
+{ #category : #'public access' }
+DASLCompiler >> ssaModule [
+	^ ssaModule
 ]

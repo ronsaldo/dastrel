@@ -13,10 +13,18 @@ DASLModuleSemanticVisitor >> visitCodeBlock: codeBlock [
 
 { #category : #visitor }
 DASLModuleSemanticVisitor >> visitFunction: function [
-	"TODO: Support function overloading"
-	currentScope at: function name put: function ifPresent: [
+	| functionGroup |
+	functionGroup := currentScope lookSymbol: function name.
+	(functionGroup isNotNil and: [ functionGroup isFunctionGroup not]) ifTrue: [
 		self error: 'function overrides a previously defined symbol' at: function
 	].
+
+	functionGroup ifNil: [ 
+		functionGroup := DASLFunctionGroup new name: function name.
+		currentScope at: function name put: functionGroup ifPresent: [self error: 'compiler bug'].
+	].
+
+	functionGroup addAlternative: function.
 ]
 
 { #category : #visitor }

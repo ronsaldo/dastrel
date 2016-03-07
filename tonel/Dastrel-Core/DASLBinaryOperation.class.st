@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'operation',
 		'left',
-		'right'
+		'right',
+		'coercionType',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -12,6 +14,16 @@ Class {
 { #category : #visitor }
 DASLBinaryOperation >> accept: aVisitor [
 	^ aVisitor visitBinaryOperation: self
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> coercionType [
+	^ coercionType
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> coercionType: anObject [
+	coercionType := anObject
 ]
 
 { #category : #accessing }
@@ -53,4 +65,14 @@ DASLBinaryOperation >> right [
 { #category : #accessing }
 DASLBinaryOperation >> right: anObject [
 	right := anObject
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> type: anObject [
+	type := anObject
 ]

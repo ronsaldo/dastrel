@@ -12,9 +12,39 @@ DASLSemanticVisitor >> adjustTypeForInference: type [
 	^ type
 ]
 
+{ #category : #types }
+DASLSemanticVisitor >> compareAlmostExactTypes: functionTypes with: valueRefTypes [
+	| functionType valueRefType |
+	functionTypes size ~= valueRefTypes size ifTrue: [ ^ false ].
+	
+	1 to: functionTypes size do: [ :i |
+		functionType := functionTypes at: i.
+		valueRefType := valueRefTypes at: i.
+		functionType ~= valueRefType ifTrue: [
+			(valueRefType isReferenceType and: [ valueRefType baseType = functionType]) ifFalse: [ ^ false ]
+		]
+	].
+
+	^ true
+]
+
 { #category : #accessing }
 DASLSemanticVisitor >> currentScope [
 	^ currentScope
+]
+
+{ #category : #types }
+DASLSemanticVisitor >> deReferenceType: aType [
+	aType isReferenceType ifTrue: [ ^ aType baseType ].
+	^ aType
+]
+
+{ #category : #types }
+DASLSemanticVisitor >> lookOperationFunctionGroup: operation at: position [
+	| functionGroup |
+	functionGroup := currentScope lookSymbolRecursively: operation.
+	functionGroup ifNil: [ self error: 'Unsupported operation yet: ' , operation at: position].
+	^ functionGroup
 ]
 
 { #category : #resolving }

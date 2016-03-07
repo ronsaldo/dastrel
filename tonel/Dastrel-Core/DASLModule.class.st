@@ -20,6 +20,11 @@ DASLModule >> inputs: anObject [
 	inputs := anObject
 ]
 
+{ #category : #testing }
+DASLModule >> isGlobalConnectionBlock [
+	^ false
+]
+
 { #category : #accessing }
 DASLModule >> name [
 	^ name

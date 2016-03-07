@@ -9,7 +9,7 @@ Class {
 		'size',
 		'alignment'
 	],
-	#category : #'Dastrel-Core-AST'
+	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #construction }
@@ -26,6 +26,16 @@ DASLMatrixType class >> baseType: aBaseType rows: numRows columns: numColumns al
 { #category : #construction }
 DASLMatrixType class >> name: aName baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment [
 	^ (self baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment) name: aName; yourself
+]
+
+{ #category : #comparing }
+DASLMatrixType >> = other [
+	^ self class == other class
+		and: [
+			baseType = other baseType and:
+			[ rows = other rows and:
+			[ columns = other columns and:
+			[ alignment = other alignment ] ] ] ]
 ]
 
 { #category : #accessing }
@@ -56,6 +66,16 @@ DASLMatrixType >> columns [
 { #category : #accessing }
 DASLMatrixType >> columns: anObject [
 	columns := anObject
+]
+
+{ #category : #comparing }
+DASLMatrixType >> hash [
+	^ (((self class hash bitXor: baseType hash) bitXor: rows hash) bitXor: columns hash) bitXor: alignment hash
+]
+
+{ #category : #testing }
+DASLMatrixType >> isMatrixType [
+	^ true
 ]
 
 { #category : #accessing }

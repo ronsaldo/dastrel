@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'operation',
 		'reference',
-		'value'
+		'value',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -43,6 +44,16 @@ DASLAssignmentExpression >> reference [
 { #category : #accessing }
 DASLAssignmentExpression >> reference: anObject [
 	reference := anObject
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> type: anObject [
+	type := anObject
 ]
 
 { #category : #accessing }

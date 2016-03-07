@@ -8,3 +8,8 @@ Class {
 DASLUniformBlock >> accept: aVisitor [
 	^ aVisitor visitUniformBlock: self
 ]
+
+{ #category : #testing }
+DASLUniformBlock >> isGlobalConnectionBlock [
+	^ true
+]

@@ -85,6 +85,15 @@ DASLVectorType >> name: anObject [
 	name := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLVectorType >> printOn: aStream [
+	name ifNotNil: [ 
+		aStream nextPutAll: name
+	] ifNil: [ 
+		aStream nextPutAll: 'Vector<' ; print: baseType; nextPut: $,; print: elements; nextPut: $,; print: alignment; nextPut: $>
+	]
+]
+
 { #category : #accessing }
 DASLVectorType >> size [
 	^ size

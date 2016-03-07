@@ -1,6 +1,9 @@
 Class {
 	#name : #DASLBlockSemanticVisitor,
 	#superclass : #DASLSemanticVisitor,
+	#instVars : [
+		'currentFunction'
+	],
 	#category : #'Dastrel-Core-Semantic'
 }
 
@@ -86,10 +89,11 @@ DASLBlockSemanticVisitor >> visitExpressionStatement: expressionStatement [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitFunction: function [
+	currentFunction := function.
 	self withScope: function scope do: [
 		function body do: [ :el | el accept: self. ]
-	]
-
+	].
+	currentFunction := nil
 ]
 
 { #category : #visitor }
@@ -104,7 +108,11 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 
 	self resolveTypeOf: declaration inferWith: declaration initialValue.
 	
-	"TODO: check the initial value type."
+	declaration initialValue ifNotNil: [
+		(self hasImplicitCoercion: declaration initialValue type to: declaration type) ifFalse: [ 
+			self error: 'cannot convert implicitly value of type "', declaration initialValue type printString, '" into type "' , declaration type printString , '".'at: declaration.
+		]
+	].
 	
 	currentScope at: declaration name put: declaration ifPresent: [ 
 		self error: 'local variable overrides an existing variable in the same lexical scope.' at: declaration.
@@ -150,8 +158,17 @@ DASLBlockSemanticVisitor >> visitPrefixUnaryOperation: operation [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitReturnStatement: returnStatement [
+	| expectedReturnType returnType |
+	currentFunction ifNil: [ self error: 'return only can be used inside of functions' at: returnStatement ].
+	
 	returnStatement value do: [ :val | val accept: self ].
-	"TODO: Check the return type"
+	
+	expectedReturnType := currentFunction functionType returnType.
+	returnType := self arrayOfTypesToTuple: (returnStatement value collect: #type).
+	(self hasImplicitCoercion: returnType to: expectedReturnType) ifFalse: [ 
+		self error: 'cannot return value of type "',  returnType printString ,'" in a function whose returning type is "', expectedReturnType printString , '".' at: returnStatement.
+	]
+
 ]
 
 { #category : #visitor }

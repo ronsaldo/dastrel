@@ -9,7 +9,13 @@ Class {
 
 { #category : #resolving }
 DASLSemanticVisitor >> adjustTypeForInference: type [
+	type isReferenceType ifTrue: [ ^ type baseType ].
 	^ type
+]
+
+{ #category : #resolving }
+DASLSemanticVisitor >> arrayOfTypesToTuple: arrayOfTypes [
+	^ arrayOfTypes size == 1 ifTrue: [ arrayOfTypes first ] ifFalse: [ DASLTupleType types: arrayOfTypes ].
 ]
 
 { #category : #types }
@@ -40,6 +46,21 @@ DASLSemanticVisitor >> deReferenceType: aType [
 ]
 
 { #category : #types }
+DASLSemanticVisitor >> hasImplicitCoercion: rawType to: rawCoercionType [
+	| type coercionType |
+	rawType = rawCoercionType ifTrue: [ ^ true ].
+	
+	type := rawType.
+	coercionType := rawCoercionType.
+
+	"De reference the variable"
+	type isReferenceType ifTrue: [ type := type baseType ].
+	type = coercionType ifTrue: [ ^ true ].
+	
+	^ false
+]
+
+{ #category : #types }
 DASLSemanticVisitor >> lookOperationFunctionGroup: operation at: position [
 	| functionGroup |
 	functionGroup := currentScope lookSymbolRecursively: operation.
@@ -51,7 +72,7 @@ DASLSemanticVisitor >> lookOperationFunctionGroup: operation at: position [
 DASLSemanticVisitor >> resolveTupleType: types [
 	| resolvedTypes |
 	resolvedTypes := types collect: [:type | self resolveType: type].
-	^ resolvedTypes size == 1 ifTrue: [ resolvedTypes first ] ifFalse: [ DASLTupleType types: resolvedTypes ].
+	^ self arrayOfTypesToTuple: resolvedTypes.
 ]
 
 { #category : #resolving }

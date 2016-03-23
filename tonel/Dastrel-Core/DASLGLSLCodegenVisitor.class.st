@@ -89,7 +89,7 @@ DASLGLSLCodegenVisitor >> generateGraphBlockPrototype: uniformBlock [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generatePrologue: translationUnit [
-	self printLine: '#version 410';
+	self printLine: '#version 450';
 		newline
 ]
 
@@ -103,22 +103,38 @@ DASLGLSLCodegenVisitor >> generateSemanticBlock: semanticBlock [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateSemanticVar: semanticVar prefix: prefix [
-	| flow glslType name |
+	| flow glslType name varString |
 	flow := semanticVar flow.
-	glslType := self mapType: semanticVar type.
-	name := semanticVar name.
-	semanticVar codegenValue: prefix , name.
-	self printLine: flow direction , ' ' , glslType , ' ' , semanticVar codegenValue , ';'.
+	varString := ByteString streamContents: [ :out |
+		flow location >= 0 ifTrue: [ 
+			out nextPutAll: 'layout(location = ';
+				nextPutAll: flow location asString;
+				nextPutAll: ') '.
+		].
+
+		glslType := self mapType: semanticVar type.
+		name := semanticVar name.
+		semanticVar codegenValue: prefix , name.
+			
+		out nextPutAll: flow direction; space;
+			 nextPutAll: glslType; space;
+			 nextPutAll: semanticVar codegenValue;
+			 nextPut: $;.
+	].
+
+	self printLine: varString.
 	
 ]
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateUniformBlock: uniformBlock [
-	| prefix instanceName |
+	| prefix instanceName layoutString |
 	instanceName := uniformBlock name , '_dastrel_singleton_'.
 	prefix := instanceName , '.'.
+	layoutString := 'layout('.
+	layoutString := layoutString , 'std140) '.
 	self
-		printLine: 'uniform ' , uniformBlock name;
+		printLine: layoutString , 'uniform ' , uniformBlock name;
 		printLine: '{';
 		withIndentation: [
 			uniformBlock body do: [ :var | self generateUniformVar: var prefix: prefix].

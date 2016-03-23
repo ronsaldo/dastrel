@@ -100,7 +100,7 @@ DASLGrammar class >> initialize [
 	super initialize.
 	
 	Keywords := #(
-		in out
+		in out inout
 		uniform
 		interface semantic implements
 		sizeof alignof

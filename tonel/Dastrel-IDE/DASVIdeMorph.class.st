@@ -3,10 +3,18 @@ Class {
 	#superclass : #Morph,
 	#instVars : [
 		'surface',
-		'graphBlock'
+		'graphBlock',
+		'session'
 	],
 	#category : #'Dastrel-IDE'
 }
+
+{ #category : #initialization }
+DASVIdeMorph >> checkSession [
+	session ~~ Smalltalk session ifTrue: [ 
+		self initializeForNewSession.
+	]
+]
 
 { #category : #initialization }
 DASVIdeMorph >> defaultExtent [
@@ -15,6 +23,7 @@ DASVIdeMorph >> defaultExtent [
 
 { #category : #drawing }
 DASVIdeMorph >> drawOn: aCanvas [
+	self checkSession.
 	self render.
 	surface displayOnMorphicCanvas: aCanvas at: bounds origin
 ]
@@ -33,9 +42,13 @@ DASVIdeMorph >> graphBlock: anObject [
 DASVIdeMorph >> initialize [
 	super initialize.
 	self extent: self defaultExtent.
-	
-	surface := AthensCairoSurface extent: self extent.
+	self initializeForNewSession.
+]
 
+{ #category : #initialization }
+DASVIdeMorph >> initializeForNewSession [
+	surface := AthensCairoSurface extent: self extent.
+	session := Smalltalk session.
 ]
 
 { #category : #drawing }
@@ -43,6 +56,8 @@ DASVIdeMorph >> render [
 	surface drawDuring: [ :canvas |
 		surface clear: Color white.
 		canvas pathTransform loadIdentity.
+		
+		graphBlock ifNotNil: [ graphBlock drawOn: canvas ]
 	].
 
 	

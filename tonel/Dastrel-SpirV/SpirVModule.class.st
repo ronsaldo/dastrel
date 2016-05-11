@@ -22,10 +22,16 @@ SpirVModule >> addInstruction: anInstruction [
 ]
 
 { #category : #building }
+SpirVModule >> addInstructions: aCollectionOfInstructions [
+	instructions addAll: aCollectionOfInstructions
+]
+
+{ #category : #building }
 SpirVModule >> build: aBlock [
 	| builder |
 	builder := SpirVModuleBuilder new module: self.
 	aBlock value: builder.
+	builder finish.
 	^ self
 ]
 
@@ -37,6 +43,7 @@ SpirVModule >> bytes [
 { #category : #'stream out' }
 SpirVModule >> emitOn: aStream [
 	aStream nextPut: SpvMagicNumber;
+		nextPut: 16r00010000;
 		nextPut: 0;
 		nextPut: idBound;
 		nextPut: 0.
@@ -56,6 +63,14 @@ SpirVModule >> newId [
 	result := idBound.
 	idBound := result + 1.
 	^ result
+]
+
+{ #category : #fileout }
+SpirVModule >> saveTo: aFileReference [
+	FileStream forceNewFileNamed: aFileReference fullName do: [ :out |
+		out binary.
+		self writeOn: out
+	]
 ]
 
 { #category : #building }

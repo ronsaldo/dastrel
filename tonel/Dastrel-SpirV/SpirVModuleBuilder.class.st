@@ -2,7 +2,14 @@ Class {
 	#name : #SpirVModuleBuilder,
 	#superclass : #Object,
 	#instVars : [
-		'module'
+		'module',
+		'typeInstructions',
+		'functionInstructions',
+		'prologueInstructions',
+		'debugInstructions',
+		'annotationInstructions',
+		'globalVariablesInstructions',
+		'constantsInstructions'
 	],
 	#pools : [
 		'SpirVConstants'
@@ -11,9 +18,61 @@ Class {
 }
 
 { #category : #adding }
-SpirVModuleBuilder >> addInstruction: anInstruction [
-	module addInstruction: anInstruction.
+SpirVModuleBuilder >> addAnnotationInstruction: anInstruction [
+	annotationInstructions add: anInstruction.
+	^ anInstruction resultId
+]
 
+{ #category : #adding }
+SpirVModuleBuilder >> addConstantInstruction: anInstruction [
+	constantsInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addDebugInstruction: anInstruction [
+	debugInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addPrologueInstruction: anInstruction [
+	prologueInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addTypeInstruction: anInstruction [
+	typeInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #initialization }
+SpirVModuleBuilder >> createDefaultPrologue [
+	
+]
+
+{ #category : #building }
+SpirVModuleBuilder >> finish [
+	module addInstructions: prologueInstructions.
+	module addInstructions: debugInstructions.
+	module addInstructions: annotationInstructions.
+	module addInstructions: typeInstructions.
+	module addInstructions: constantsInstructions.
+	module addInstructions: functionInstructions.
+	
+]
+
+{ #category : #initialization }
+SpirVModuleBuilder >> initialize [
+	super initialize.
+	prologueInstructions := OrderedCollection new.
+	debugInstructions := OrderedCollection new.
+	annotationInstructions := OrderedCollection new.
+	typeInstructions := OrderedCollection new.
+	constantsInstructions := OrderedCollection new.
+	functionInstructions := OrderedCollection new.
+	self createDefaultPrologue.
 ]
 
 { #category : #'control flow' }
@@ -39,30 +98,4 @@ SpirVModuleBuilder >> module: anObject [
 { #category : #building }
 SpirVModuleBuilder >> newId [
 	^ module newId
-]
-
-{ #category : #miscellaneous }
-SpirVModuleBuilder >> nop [
-	self operation: SpvOpNop
-]
-
-{ #category : #adding }
-SpirVModuleBuilder >> operation: opcode [
-	self addInstruction: (SpirVInstruction new opcode: opcode)
-]
-
-{ #category : #adding }
-SpirVModuleBuilder >> operation: opcode result: resultId [
-	self addInstruction: (SpirVInstruction new opcode: opcode; resultId: resultId).
-	^ resultId
-]
-
-{ #category : #miscellaneous }
-SpirVModuleBuilder >> undef [
-	^ self undef: self newId
-]
-
-{ #category : #miscellaneous }
-SpirVModuleBuilder >> undef: result [
-	^ self operation: SpvOpNop result: result
 ]

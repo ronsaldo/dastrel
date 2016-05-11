@@ -10,6 +10,36 @@ Class {
 	#category : #'Dastrel-SpirV'
 }
 
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode operands: operands [
+	^ self new opcode: opcode; operands: operands
+]
+
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode result: resultId [
+	^ self new opcode: opcode; resultId: resultId
+]
+
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode result: resultId operands: operands [
+	^ self new opcode: opcode; resultId: resultId; operands: operands
+]
+
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode type: typeId [
+	^ self new opcode: opcode; typeId: typeId
+]
+
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode type: typeId result: resultId [
+	^ self new opcode: opcode; typeId: typeId; resultId: resultId
+]
+
+{ #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode type: typeId result: resultId operands: operands [
+	^ self new opcode: opcode; typeId: typeId; resultId: resultId; operands: operands
+]
+
 { #category : #'stream out' }
 SpirVInstruction >> emitOn: aWordStream [
 	aWordStream nextPut: opcode | (self wordCount << 16).
@@ -67,7 +97,7 @@ SpirVInstruction >> typeId: anObject [
 { #category : #accessing }
 SpirVInstruction >> wordCount [
 	| wordCount |
-	wordCount := 0.
+	wordCount := 1.
 	typeId ifNotNil: [ wordCount := wordCount + 1 ].
 	resultId ifNotNil: [ wordCount := wordCount + 1 ].
 	wordCount := wordCount + operands size.

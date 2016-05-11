@@ -16,6 +16,11 @@ DAIRAlloca class >> valueType: valueType [
 	^ self new valueType: valueType
 ]
 
+{ #category : #'as yet unclassified' }
+DAIRAlloca >> mnemonic [
+	^ 'alloca'
+]
+
 { #category : #accessing }
 DAIRAlloca >> type [
 	^ type

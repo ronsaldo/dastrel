@@ -6,7 +6,8 @@ Class {
 		'left',
 		'right',
 		'coercionType',
-		'type'
+		'type',
+		'builtInFunction'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -14,6 +15,16 @@ Class {
 { #category : #visitor }
 DASLBinaryOperation >> accept: aVisitor [
 	^ aVisitor visitBinaryOperation: self
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> builtInFunction [
+	^ builtInFunction
+]
+
+{ #category : #accessing }
+DASLBinaryOperation >> builtInFunction: anObject [
+	builtInFunction := anObject
 ]
 
 { #category : #accessing }

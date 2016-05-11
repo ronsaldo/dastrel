@@ -21,6 +21,11 @@ DASLModule >> inputs: anObject [
 ]
 
 { #category : #testing }
+DASLModule >> isBuiltInFunction [
+	^ false
+]
+
+{ #category : #testing }
 DASLModule >> isCodeBlock [
 	^ false
 ]

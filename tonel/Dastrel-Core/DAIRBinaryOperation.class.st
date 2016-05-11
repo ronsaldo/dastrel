@@ -60,6 +60,10 @@ DAIRBinaryOperation class >> initialize [
 		ofne floatComp
 		ofgt floatComp
 		ofge floatComp
+		
+		mulMatrixMatrix matrixMatrix
+		mulMatrixVector matrixVector
+		mulVectorMatrix vectorMatrix
 	).
 
 ]
@@ -75,9 +79,33 @@ DAIRBinaryOperation >> computeTypeFor: anOperation left: leftOperand right: righ
 	| leftType rightType operationType |
 	leftType := leftOperand type.
 	rightType := rightOperand type.
+	operationType := OperationSignatures at: anOperation.
+	operationType == #matrixMatrix ifTrue: [ 
+		self assert: leftType isMatrixType.
+		self assert: rightType isMatrixType.
+		self assert: leftType baseType = rightType baseType.
+		self assert: leftType columns = rightType rows.
+		^ DASLMatrixType baseType: leftType baseType rows: leftType rows columns: rightType columns alignment: leftType alignment
+	].
+
+	operationType == #matrixVector ifTrue: [ 
+		self assert: leftType isMatrixType.
+		self assert: rightType isVectorType.
+		self assert: leftType baseType = rightType baseType.
+		self assert: leftType columns = rightType elements.
+		^ rightType
+	].
+
+	operationType == #vectorMatrix ifTrue: [ 
+		self assert: leftType isVectorType.
+		self assert: rightType isMatrixType.
+		self assert: leftType baseType = rightType baseType.
+		self assert: leftType elements = rightType rows.
+		^ leftType
+	].
+
 	leftType ~= rightType ifTrue: [ self error: 'Unsupported binary operation whose operands have a different type.' ].
 	
-	operationType := OperationSignatures at: anOperation.
 	((operationType == #integer) or: [ operationType == #integerComp ]) ifTrue: [ 
 		leftType isIntegerType ifFalse: [ self error: 'Binary operation ' , anOperation , ' requires integer operands.' ].
 		^ operationType == #integerComp ifTrue: [ DASLType boolType ] ifFalse: [ leftType ]

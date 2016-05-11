@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLAstNode,
 	#instVars : [
 		'name',
-		'type'
+		'type',
+		'codegenValue'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -15,7 +16,12 @@ DASLFunctionArgument >> accept: aVisitor [
 
 { #category : #accessing }
 DASLFunctionArgument >> codegenValue [
-	^ name
+	^ codegenValue
+]
+
+{ #category : #accessing }
+DASLFunctionArgument >> codegenValue: anObject [
+	codegenValue := anObject
 ]
 
 { #category : #accessing }

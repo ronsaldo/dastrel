@@ -183,6 +183,7 @@ DASLGLSLCodegenVisitor >> visitFunctionPrototype: prototype [
 	firstArg := true.
 	prototype arguments do: [ :arg |
 		firstArg ifFalse: [ self printString: ', ' ] ifTrue: [  firstArg := false ].
+		arg codegenValue: arg name.
 		self printString:  (self mapType: arg type) , ' ', arg name.
 	].
 
@@ -204,8 +205,4 @@ DASLGLSLCodegenVisitor >> visitFunctionPrototype: prototype [
 { #category : #'as yet unclassified' }
 DASLGLSLCodegenVisitor >> visitInteger: integerLiteral [
 	^ integerLiteral value printString
-]
-
-{ #category : #'code generation' }
-DASLGLSLCodegenVisitor >> visitUsingStatement: usingStatement [
 ]

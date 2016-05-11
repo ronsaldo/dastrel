@@ -8,8 +8,39 @@ Class {
 		'entryBlock',
 		'allocaBuilder'
 	],
+	#classVars : [
+		'BinaryOperationMap'
+	],
 	#category : #'Dastrel-Core-Codegen'
 }
+
+{ #category : #'as yet unclassified' }
+DASLSSACodegenVisitor class >> initialize [
+	"
+	self initialize
+	"
+	BinaryOperationMap := Dictionary newFromPairs: #(
+		+ (add fadd)
+		- (sub fsub)
+		* (mul fmul)
+		/ (div fdiv)
+		% (rem frem)
+		
+		& (bitand nil)
+		| (bitor nil)
+		^ (bitxor nil)
+		
+		<< (shiftleft nil)
+		>> (shiftright nil)
+		
+		<  (ilt uflt)
+		<= (ile ufle)
+		>= (ige ufge)
+		>  (igt ufgt)
+		== (ieq ufeq)
+		!= (ieq ufne)
+	)
+]
 
 { #category : #coercing }
 DASLSSACodegenVisitor >> coerce: value into: targetType [
@@ -24,19 +55,54 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 
 { #category : #coercing }
 DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
-	| baseType expandedArguments coercedValues |
+	| baseType expandedArguments |
 	baseType := type baseType.
 	expandedArguments := OrderedCollection new.
-	arguments do: [ :arg | self extractImplicitVectorElements: arg into: expandedArguments].
+	arguments do: [ :arg | self extractImplicitVectorElements: arg typeElement: baseType into: expandedArguments].
 	self assert: expandedArguments size = type elements.
-	coercedValues := expandedArguments collect: [ :arg | self coerce: arg into: baseType ].
-	^ builder makeVector: type arguments: coercedValues asArray
+	^ builder makeVector: type arguments: expandedArguments asArray
 ]
 
 { #category : #coercing }
-DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar into: expandedArguments [
-	self flag: 'Perform the proper expansion that is needed'.
-	expandedArguments add: vectorOrScalar
+DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeElement: typeElement into: expandedArguments [
+	| vectorOrScalarTypeNoRef loadedVector |
+	vectorOrScalarTypeNoRef := vectorOrScalar type.
+	vectorOrScalarTypeNoRef isReferenceType ifTrue: [ vectorOrScalarTypeNoRef := vectorOrScalarTypeNoRef baseType ].
+	vectorOrScalarTypeNoRef isVectorType ifTrue: [
+		loadedVector := self coerce: vectorOrScalar into: vectorOrScalarTypeNoRef.
+		self assert: vectorOrScalarTypeNoRef baseType = typeElement.
+		1 to: vectorOrScalarTypeNoRef elements do: [ :i |
+			expandedArguments add: (builder extractVector: loadedVector element: (builder constInt: i))
+		].
+		^ self
+	].
+
+	"It has to be an scalar."
+	expandedArguments add: (self coerce: vectorOrScalar into: typeElement) 
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction arguments: arguments [
+	| functionType expectedArgumentTypes coercedArguments leftValue rightValue |
+	functionType := builtInFunction functionType.
+	expectedArgumentTypes := functionType arguments.
+	coercedArguments := arguments collectWithIndex: [ :argument :index |
+		self coerce: argument into: (expectedArgumentTypes at: index)
+	].
+
+	(arguments size = 2 and: [BinaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
+		"Give a special treatment to the multiplication"
+		builtInFunction name = #* ifTrue: [ 
+			^ self generateMultiplication: coercedArguments first with: coercedArguments second
+		].
+	
+		leftValue := coercedArguments first.
+		rightValue := coercedArguments right.
+		
+		self halt.
+	].
+
+	self halt.
 ]
 
 { #category : #coercing }
@@ -89,9 +155,13 @@ DASLSSACodegenVisitor >> generateCodeBlocks: translationUnit [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
-	| contentBlock |
+	| contentBlock argumentValues |
 	currentFunction := ssaModule globalNamed: aFunctionNode mangledName.
 	builder := DAIRBuilder on: currentFunction.
+	argumentValues := currentFunction arguments.
+	aFunctionNode prototype arguments doWithIndex: [ :protoArg :index |
+		protoArg codegenValue: (argumentValues at: index)
+	].
 
 	entryBlock := builder newBasicBlock: #entry.
 	allocaBuilder := DAIRBuilder on: currentFunction.
@@ -99,7 +169,17 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 
 	contentBlock := builder newBasicBlock: #content.
 	builder withBasicBlock: contentBlock do: [
-		builder isLastTerminator ifFalse: [ builder returnVoid ]
+		aFunctionNode body do: [ :statement |
+			builder isLastTerminator ifFalse: [ statement accept: self ]
+		].
+	
+		builder isLastTerminator ifFalse: [
+			currentFunction returnType isVoidType ifTrue: [
+				builder returnVoid
+			] ifFalse: [
+				self error: 'not all the control flow paths in ' , aFunctionNode name , ' return something.'
+			]
+		]
 	].
 
 	allocaBuilder jump: entryBlock
@@ -135,6 +215,30 @@ DASLSSACodegenVisitor >> generateGraphBlocks: translationUnit [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> generateMultiplication: leftValue with: rightValue [
+	| leftType rightType |
+	leftType := leftValue type.
+	rightType := rightValue type.
+	(leftType isMatrixType and: rightType isMatrixType) ifTrue: [
+		^ builder mulMatrix: leftValue withMatrix: rightValue.
+	].
+ 
+	(leftType isMatrixType and: rightType isVectorType) ifTrue: [
+		^ builder mulMatrix: leftValue withVector: rightValue.
+	].
+
+	(leftType isVectorType and: rightType isMatrixType) ifTrue: [
+		^ builder mulVector: leftValue withMatrix: rightValue.
+	].
+
+	leftType isFloatType ifTrue: [ 
+		^ builder fmul: leftValue with: rightValue 
+	] ifFalse: [
+		^ builder mul: leftValue with: rightValue
+	]
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> generateSemanticBlock: semanticBlock [
 	| prefix |
 	prefix := semanticBlock name , '.'.
@@ -164,13 +268,21 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	blockType := DASLStructureType types: elementTypes.
 	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType.
 	ssaModule add: globalVar.
+	uniformBlock codegenValue: globalVar.
 	
-	"TODO: Assign a const value to the fields of the uniform block"
+	
+	uniformBlock body do: [ :var | self generateUniformVar: var structVar: globalVar].
+
 ]
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 	translationUnit modules select: #isUniformBlock thenDo: [ :block | self generateUniformBlock: block ]
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateUniformVar: var structVar: structGlobalVar [
+	var codegenValue: (DAIRConstantGetElementReference reference: structGlobalVar index: (DAIRConstant int: var fieldIndex))
 ]
 
 { #category : #visitor }
@@ -184,10 +296,24 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitBinaryOperation: binaryOperation [
+	^ self generateBuiltInCall: binaryOperation builtInFunction arguments: {
+		binaryOperation left accept: self.
+		binaryOperation right accept: self.
+	}
+
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitCallExpression: callExpression [
 	| function arguments functionRefType functionType expectedArgumentTypes coercedArguments |
 	function := callExpression solvedFunction ifNotNil: [
-		 callExpression solvedFunction codegenValue
+		callExpression solvedFunction isBuiltInFunction ifTrue: [ 
+			arguments := callExpression arguments collect: [ :arg | arg accept: self ].
+			^ self generateBuiltInCall: callExpression solvedFunction arguments: arguments
+		].
+	
+		callExpression solvedFunction codegenValue
 	] ifNil: [
 		callExpression reference accept: self.
 	].
@@ -247,9 +373,26 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 		globalRefValue codegenValue ifNotNil: [ ^ globalRefValue codegenValue]
 	].
 	
-	self halt.
 	baseReference := memberAccess reference accept: self.
-	^ builder getReference: baseReference element: memberAccess name.
+	^ builder getReference: baseReference element: (builder constInt: memberAccess memberIndex).
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
+	| returnType returnTypes returnValues |
+	returnType := currentFunction functionType returnType.
+	returnTypes := returnType isTupleType ifTrue: [ returnType types ] ifFalse: [ { returnType } ].
+	returnValues := returnStatement value collect: [:value | value accept: self].
+	
+	returnType isVoidType ifTrue: [
+		^ builder returnVoid
+	].
+
+	returnTypes size = 1 ifTrue: [
+		^ builder return: (self coerce: returnValues first into: returnType)
+	].
+
+	self halt.
 ]
 
 { #category : #visitor }
@@ -267,4 +410,9 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 		generateGraphBlocks: translationUnit.
 		
 	^ ssaModule.
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitUsingStatement: anUsingStatement [
+	"Nothing to do, for now"
 ]

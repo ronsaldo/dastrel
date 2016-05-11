@@ -30,6 +30,7 @@ DASLBuiltInFunctionAlternative >> asBuiltInFunction [
 	^ DASLBuiltInFunction new
 		functionType: self functionType;
 		coercionType: coercionType;
+		builtInOptions: options
 		yourself
 ]
 

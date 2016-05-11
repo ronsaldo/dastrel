@@ -5,7 +5,8 @@ Class {
 		'flow',
 		'type',
 		'name',
-		'codegenValue'
+		'codegenValue',
+		'fieldIndex'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -23,6 +24,16 @@ DASLFieldDefinition >> codegenValue [
 { #category : #accessing }
 DASLFieldDefinition >> codegenValue: anObject [
 	codegenValue := anObject
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> fieldIndex [
+	^ fieldIndex
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> fieldIndex: anObject [
+	fieldIndex := anObject
 ]
 
 { #category : #accessing }

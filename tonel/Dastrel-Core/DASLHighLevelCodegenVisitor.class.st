@@ -280,6 +280,10 @@ DASLHighLevelCodegenVisitor >> visitTranslationUnit: translationUnit [
 	]
 ]
 
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitUsingStatement: usingStatement [
+]
+
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> withIndentation: aBlock [
 	self increaseTabCount.

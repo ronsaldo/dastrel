@@ -41,6 +41,7 @@ DASLBlockSemanticVisitor >> visitBinaryOperation: operation [
 
 	functionGroup := self lookOperationFunctionGroup: operation operation at: operation.
 	matchingFunction := self findIn: functionGroup bestMatchingType: { operation left type . operation right type} at: operation.
+	operation builtInFunction: matchingFunction.
 	operation coercionType: matchingFunction coercionType.
 	operation type: matchingFunction functionType returnType
 ]
@@ -132,6 +133,7 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 		block isGlobalConnectionBlock ifTrue: [
 			member := block scope lookSymbol: memberAccess memberName.
 			member ifNil: [ self error: 'failed to find member "' ,  memberAccess memberName , '" in block "' , block name, '".' at:  memberAccess ].
+			memberAccess memberIndex: member fieldIndex.
 			memberAccess type: member referenceType.
 			memberAccess globalReferenceValue: member.
 			^ self

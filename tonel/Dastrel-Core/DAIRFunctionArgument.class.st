@@ -29,6 +29,11 @@ DAIRFunctionArgument >> name: anObject [
 	name := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DAIRFunctionArgument >> printOn: aStream [
+	^ aStream nextPut: $%; nextPutAll: name
+]
+
 { #category : #accessing }
 DAIRFunctionArgument >> type [
 	^ type

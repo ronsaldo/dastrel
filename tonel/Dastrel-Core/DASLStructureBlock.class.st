@@ -14,8 +14,9 @@ DASLStructureBlock >> body [
 ]
 
 { #category : #accessing }
-DASLStructureBlock >> body: anObject [
-	body := anObject
+DASLStructureBlock >> body: anArray [
+	body := anArray.
+	body doWithIndex: [ :field :index | field fieldIndex: index - 1]
 ]
 
 { #category : #accessing }

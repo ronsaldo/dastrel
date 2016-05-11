@@ -111,6 +111,16 @@ DAIRBuilder >> div: left with: right name: resultName [
 ]
 
 { #category : #instructions }
+DAIRBuilder >> extractVector: aVectorValue element: indexValue [
+	^ self extractVector: aVectorValue element: indexValue name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> extractVector: aVectorValue element: indexValue name: resultName [
+	^ self addInstruction: (DAIRExtractVectorElement vector: aVectorValue index: indexValue) name: resultName
+]
+
+{ #category : #instructions }
 DAIRBuilder >> fadd: left with: right [
 	^ self fadd: left with: right name: function generateSymbol
 ]
@@ -170,6 +180,16 @@ DAIRBuilder >> function: anObject [
 	function := anObject
 ]
 
+{ #category : #instructions }
+DAIRBuilder >> getReference: reference element: element [
+	^ self getReference: reference element: element resultName: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> getReference: reference element: element resultName: resultName [
+	^ self addInstruction: (DAIRGetElementReference reference: reference index: element) name: resultName
+]
+
 { #category : #testing }
 DAIRBuilder >> isLastTerminator [
 	^ currentBlock isLastTerminator
@@ -224,6 +244,36 @@ DAIRBuilder >> mul: left with: right [
 { #category : #instructions }
 DAIRBuilder >> mul: left with: right name: resultName [
 	^ self addOperation: #mul left: left right: right name: resultName
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulMatrix: left withMatrix: right [
+	^ self mulMatrix: left withMatrix: right name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulMatrix: left withMatrix: right name: resultName [
+	^ self addOperation: #mulMatrixMatrix left: left right: right name: resultName
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulMatrix: left withVector: right [
+	^ self mulMatrix: left withVector: right name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulMatrix: left withVector: right name: resultName [
+	^ self addOperation: #mulMatrixVector left: left right: right name: resultName
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulVector: left withMatrix: right [
+	^ self mulVector: left withMatrix: right name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> mulVector: left withMatrix: right name: resultName [
+	^ self addOperation: #mulVectorMatrix left: left right: right name: resultName
 ]
 
 { #category : #'instance creation' }

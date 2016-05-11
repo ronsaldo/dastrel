@@ -5,7 +5,8 @@ Class {
 		'reference',
 		'memberName',
 		'globalReferenceValue',
-		'type'
+		'type',
+		'memberIndex'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -23,6 +24,16 @@ DASLMemberAccessExpression >> globalReferenceValue [
 { #category : #accessing }
 DASLMemberAccessExpression >> globalReferenceValue: anObject [
 	globalReferenceValue := anObject
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> memberIndex [
+	^ memberIndex
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> memberIndex: anObject [
+	memberIndex := anObject
 ]
 
 { #category : #accessing }

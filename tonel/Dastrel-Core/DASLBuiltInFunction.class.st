@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'functionType',
 		'coercionType',
-		'operation'
+		'operation',
+		'builtInOptions'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -12,6 +13,16 @@ Class {
 { #category : #visitor }
 DASLBuiltInFunction >> accept: aVisitor [
 	^ aVisitor visitBuiltInFunction: self
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> builtInOptions [
+	^ builtInOptions
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> builtInOptions: anObject [
+	builtInOptions := anObject
 ]
 
 { #category : #accessing }
@@ -32,6 +43,11 @@ DASLBuiltInFunction >> functionType [
 { #category : #accessing }
 DASLBuiltInFunction >> functionType: anObject [
 	functionType := anObject
+]
+
+{ #category : #testing }
+DASLBuiltInFunction >> isBuiltInFunction [
+	^ true
 ]
 
 { #category : #accessing }

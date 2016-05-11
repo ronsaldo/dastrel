@@ -88,9 +88,13 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 	^ #(
 		(
-			(*) (operation)
+			(*) (operation matrixMatrix)
 			(float4x4 float4x4 => float4x4)
 			(float3x3 float3x3 => float3x3)
+		)
+		
+		(
+			(*) (operation matrixVector)
 			(float4x4 float4 => float4)
 			(float4 float4x4 => float4)
 			(float3x3 float3 => float3)

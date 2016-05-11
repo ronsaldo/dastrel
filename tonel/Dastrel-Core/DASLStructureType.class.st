@@ -27,6 +27,12 @@ DASLStructureType >> isStructureType [
 	^ true
 ]
 
+{ #category : #accessing }
+DASLStructureType >> memberAt: constantValue [
+	self assert: constantValue isConstant.
+	^ types at: constantValue value + 1
+]
+
 { #category : #printing }
 DASLStructureType >> printOn: aStream [
 	aStream nextPutAll: 'struct {'.

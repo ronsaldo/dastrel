@@ -4,6 +4,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #visitor }
+DAIRValue >> accept: aVisitor [
+	self subclassResponsibility
+]
+
 { #category : #adding }
 DAIRValue >> addInstructionReference: anInstruction [
 	"By default, do nothing"

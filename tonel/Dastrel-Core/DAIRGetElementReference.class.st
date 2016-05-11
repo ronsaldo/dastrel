@@ -12,6 +12,11 @@ DAIRGetElementReference class >> reference: reference index: index [
 	^ self new reference: reference index: index
 ]
 
+{ #category : #visitor }
+DAIRGetElementReference >> accept: aVisitor [
+	^ aVisitor visitGetElementReference: self
+]
+
 { #category : #accessing }
 DAIRGetElementReference >> index [
 	^ parameters second
@@ -31,7 +36,7 @@ DAIRGetElementReference >> reference [
 DAIRGetElementReference >> reference: reference index: index [
 	self parameters: { reference . index }.
 	self assert: reference type isReferenceType.
-	type := DASLReferenceType baseType: (reference type baseType memberAt: index)
+	type := DASLReferenceType baseType: (reference type baseType memberAt: index) storage: reference type storage
 ]
 
 { #category : #accessing }

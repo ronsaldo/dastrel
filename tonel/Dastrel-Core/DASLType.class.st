@@ -2,23 +2,40 @@ Class {
 	#name : #DASLType,
 	#superclass : #DASLObject,
 	#classVars : [
+		'AtomicCounterStorage',
 		'AutoType',
 		'BoolType',
 		'BuiltInTypes',
 		'CharType',
+		'CrossWorkgroupStorage',
 		'DoubleType',
 		'FloatType',
+		'FunctionStorage',
+		'GenericStorage',
+		'ImageStorage',
+		'InputStorage',
 		'IntType',
 		'LongType',
+		'OutputStorage',
+		'PrivateStorage',
+		'PushConstantStorage',
 		'ShortType',
 		'UCharType',
 		'UIntType',
 		'ULongType',
 		'UShortType',
-		'VoidType'
+		'UniformConstantStorage',
+		'UniformStorage',
+		'VoidType',
+		'WorkgroupStorage'
 	],
 	#category : #'Dastrel-Core-Type'
 }
+
+{ #category : #'storage classes' }
+DASLType class >> atomicCounterStorage [
+	^ AtomicCounterStorage
+]
 
 { #category : #'built in types' }
 DASLType class >> autoType [
@@ -44,6 +61,11 @@ DASLType class >> charType [
 	^ CharType
 ]
 
+{ #category : #'storage classes' }
+DASLType class >> crossWorkgroupStorage [
+	^ CrossWorkgroupStorage
+]
+
 { #category : #'built in types' }
 DASLType class >> doubleType [
 	^ DoubleType
@@ -54,6 +76,21 @@ DASLType class >> floatType [
 	^ FloatType
 ]
 
+{ #category : #'storage classes' }
+DASLType class >> functionStorage [
+	^ FunctionStorage
+]
+
+{ #category : #'storage classes' }
+DASLType class >> genericStorage [
+	^ GenericStorage
+]
+
+{ #category : #'storage classes' }
+DASLType class >> imageStorage [
+	^ ImageStorage
+]
+
 { #category : #'class initialization' }
 DASLType class >> initialize [
 	"
@@ -61,8 +98,27 @@ DASLType class >> initialize [
 	"
 	super initialize.
 	
+	UniformConstantStorage := #uniform.
+	UniformStorage := 	#uniform.
+	InputStorage := #input.
+	OutputStorage := #output.
+	GenericStorage := #generic.
+	WorkgroupStorage := #workgroup.
+	CrossWorkgroupStorage := #crossWorkgroup.
+	PrivateStorage := #private.
+	FunctionStorage := #function.
+	GenericStorage := #generic.
+	PushConstantStorage := #pushConstant.
+	AtomicCounterStorage := #atomicCounter.
+	ImageStorage := #image.
+	
 	BuiltInTypes := IdentityDictionary new.
 	(self primitiveTypes , self vectorTypes , self matrixTypes )do: [ :type | BuiltInTypes at: type name put: type ]
+]
+
+{ #category : #'storage classes' }
+DASLType class >> inputStorage [
+	^ InputStorage
 ]
 
 { #category : #'built in types' }
@@ -82,6 +138,11 @@ DASLType class >> matrixTypes [
 		DASLMatrixType name: #float3x3 baseType: FloatType rows: 3 columns: 3 alignment: 16.
 		DASLMatrixType name: #float4x4 baseType: FloatType rows: 4 columns: 4 alignment: 16.
 	}
+]
+
+{ #category : #'storage classes' }
+DASLType class >> outputStorage [
+	^ OutputStorage
 ]
 
 { #category : #'built in types' }
@@ -125,6 +186,16 @@ DASLType class >> primitiveTypes [
 	}
 ]
 
+{ #category : #'storage classes' }
+DASLType class >> privateStorage [
+	^ PrivateStorage
+]
+
+{ #category : #'storage classes' }
+DASLType class >> pushConstantStorage [
+	^ PushConstantStorage
+]
+
 { #category : #'built in types' }
 DASLType class >> shortType [
 	^ ShortType
@@ -145,6 +216,16 @@ DASLType class >> ulongType [
 	^ ULongType
 ]
 
+{ #category : #'storage classes' }
+DASLType class >> uniformConstantStorage [
+	^ UniformConstantStorage
+]
+
+{ #category : #'storage classes' }
+DASLType class >> uniformStorage [
+	^ UniformStorage
+]
+
 { #category : #'built in types' }
 DASLType class >> ushortType [
 	^ UShortType
@@ -162,6 +243,16 @@ DASLType class >> vectorTypes [
 { #category : #'built in types' }
 DASLType class >> voidType [
 	^ VoidType
+]
+
+{ #category : #'storage classes' }
+DASLType class >> workgroupStorage [
+	^ WorkgroupStorage
+]
+
+{ #category : #visitor }
+DASLType >> accept: aVisitor [
+	self subclassResponsibility
 ]
 
 { #category : #accessing }

@@ -12,6 +12,11 @@ DAIRCall class >> function: functionValue arguments: arguments [
 	^ self new function: functionValue arguments: arguments
 ]
 
+{ #category : #visitor }
+DAIRCall >> accept: aVisitor [
+	^ aVisitor visitCall: self
+]
+
 { #category : #accessing }
 DAIRCall >> arguments [
 	^ parameters allButFirst

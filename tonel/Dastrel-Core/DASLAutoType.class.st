@@ -9,6 +9,11 @@ DASLAutoType >> = other [
 	^ self class == other class
 ]
 
+{ #category : #visitor }
+DASLAutoType >> accept: aVisitor [
+	^ aVisitor visitAutoType: self
+]
+
 { #category : #comparing }
 DASLAutoType >> hash [
 	^ self class hash

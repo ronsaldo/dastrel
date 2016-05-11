@@ -12,6 +12,11 @@ DAIRExtractVectorElement class >> vector: aVectorValue index: indexValue [
 	^ self new vector: aVectorValue index: indexValue
 ]
 
+{ #category : #visitor }
+DAIRExtractVectorElement >> accept: aVisitor [
+	^ aVisitor visitExtractVectorElement: self
+]
+
 { #category : #accessing }
 DAIRExtractVectorElement >> index [
 	^ parameters second

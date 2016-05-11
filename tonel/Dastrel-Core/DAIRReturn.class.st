@@ -9,6 +9,11 @@ DAIRReturn class >> value: aReturnValue [
 	^ DAIRReturn new value: aReturnValue
 ]
 
+{ #category : #visitor }
+DAIRReturn >> accept: aVisitor [
+	^ aVisitor visitReturn: self
+]
+
 { #category : #testing }
 DAIRReturn >> isTerminator [
 	^ true

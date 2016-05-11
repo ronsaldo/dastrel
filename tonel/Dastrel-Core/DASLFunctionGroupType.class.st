@@ -7,6 +7,11 @@ Class {
 	#category : #'Dastrel-Core-Type'
 }
 
+{ #category : #visitor }
+DASLFunctionGroupType >> accept: aVisitor [
+	^ aVisitor visitFunctionGroupType: self
+]
+
 { #category : #accessing }
 DASLFunctionGroupType >> functionGroup [
 	^ functionGroup

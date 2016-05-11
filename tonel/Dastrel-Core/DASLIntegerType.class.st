@@ -17,6 +17,11 @@ DASLIntegerType >> = other [
 	^ super = other and: [ signed = other isSigned ]
 ]
 
+{ #category : #visitor }
+DASLIntegerType >> accept: aVisitor [
+	^ aVisitor visitIntegerType: self
+]
+
 { #category : #comparing }
 DASLIntegerType >> hash [
 	^ super hash bitXor: signed hash

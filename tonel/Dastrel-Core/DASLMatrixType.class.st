@@ -38,6 +38,11 @@ DASLMatrixType >> = other [
 			[ alignment = other alignment ] ] ] ]
 ]
 
+{ #category : #visitor }
+DASLMatrixType >> accept: aVisitor [
+	^ aVisitor visitMatrixType: self
+]
+
 { #category : #accessing }
 DASLMatrixType >> alignment [
 	^ alignment
@@ -88,7 +93,7 @@ DASLMatrixType >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLMatrixType >> printOn: aStream [
 	aStream nextPutAll: 'matrix!<'; print: baseType; nextPutAll: ', '; print: rows; nextPutAll: ', '; print: columns; nextPutAll: '>'
 ]

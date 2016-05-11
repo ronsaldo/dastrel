@@ -9,6 +9,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #visitor }
+DAIRFunctionArgument >> accept: aVisitor [
+	^ aVisitor visitFunctionArgument: self
+]
+
 { #category : #accessing }
 DAIRFunctionArgument >> index [
 	^ index
@@ -29,7 +34,7 @@ DAIRFunctionArgument >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DAIRFunctionArgument >> printOn: aStream [
 	^ aStream nextPut: $%; nextPutAll: name
 ]

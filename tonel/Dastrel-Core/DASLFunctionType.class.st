@@ -18,6 +18,11 @@ DASLFunctionType >> = other [
 	^ self class == other class and: [ arguments = other arguments and: [ returnType = other returnType  ] ]
 ]
 
+{ #category : #visitor }
+DASLFunctionType >> accept: aVisitor [
+	^ aVisitor visitFunctionType: self
+]
+
 { #category : #accessing }
 DASLFunctionType >> arguments [
 	^ arguments

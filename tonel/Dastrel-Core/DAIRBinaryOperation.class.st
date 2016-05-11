@@ -74,6 +74,11 @@ DAIRBinaryOperation class >> operation: operation left: leftOperand right: right
 
 ]
 
+{ #category : #visitor }
+DAIRBinaryOperation >> accept: aVisitor [
+	^ aVisitor visitBinaryOperation: self
+]
+
 { #category : #accessing }
 DAIRBinaryOperation >> computeTypeFor: anOperation left: leftOperand right: rightOperand [
 	| leftType rightType operationType |

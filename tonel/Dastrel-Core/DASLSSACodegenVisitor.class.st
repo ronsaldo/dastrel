@@ -254,10 +254,9 @@ DASLSSACodegenVisitor >> generateSemanticBlocks: translationUnit [
 DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 	| fullName globalVar |
 	fullName := namePrefix , aVariable name.
-	globalVar := DAIRGlobalVariable name: fullName valueType: aVariable type.
+	globalVar := DAIRGlobalVariable name: fullName valueType: aVariable type storage: aVariable storage.
 	aVariable codegenValue: globalVar.
-	globalVar propertyAt: #flowDirection put: aVariable flow direction.
-	globalVar propertyAt: #flowLocation put: aVariable flow location.
+	globalVar propertyAt: #location put: aVariable flow location.
 	ssaModule add: globalVar.
 ]
 
@@ -266,7 +265,7 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	| elementTypes blockType globalVar |
 	elementTypes := uniformBlock body collect: #type.
 	blockType := DASLStructureType types: elementTypes.
-	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType.
+	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
 	ssaModule add: globalVar.
 	uniformBlock codegenValue: globalVar.
 	

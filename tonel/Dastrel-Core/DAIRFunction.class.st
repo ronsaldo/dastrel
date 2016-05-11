@@ -16,6 +16,11 @@ DAIRFunction class >> name: aString functionType: aFunctionType [
 	^ self new name: aString; functionType: aFunctionType; yourself
 ]
 
+{ #category : #visitor }
+DAIRFunction >> accept: aVisitor [
+	^ aVisitor visitFunction: self
+]
+
 { #category : #adding }
 DAIRFunction >> addBasicBlock: aBasicBlock [
 	basicBlocks add: aBasicBlock.
@@ -48,7 +53,7 @@ DAIRFunction >> functionType [
 { #category : #accessing }
 DAIRFunction >> functionType: anObject [
 	functionType := anObject.
-	type := DASLReferenceType baseType: functionType.
+	type := DASLReferenceType baseType: functionType storage: DASLType genericStorage.
 	self makeArguments.
 ]
 
@@ -64,6 +69,11 @@ DAIRFunction >> initialize [
 	basicBlocks := OrderedCollection new.
 	arguments := #().
 	gensymCount := 0.
+]
+
+{ #category : #testing }
+DAIRFunction >> isFunction [
+	^ true
 ]
 
 { #category : #private }

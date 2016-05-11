@@ -17,6 +17,11 @@ DASLStructureType >> = other [
 	^ self class == other class and: [ types = other types ]
 ]
 
+{ #category : #visitor }
+DASLStructureType >> accept: aVisitor [
+	^ aVisitor visitStructureType: self
+]
+
 { #category : #comparing }
 DASLStructureType >> hash [
 	^ self class hash bitXor: types hash

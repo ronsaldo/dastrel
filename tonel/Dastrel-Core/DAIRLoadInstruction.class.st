@@ -12,6 +12,11 @@ DAIRLoadInstruction class >> variable: variableReference [
 	^ self new variable: variableReference
 ]
 
+{ #category : #visitor }
+DAIRLoadInstruction >> accept: aVisitor [
+	^ aVisitor visitLoad: self
+]
+
 { #category : #printing }
 DAIRLoadInstruction >> mnemonic [
 	^ 'load'

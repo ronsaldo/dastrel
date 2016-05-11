@@ -4,6 +4,11 @@ Class {
 	#category : #'Dastrel-Core-Type'
 }
 
+{ #category : #visitor }
+DASLBoolType >> accept: aVisitor [
+	^ aVisitor visitBoolType: self
+]
+
 { #category : #initialization }
 DASLBoolType >> initialize [
 	super initialize.

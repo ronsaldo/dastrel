@@ -8,7 +8,12 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
+DAIRConstantValue >> accept: aVisitor [
+	^ aVisitor visitConstantValue: self
+]
+
+{ #category : #printing }
 DAIRConstantValue >> printOn: aStream [
 	aStream nextPutAll: 'constant '; print: type; space; print: value
 ]

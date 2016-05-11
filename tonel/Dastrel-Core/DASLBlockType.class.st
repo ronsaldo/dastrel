@@ -12,6 +12,11 @@ DASLBlockType >> = other [
 	^ self class = other class and: [ block == other block]
 ]
 
+{ #category : #visitor }
+DASLBlockType >> accept: aVisitor [
+	^ aVisitor visitBlockType: self
+]
+
 { #category : #accessing }
 DASLBlockType >> block [
 	^ block

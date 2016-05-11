@@ -4,7 +4,12 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
+DAIRPhi >> accept: aVisitor [
+	^ aVisitor visitPhi: self
+]
+
+{ #category : #printing }
 DAIRPhi >> mnemonic [
 	^ 'phi'
 ]

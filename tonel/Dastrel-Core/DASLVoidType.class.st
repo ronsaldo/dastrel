@@ -9,6 +9,11 @@ DASLVoidType >> = other [
 	^ self class == other class
 ]
 
+{ #category : #visitor }
+DASLVoidType >> accept: aVisitor [
+	^ aVisitor visitVoidType: self
+]
+
 { #category : #comparing }
 DASLVoidType >> hash [
 	^ self class hash

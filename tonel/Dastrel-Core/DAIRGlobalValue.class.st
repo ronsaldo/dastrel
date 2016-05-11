@@ -14,6 +14,16 @@ DAIRGlobalValue >> initialize [
 	properties := IdentityDictionary new.
 ]
 
+{ #category : #testing }
+DAIRGlobalValue >> isFunction [
+	^ false
+]
+
+{ #category : #testing }
+DAIRGlobalValue >> isGlobalVariable [
+	^ false
+]
+
 { #category : #accessing }
 DAIRGlobalValue >> name [
 	^ name

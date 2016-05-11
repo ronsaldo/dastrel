@@ -37,7 +37,7 @@ DASLFunctionArgument >> name: anObject [
 { #category : #accessing }
 DASLFunctionArgument >> referenceType [
 	type isReferenceType ifTrue: [ ^ type ].
-	^ DASLReferenceType baseType: type.
+	^ DASLReferenceType baseType: type storage: DASLType functionStorage.
 ]
 
 { #category : #accessing }

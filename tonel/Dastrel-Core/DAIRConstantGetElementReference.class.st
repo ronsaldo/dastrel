@@ -9,6 +9,11 @@ DAIRConstantGetElementReference class >> reference: reference index: index [
 	^ self new reference: reference index: index
 ]
 
+{ #category : #visitor }
+DAIRConstantGetElementReference >> accept: aVisitor [
+	^ aVisitor visitConstantGetElementReference: self
+]
+
 { #category : #accessing }
 DAIRConstantGetElementReference >> index [
 	^ parameters second
@@ -38,5 +43,5 @@ DAIRConstantGetElementReference >> reference [
 DAIRConstantGetElementReference >> reference: reference index: index [
 	self parameters: { reference . index }.
 	self assert: reference type isReferenceType.
-	type := DASLReferenceType baseType: (reference type baseType memberAt: index)
+	type := DASLReferenceType baseType: (reference type baseType memberAt: index) storage: reference type storage
 ]

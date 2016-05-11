@@ -7,6 +7,11 @@ Class {
 	#category : #'Dastrel-Core-Type'
 }
 
+{ #category : #visitor }
+DASLTypeWrapper >> accept: aVisitor [
+	^ aVisitor visitTypeWrapper: self
+]
+
 { #category : #testing }
 DASLTypeWrapper >> isTypeWrapper [
 	^ true

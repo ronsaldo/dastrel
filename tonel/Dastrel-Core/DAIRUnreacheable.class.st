@@ -4,6 +4,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #visitor }
+DAIRUnreacheable >> accept: aVisitor [
+	^ aVisitor visitUnreachable: self
+]
+
 { #category : #testing }
 DAIRUnreacheable >> isTerminator [
 	^ true

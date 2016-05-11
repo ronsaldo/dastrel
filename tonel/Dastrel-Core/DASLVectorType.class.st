@@ -35,6 +35,11 @@ DASLVectorType >> = other [
 			[ alignment = other alignment ] ] ]
 ]
 
+{ #category : #visitor }
+DASLVectorType >> accept: aVisitor [
+	^ aVisitor visitVectorType: self
+]
+
 { #category : #accessing }
 DASLVectorType >> alignment [
 	^ alignment
@@ -85,7 +90,7 @@ DASLVectorType >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLVectorType >> printOn: aStream [
 	name ifNotNil: [ 
 		aStream nextPutAll: name

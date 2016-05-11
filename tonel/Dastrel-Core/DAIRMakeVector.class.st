@@ -12,7 +12,12 @@ DAIRMakeVector class >> type: vectorType parameters: arguments [
 	^ self new type: vectorType parameters: arguments
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
+DAIRMakeVector >> accept: aVisitor [
+	^ aVisitor visitMakeVector: self
+]
+
+{ #category : #printing }
 DAIRMakeVector >> mnemonic [
 	^ 'makeVector'
 ]

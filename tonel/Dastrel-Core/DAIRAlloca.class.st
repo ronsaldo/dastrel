@@ -16,7 +16,12 @@ DAIRAlloca class >> valueType: valueType [
 	^ self new valueType: valueType
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
+DAIRAlloca >> accept: aVisitor [
+	^ aVisitor visitAlloca: self
+]
+
+{ #category : #printing }
 DAIRAlloca >> mnemonic [
 	^ 'alloca'
 ]
@@ -34,5 +39,5 @@ DAIRAlloca >> valueType [
 { #category : #accessing }
 DAIRAlloca >> valueType: aType [
 	valueType := aType.
-	type := DASLReferenceType baseType: valueType
+	type := DASLReferenceType baseType: valueType storage: DASLType functionStorage
 ]

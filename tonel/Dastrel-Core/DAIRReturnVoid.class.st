@@ -4,6 +4,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #visitor }
+DAIRReturnVoid >> accept: aVisitor [
+	^ aVisitor visitReturnVoid: self
+]
+
 { #category : #testing }
 DAIRReturnVoid >> isTerminator [
 	^ true

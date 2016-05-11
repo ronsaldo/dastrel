@@ -17,6 +17,11 @@ DASLTupleType >> = other [
 	^ self class == other class and: [ types = other types ]
 ]
 
+{ #category : #visitor }
+DASLTupleType >> accept: aVisitor [
+	^ aVisitor visitTupleType: self
+]
+
 { #category : #comparing }
 DASLTupleType >> hash [
 	^ self class hash bitXor: types hash

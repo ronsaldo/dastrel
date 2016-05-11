@@ -12,6 +12,11 @@ DAIRJump class >> destination: aBasicBlock [
 	^ self new destination: aBasicBlock
 ]
 
+{ #category : #visitor }
+DAIRJump >> accept: aVisitor [
+	^ aVisitor visitJump: self
+]
+
 { #category : #accessing }
 DAIRJump >> destination [
 	^ destination
@@ -22,7 +27,7 @@ DAIRJump >> destination: anObject [
 	destination := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DAIRJump >> fullPrintOn: aStream [
 	aStream nextPutAll: 'jump '; nextPutAll:destination name
 ]
@@ -37,7 +42,7 @@ DAIRJump >> isTerminator [
 	^ true
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DAIRJump >> printOn: aStream [
 	aStream nextPutAll: 'jump '; nextPutAll:destination name
 ]

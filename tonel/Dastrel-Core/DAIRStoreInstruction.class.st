@@ -9,6 +9,11 @@ DAIRStoreInstruction class >> value: value variable: variable [
 	^ self new value: value variable: variable
 ]
 
+{ #category : #visitor }
+DAIRStoreInstruction >> accept: aVisitor [
+	^ aVisitor visitStore: self
+]
+
 { #category : #printing }
 DAIRStoreInstruction >> mnemonic [
 	^ 'store'

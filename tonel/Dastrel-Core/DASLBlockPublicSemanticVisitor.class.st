@@ -81,7 +81,17 @@ DASLBlockPublicSemanticVisitor >> visitSemanticBlock: semanticBlock [
 	
 	semanticBlock scope: (DASLModuleScope new parentScope: currentScope; node: semanticBlock).
 	self withScope: semanticBlock scope do: [
-		semanticBlock body do: [ :el | el accept: self. ]
+		semanticBlock body do: [ :field |
+			field flow ifNil: [ self error: 'flow information is required for members of semantic blocks.' ].
+			field flow direction = #in ifTrue: [
+				field storage: DASLType inputStorage
+			].
+			field flow direction = #out ifTrue: [
+				field storage: DASLType outputStorage
+			].
+			
+			field accept: self.
+		]
 	].
 
 ]
@@ -99,7 +109,10 @@ DASLBlockPublicSemanticVisitor >> visitUniformBlock: uniformBlock [
 	
 	uniformBlock scope: (DASLModuleScope new parentScope: currentScope; node: uniformBlock).
 	self withScope: uniformBlock scope do: [
-		uniformBlock body do: [ :el | el accept: self. ]
+		uniformBlock body do: [ :field |
+			field storage: DASLType uniformStorage.
+			field accept: self.
+		]
 	].
 
 ]

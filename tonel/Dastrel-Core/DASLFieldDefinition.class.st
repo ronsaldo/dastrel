@@ -6,7 +6,8 @@ Class {
 		'type',
 		'name',
 		'codegenValue',
-		'fieldIndex'
+		'fieldIndex',
+		'storage'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -58,7 +59,17 @@ DASLFieldDefinition >> name: anObject [
 
 { #category : #accessing }
 DASLFieldDefinition >> referenceType [
-	^ DASLReferenceType baseType: self type
+	^ DASLReferenceType baseType: self type storage: self storage
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> storage [
+	^ storage
+]
+
+{ #category : #accessing }
+DASLFieldDefinition >> storage: anObject [
+	storage := anObject
 ]
 
 { #category : #accessing }

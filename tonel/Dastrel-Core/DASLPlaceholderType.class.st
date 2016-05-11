@@ -8,6 +8,11 @@ Class {
 	#category : #'Dastrel-Core-Type'
 }
 
+{ #category : #visitor }
+DASLPlaceholderType >> accept: aVisitor [
+	^ aVisitor visitPlaceholderType: self
+]
+
 { #category : #testing }
 DASLPlaceholderType >> canBeExpanded [
 	^ constraint canBeExpanded

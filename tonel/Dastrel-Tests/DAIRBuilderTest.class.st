@@ -88,6 +88,18 @@ DAIRBuilderTest >> testNewBasicBlock [
 ]
 
 { #category : #'as yet unclassified' }
+DAIRBuilderTest >> testReturn [
+	| top instruction |
+	top := builder newBasicBlock: #top.
+	builder withBasicBlock: top do: [
+		instruction := builder return: (builder constInt: 1)
+	].
+
+	self assert: instruction block function equals: function.
+	self assert: function basicBlocks first instructions first equals: instruction.
+]
+
+{ #category : #'as yet unclassified' }
 DAIRBuilderTest >> testReturnVoid [
 	| top instruction |
 	top := builder newBasicBlock: #top.

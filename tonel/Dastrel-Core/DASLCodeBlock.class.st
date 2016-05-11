@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLModule,
 	#instVars : [
 		'interfaceList',
-		'body'
+		'body',
+		'codegenValue'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -21,6 +22,16 @@ DASLCodeBlock >> body [
 { #category : #accessing }
 DASLCodeBlock >> body: anObject [
 	body := anObject
+]
+
+{ #category : #accessing }
+DASLCodeBlock >> codegenValue [
+	^ codegenValue
+]
+
+{ #category : #accessing }
+DASLCodeBlock >> codegenValue: anObject [
+	codegenValue := anObject
 ]
 
 { #category : #accessing }

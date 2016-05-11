@@ -5,6 +5,7 @@ Class {
 		'arguments',
 		'returnType',
 		'functionType',
+		'codegenValue',
 		'codegenReturnVariables'
 	],
 	#category : #'Dastrel-Core-AST'
@@ -36,6 +37,16 @@ DASLFunctionPrototype >> codegenReturnVariables: anObject [
 ]
 
 { #category : #accessing }
+DASLFunctionPrototype >> codegenValue [
+	^ codegenValue
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> codegenValue: anObject [
+	codegenValue := anObject
+]
+
+{ #category : #accessing }
 DASLFunctionPrototype >> functionType [
 	^ functionType
 ]
@@ -43,6 +54,11 @@ DASLFunctionPrototype >> functionType [
 { #category : #accessing }
 DASLFunctionPrototype >> functionType: anObject [
 	functionType := anObject
+]
+
+{ #category : #accessing }
+DASLFunctionPrototype >> mangledName [
+	^ name , ' ' , self functionType printString
 ]
 
 { #category : #accessing }

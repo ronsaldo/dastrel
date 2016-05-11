@@ -38,6 +38,18 @@ DASLFunctionType >> isFunctionType [
 	^ true
 ]
 
+{ #category : #printing }
+DASLFunctionType >> printOn: aStream [
+	aStream nextPutAll: 'function {('.
+	arguments doWithIndex: [ :arg :index |
+		index > 1 ifTrue: [ aStream nextPutAll: ', ' ].
+		aStream print: arg.
+	].
+	aStream nextPutAll: ') ->';
+		print: returnType;
+		nextPutAll:  '}'
+]
+
 { #category : #accessing }
 DASLFunctionType >> returnType [
 	^ returnType

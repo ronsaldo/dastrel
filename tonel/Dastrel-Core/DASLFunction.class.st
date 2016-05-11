@@ -24,6 +24,16 @@ DASLFunction >> body: anObject [
 ]
 
 { #category : #accessing }
+DASLFunction >> codegenValue [
+	^ prototype codegenValue
+]
+
+{ #category : #accessing }
+DASLFunction >> codegenValue: anObject [
+	^ prototype codegenValue: anObject
+]
+
+{ #category : #accessing }
 DASLFunction >> functionType [
 	^ prototype functionType
 ]
@@ -31,6 +41,11 @@ DASLFunction >> functionType [
 { #category : #testing }
 DASLFunction >> isFunction [
 	^ true
+]
+
+{ #category : #accessing }
+DASLFunction >> mangledName [
+	^ prototype mangledName
 ]
 
 { #category : #accessing }

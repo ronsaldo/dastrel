@@ -14,6 +14,11 @@ DAIRReturn >> isTerminator [
 	^ true
 ]
 
+{ #category : #printing }
+DAIRReturn >> mnemonic [
+	^ 'return'
+]
+
 { #category : #accessing }
 DAIRReturn >> type [
 	^ DASLType voidType

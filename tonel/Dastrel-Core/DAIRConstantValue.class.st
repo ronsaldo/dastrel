@@ -8,6 +8,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #'as yet unclassified' }
+DAIRConstantValue >> printOn: aStream [
+	aStream nextPutAll: 'constant '; print: type; space; print: value
+]
+
 { #category : #accessing }
 DAIRConstantValue >> type [
 	^ type

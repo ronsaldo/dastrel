@@ -36,3 +36,9 @@ DASLReferenceType >> hash [
 DASLReferenceType >> isReferenceType [
 	^ true
 ]
+
+{ #category : #printing }
+DASLReferenceType >> printOn: aStream [
+	aStream print: baseType;
+		nextPutAll: ' ref'
+]

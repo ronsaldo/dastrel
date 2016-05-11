@@ -18,3 +18,8 @@ DASLVoidType >> hash [
 DASLVoidType >> isVoidType [
 	^ true
 ]
+
+{ #category : #printing }
+DASLVoidType >> printOn: aStream [
+	aStream nextPutAll: 'void'
+]

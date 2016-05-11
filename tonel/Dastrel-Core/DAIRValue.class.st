@@ -9,6 +9,11 @@ DAIRValue >> addInstructionReference: anInstruction [
 	"By default, do nothing"
 ]
 
+{ #category : #adding }
+DAIRValue >> fullPrintOn: aStream [
+	self printOn: aStream
+]
+
 { #category : #testing }
 DAIRValue >> isConstant [
 	^ false
@@ -17,6 +22,11 @@ DAIRValue >> isConstant [
 { #category : #testing }
 DAIRValue >> isInstruction [
 	^ false
+]
+
+{ #category : #testing }
+DAIRValue >> isSSAValue [
+	^ true
 ]
 
 { #category : #accessing }

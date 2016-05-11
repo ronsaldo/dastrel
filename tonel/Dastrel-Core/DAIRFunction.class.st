@@ -32,6 +32,14 @@ DAIRFunction >> basicBlocks [
 	^ basicBlocks
 ]
 
+{ #category : #printing }
+DAIRFunction >> fullPrintOn: aStream [
+	aStream nextPut: $@; print: name; space; print: type; cr.
+	aStream nextPutAll: '{'; cr.
+	basicBlocks do: [ :bb | bb printOn: aStream ].
+	aStream nextPutAll: '}'; cr.
+]
+
 { #category : #accessing }
 DAIRFunction >> functionType [
 	^ functionType
@@ -44,7 +52,7 @@ DAIRFunction >> functionType: anObject [
 	self makeArguments.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #private }
 DAIRFunction >> generateSymbol [
 	gensymCount := gensymCount + 1.
 	^ (#g , gensymCount printString) asSymbol

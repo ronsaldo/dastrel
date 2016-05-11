@@ -97,6 +97,11 @@ DAIRBinaryOperation >> left [
 	^ parameters first
 ]
 
+{ #category : #printing }
+DAIRBinaryOperation >> mnemonic [
+	^ self operation
+]
+
 { #category : #accessing }
 DAIRBinaryOperation >> operation [
 	^ operation

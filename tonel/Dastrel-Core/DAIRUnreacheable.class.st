@@ -14,6 +14,11 @@ DAIRUnreacheable >> isUnreachable [
 	^ true
 ]
 
+{ #category : #printing }
+DAIRUnreacheable >> mnemonic [
+	^ 'unreachable'
+]
+
 { #category : #accessing }
 DAIRUnreacheable >> type [
 	^ DASLType voidType

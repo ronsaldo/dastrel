@@ -25,9 +25,23 @@ DAIRInstruction >> block: anObject [
 	block := anObject
 ]
 
+{ #category : #printing }
+DAIRInstruction >> fullPrintOn: aStream [
+	self type isVoidType ifFalse: [
+		self printOn: aStream.
+		aStream nextPutAll: ' = '.
+	].
+	aStream nextPutAll: self mnemonic; space.
+	parameters doWithIndex: [ :param :index |
+		index > 1 ifTrue: [  aStream nextPutAll: ', ' ].
+		aStream print: param
+	]
+]
+
 { #category : #initialization }
 DAIRInstruction >> initialize [
 	instructionReferences := Set new.
+	parameters := #().
 ]
 
 { #category : #accessing }
@@ -60,6 +74,11 @@ DAIRInstruction >> isUnreachable [
 	^ false
 ]
 
+{ #category : #printing }
+DAIRInstruction >> mnemonic [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 DAIRInstruction >> name [
 	^ name
@@ -79,6 +98,11 @@ DAIRInstruction >> parameters [
 DAIRInstruction >> parameters: anArrayOfParameter [
 	parameters := anArrayOfParameter.
 	parameters do: [ :param | param addInstructionReference: self ]
+]
+
+{ #category : #printing }
+DAIRInstruction >> printOn: aStream [
+	aStream nextPut: $%; nextPutAll: name
 ]
 
 { #category : #accessing }

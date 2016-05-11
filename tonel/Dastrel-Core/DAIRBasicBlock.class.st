@@ -59,6 +59,16 @@ DAIRBasicBlock >> isEmpty [
 	^ instructions isEmpty
 ]
 
+{ #category : #testing }
+DAIRBasicBlock >> isLastTerminator [
+	^ self isEmpty not and: [ self lastInstruction isTerminator ]
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> lastInstruction [
+	^ instructions last
+]
+
 { #category : #accessing }
 DAIRBasicBlock >> name [
 	^ name
@@ -82,6 +92,12 @@ DAIRBasicBlock >> predecessors [
 { #category : #accessing }
 DAIRBasicBlock >> predecessors: anObject [
 	predecessors := anObject
+]
+
+{ #category : #printing }
+DAIRBasicBlock >> printOn: aStream [
+	aStream nextPutAll: name; nextPut: $:; cr.
+	instructions do: [ :ins | aStream tab. ins fullPrintOn: aStream. aStream cr ]
 ]
 
 { #category : #accessing }

@@ -88,6 +88,11 @@ DASLMatrixType >> name: anObject [
 	name := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLMatrixType >> printOn: aStream [
+	aStream nextPutAll: 'matrix!<'; print: baseType; nextPutAll: ', '; print: rows; nextPutAll: ', '; print: columns; nextPutAll: '>'
+]
+
 { #category : #accessing }
 DASLMatrixType >> rows [
 	^ rows

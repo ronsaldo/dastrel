@@ -25,6 +25,6 @@ DAIRFunctionTest >> testNew [
 	functionType := DASLFunctionType arguments: {DASLType intType} returnType: DASLType voidType.
 	function := DAIRFunction name: #testFunction functionType: functionType.
 	self assert: function functionType equals: functionType.
-	self assert: function type equals: (DASLReferenceType baseType: functionType).
+	self assert: function type equals: (DASLReferenceType baseType: functionType storage: DASLType genericStorage).
 	self assert: function arguments size equals: 1.
 ]

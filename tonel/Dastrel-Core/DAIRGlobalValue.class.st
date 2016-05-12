@@ -50,27 +50,32 @@ DAIRGlobalValue >> printPropertiesOn: aStream [
 	aStream nextPut: $}.
 ]
 
-{ #category : #accessing }
+{ #category : #properties }
 DAIRGlobalValue >> properties [
 	^ properties
 ]
 
-{ #category : #accessing }
+{ #category : #properties }
 DAIRGlobalValue >> propertyAt: aSymbol [ 
 	^ properties at: aSymbol
 ]
 
-{ #category : #accessing }
+{ #category : #properties }
 DAIRGlobalValue >> propertyAt: aSymbol ifAbsent: aBlock [
 	^ properties at: aSymbol ifAbsent: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : #properties }
 DAIRGlobalValue >> propertyAt: aSymbol ifAbsentPut: aBlock [
 	^ properties at: aSymbol ifAbsentPut: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : #properties }
+DAIRGlobalValue >> propertyAt: aSymbol ifPresent: aBlock [
+	^ properties at: aSymbol ifPresent: aBlock
+]
+
+{ #category : #properties }
 DAIRGlobalValue >> propertyAt: aSymbol put: anObject [
 	^ properties at: aSymbol put: anObject
 ]

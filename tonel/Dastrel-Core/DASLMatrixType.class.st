@@ -64,6 +64,11 @@ DASLMatrixType >> baseType: anObject [
 ]
 
 { #category : #accessing }
+DASLMatrixType >> columnType [
+	^ DASLVectorType baseType: baseType elements: rows alignment: alignment
+]
+
+{ #category : #accessing }
 DASLMatrixType >> columns [
 	^ columns
 ]

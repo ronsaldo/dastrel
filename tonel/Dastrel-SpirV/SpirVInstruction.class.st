@@ -11,6 +11,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+SpirVInstruction class >> opcode: opcode [
+	^ self new opcode: opcode
+]
+
+{ #category : #'as yet unclassified' }
 SpirVInstruction class >> opcode: opcode operands: operands [
 	^ self new opcode: opcode; operands: operands
 ]

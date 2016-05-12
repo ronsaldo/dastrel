@@ -6,13 +6,19 @@ Class {
 
 { #category : #'as yet unclassified' }
 SpirVConstantGenerator >> generateEnum: enum [
-	| name values generatedData |
+	| name values generatedData type isBitValue value |
 	name := enum at: 'Name'.
+	type := enum at: 'Type'.
 	values := enum at: 'Values'.
+	isBitValue := type = 'Bit'.
+	
 	generatedData := String streamContents: [ :out |
 		out nextPutAll: 'dataFor' , name; cr.
 		out tab; nextPutAll: '^ #('; cr.
-		values keysAndValuesDo: [ :key :value |
+		isBitValue ifTrue: [ out tab; tab; nextPutAll: 'None'; space; print: 0; cr].
+		
+		values keysAndValuesDo: [ :key :rawValue |
+			value := isBitValue ifTrue: [ 1 bitShift: rawValue ] ifFalse: [ rawValue ].
 			out tab; tab; nextPutAll: key; space; print: value; cr
 		].
 		out tab; nextPut: $).

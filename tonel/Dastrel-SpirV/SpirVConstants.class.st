@@ -196,6 +196,7 @@ Class {
 		'SpvFPFastMathModeAllowRecip',
 		'SpvFPFastMathModeFast',
 		'SpvFPFastMathModeNSZ',
+		'SpvFPFastMathModeNone',
 		'SpvFPFastMathModeNotInf',
 		'SpvFPFastMathModeNotNaN',
 		'SpvFPRoundingModeRTE',
@@ -205,6 +206,7 @@ Class {
 		'SpvFunctionControlConst',
 		'SpvFunctionControlDontInline',
 		'SpvFunctionControlInline',
+		'SpvFunctionControlNone',
 		'SpvFunctionControlPure',
 		'SpvFunctionParameterAttributeByVal',
 		'SpvFunctionParameterAttributeNoAlias',
@@ -299,18 +301,22 @@ Class {
 		'SpvImageOperandsGrad',
 		'SpvImageOperandsLod',
 		'SpvImageOperandsMinLod',
+		'SpvImageOperandsNone',
 		'SpvImageOperandsOffset',
 		'SpvImageOperandsSample',
 		'SpvKernelEnqueueFlagsNoWait',
 		'SpvKernelEnqueueFlagsWaitKernel',
 		'SpvKernelEnqueueFlagsWaitWorkGroup',
 		'SpvKernelProfilingInfoCmdExecTime',
+		'SpvKernelProfilingInfoNone',
 		'SpvLinkageTypeExport',
 		'SpvLinkageTypeImport',
 		'SpvLoopControlDontUnroll',
+		'SpvLoopControlNone',
 		'SpvLoopControlUnroll',
 		'SpvMagicNumber',
 		'SpvMemoryAccessAligned',
+		'SpvMemoryAccessNone',
 		'SpvMemoryAccessNontemporal',
 		'SpvMemoryAccessVolatile',
 		'SpvMemoryModelGLSL450',
@@ -321,6 +327,7 @@ Class {
 		'SpvMemorySemanticsAtomicCounterMemory',
 		'SpvMemorySemanticsCrossWorkgroupMemory',
 		'SpvMemorySemanticsImageMemory',
+		'SpvMemorySemanticsNone',
 		'SpvMemorySemanticsRelease',
 		'SpvMemorySemanticsSequentiallyConsistent',
 		'SpvMemorySemanticsSubgroupMemory',
@@ -636,6 +643,7 @@ Class {
 		'SpvScopeWorkgroup',
 		'SpvSelectionControlDontFlatten',
 		'SpvSelectionControlFlatten',
+		'SpvSelectionControlNone',
 		'SpvSourceLanguageESSL',
 		'SpvSourceLanguageGLSL',
 		'SpvSourceLanguageOpenCL_C',
@@ -901,11 +909,12 @@ SpirVConstants class >> dataForExecutionModel [
 { #category : #'constant data' }
 SpirVConstants class >> dataForFPFastMathMode [
 	^ #(
-		NotInf 1
-		Fast 4
-		NSZ 2
-		NotNaN 0
-		AllowRecip 3
+		None 0
+		NotInf 2
+		Fast 16
+		NSZ 4
+		NotNaN 1
+		AllowRecip 8
 	)
 ]
 
@@ -922,10 +931,11 @@ SpirVConstants class >> dataForFPRoundingMode [
 { #category : #'constant data' }
 SpirVConstants class >> dataForFunctionControl [
 	^ #(
-		Inline 0
-		Pure 2
-		Const 3
-		DontInline 1
+		None 0
+		Inline 1
+		Pure 4
+		Const 8
+		DontInline 2
 	)
 ]
 
@@ -1049,14 +1059,15 @@ SpirVConstants class >> dataForImageFormat [
 { #category : #'constant data' }
 SpirVConstants class >> dataForImageOperands [
 	^ #(
-		ConstOffset 3
-		Sample 6
-		MinLod 7
-		Grad 2
-		Bias 0
-		Offset 4
-		ConstOffsets 5
-		Lod 1
+		None 0
+		ConstOffset 8
+		Sample 64
+		MinLod 128
+		Grad 4
+		Bias 1
+		Offset 16
+		ConstOffsets 32
+		Lod 2
 	)
 ]
 
@@ -1072,7 +1083,8 @@ SpirVConstants class >> dataForKernelEnqueueFlags [
 { #category : #'constant data' }
 SpirVConstants class >> dataForKernelProfilingInfo [
 	^ #(
-		CmdExecTime 0
+		None 0
+		CmdExecTime 1
 	)
 ]
 
@@ -1087,17 +1099,19 @@ SpirVConstants class >> dataForLinkageType [
 { #category : #'constant data' }
 SpirVConstants class >> dataForLoopControl [
 	^ #(
-		Unroll 0
-		DontUnroll 1
+		None 0
+		Unroll 1
+		DontUnroll 2
 	)
 ]
 
 { #category : #'constant data' }
 SpirVConstants class >> dataForMemoryAccess [
 	^ #(
-		Aligned 1
-		Volatile 0
-		Nontemporal 2
+		None 0
+		Aligned 2
+		Volatile 1
+		Nontemporal 4
 	)
 ]
 
@@ -1113,16 +1127,17 @@ SpirVConstants class >> dataForMemoryModel [
 { #category : #'constant data' }
 SpirVConstants class >> dataForMemorySemantics [
 	^ #(
-		UniformMemory 6
-		SequentiallyConsistent 4
-		AcquireRelease 3
-		CrossWorkgroupMemory 9
-		Acquire 1
-		ImageMemory 11
-		AtomicCounterMemory 10
-		SubgroupMemory 7
-		WorkgroupMemory 8
-		Release 2
+		None 0
+		UniformMemory 64
+		SequentiallyConsistent 16
+		AcquireRelease 8
+		CrossWorkgroupMemory 512
+		Acquire 2
+		ImageMemory 2048
+		AtomicCounterMemory 1024
+		SubgroupMemory 128
+		WorkgroupMemory 256
+		Release 4
 	)
 ]
 
@@ -1459,8 +1474,9 @@ SpirVConstants class >> dataForScope [
 { #category : #'constant data' }
 SpirVConstants class >> dataForSelectionControl [
 	^ #(
-		DontFlatten 1
-		Flatten 0
+		None 0
+		DontFlatten 2
+		Flatten 1
 	)
 ]
 

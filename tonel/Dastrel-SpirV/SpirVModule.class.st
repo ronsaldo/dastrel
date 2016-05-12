@@ -53,7 +53,7 @@ SpirVModule >> emitOn: aStream [
 { #category : #initialization }
 SpirVModule >> initialize [
 	super initialize.
-	idBound := 0.
+	idBound := 1.
 	instructions := OrderedCollection new.
 ]
 

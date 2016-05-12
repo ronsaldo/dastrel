@@ -8,8 +8,9 @@ Class {
 		'prologueInstructions',
 		'debugInstructions',
 		'annotationInstructions',
-		'globalVariablesInstructions',
-		'constantsInstructions'
+		'constantsInstructions',
+		'globalsInstructions',
+		'currentFunctionInstructions'
 	],
 	#pools : [
 		'SpirVConstants'
@@ -24,6 +25,12 @@ SpirVModuleBuilder >> addAnnotationInstruction: anInstruction [
 ]
 
 { #category : #adding }
+SpirVModuleBuilder >> addCapability: capability [
+	self addPrologueInstruction: (SpirVInstruction opcode: SpvOpCapability operands: {capability}).
+	
+]
+
+{ #category : #adding }
 SpirVModuleBuilder >> addConstantInstruction: anInstruction [
 	constantsInstructions add: anInstruction.
 	^ anInstruction resultId
@@ -32,6 +39,18 @@ SpirVModuleBuilder >> addConstantInstruction: anInstruction [
 { #category : #adding }
 SpirVModuleBuilder >> addDebugInstruction: anInstruction [
 	debugInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addFunctionInstruction: anInstruction [
+	currentFunctionInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addGlobalInstruction: anInstruction [
+	globalsInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
@@ -49,6 +68,7 @@ SpirVModuleBuilder >> addTypeInstruction: anInstruction [
 
 { #category : #initialization }
 SpirVModuleBuilder >> createDefaultPrologue [
+	self addCapability: SpvCapabilityShader.
 	
 ]
 
@@ -59,8 +79,20 @@ SpirVModuleBuilder >> finish [
 	module addInstructions: annotationInstructions.
 	module addInstructions: typeInstructions.
 	module addInstructions: constantsInstructions.
+	module addInstructions: globalsInstructions.
 	module addInstructions: functionInstructions.
 	
+]
+
+{ #category : #building }
+SpirVModuleBuilder >> functionDo: aBlock [
+	| oldScope |
+	oldScope := currentFunctionInstructions.
+	currentFunctionInstructions := OrderedCollection new.
+	[
+		aBlock value.
+		functionInstructions addAll: currentFunctionInstructions.
+	] ensure: [ currentFunctionInstructions := oldScope. ]
 ]
 
 { #category : #initialization }
@@ -71,6 +103,7 @@ SpirVModuleBuilder >> initialize [
 	annotationInstructions := OrderedCollection new.
 	typeInstructions := OrderedCollection new.
 	constantsInstructions := OrderedCollection new.
+	globalsInstructions := OrderedCollection new.
 	functionInstructions := OrderedCollection new.
 	self createDefaultPrologue.
 ]

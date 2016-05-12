@@ -78,7 +78,7 @@ DASLSSASpirVTranslator >> translateBasicBlock: basicBlock [
 
 { #category : #'as yet unclassified' }
 DASLSSASpirVTranslator >> translateSSAModule: ssaModule [
-	^ SpirVModule build: [ :builderArg |
+	^ SpirVModuleBuilder build: [ :builderArg |
 		builder := builderArg.
 		ssaModule globalValues valuesDo: [ :globalValue | self translateValue: globalValue ]
 	]
@@ -203,6 +203,11 @@ DASLSSASpirVTranslator >> visitGlobalVariable: globalVariable [
 			type: type 
 			result: id
 			operands: { storage }
+		).
+		
+		builder addDebugInstruction: (SpirVInstruction
+			opcode: SpvOpName
+			operands: { id } , globalVariable name asSpirVStringLiteral
 		).
 		
 		globalVariable propertyAt: #location ifPresent: [ :location |

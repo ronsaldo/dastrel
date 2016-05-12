@@ -27,15 +27,6 @@ SpirVModule >> addInstructions: aCollectionOfInstructions [
 ]
 
 { #category : #building }
-SpirVModule >> build: aBlock [
-	| builder |
-	builder := SpirVModuleBuilder new module: self.
-	aBlock value: builder.
-	builder finish.
-	^ self
-]
-
-{ #category : #building }
 SpirVModule >> bytes [
 	^ ByteArray streamContents: [ :out | self writeOn: out ]
 ]

@@ -10,13 +10,22 @@ Class {
 		'annotationInstructions',
 		'constantsInstructions',
 		'globalsInstructions',
-		'currentFunctionInstructions'
+		'currentFunctionInstructions',
+		'glsl450ExtensionId'
 	],
 	#pools : [
 		'SpirVConstants'
 	],
 	#category : #'Dastrel-SpirV'
 }
+
+{ #category : #building }
+SpirVModuleBuilder class >> build: aBlock [
+	| builder |
+	builder := self new.
+	aBlock value: builder.
+	^ builder finish.
+]
 
 { #category : #adding }
 SpirVModuleBuilder >> addAnnotationInstruction: anInstruction [
@@ -69,6 +78,15 @@ SpirVModuleBuilder >> addTypeInstruction: anInstruction [
 { #category : #initialization }
 SpirVModuleBuilder >> createDefaultPrologue [
 	self addCapability: SpvCapabilityShader.
+	glsl450ExtensionId := self newId.
+	self addPrologueInstruction: (SpirVInstruction
+		opcode: SpvOpExtInstImport
+		result: glsl450ExtensionId
+		operands: 'GLSL.std.450' asSpirVStringLiteral
+	).
+	self addPrologueInstruction: (SpirVInstruction
+		opcode: SpvOpMemoryModel
+		operands: {SpvAddressingModelLogical . SpvMemoryModelGLSL450}).
 	
 ]
 
@@ -81,7 +99,7 @@ SpirVModuleBuilder >> finish [
 	module addInstructions: constantsInstructions.
 	module addInstructions: globalsInstructions.
 	module addInstructions: functionInstructions.
-	
+	^ module
 ]
 
 { #category : #building }
@@ -98,6 +116,7 @@ SpirVModuleBuilder >> functionDo: aBlock [
 { #category : #initialization }
 SpirVModuleBuilder >> initialize [
 	super initialize.
+	module := SpirVModule new.
 	prologueInstructions := OrderedCollection new.
 	debugInstructions := OrderedCollection new.
 	annotationInstructions := OrderedCollection new.
@@ -121,11 +140,6 @@ SpirVModuleBuilder >> makeLabel [
 { #category : #accessing }
 SpirVModuleBuilder >> module [
 	^ module
-]
-
-{ #category : #accessing }
-SpirVModuleBuilder >> module: anObject [
-	module := anObject
 ]
 
 { #category : #building }

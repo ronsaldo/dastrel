@@ -8,9 +8,19 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #comparing }
+DAIRConstantValue >> = other [
+	^ self class = other class and: [ self type = other type and: [ self value = other value ] ]
+]
+
 { #category : #visitor }
 DAIRConstantValue >> accept: aVisitor [
 	^ aVisitor visitConstantValue: self
+]
+
+{ #category : #comparing }
+DAIRConstantValue >> hash [
+	^ (self class hash bitXor: type hash) bitXor: value hash
 ]
 
 { #category : #printing }

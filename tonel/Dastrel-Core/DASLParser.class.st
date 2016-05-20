@@ -26,6 +26,21 @@ DASLParser >> asignmentExpression [
 ]
 
 { #category : #grammar }
+DASLParser >> attributeKeyAndValue [
+	^ super attributeKeyAndValue ==> [ :keyAndValue | keyAndValue first -> (keyAndValue second ifNotNil: [ keyAndValue second second ]) ]
+]
+
+{ #category : #grammar }
+DASLParser >> attributeKeyAndValues [
+	^ super attributeKeyAndValues ==> [ :keyAndValues | { keyAndValues first } , (keyAndValues second collect: #second)  ]
+]
+
+{ #category : #grammar }
+DASLParser >> blockAttributes [
+	^ super blockAttributes ==> [ :attributes | Dictionary newFrom: attributes second ]
+]
+
+{ #category : #grammar }
 DASLParser >> blockVariable [
 	^ super blockVariable ==> [:var | DASLFieldDefinition new
 			position: var second position;
@@ -52,9 +67,10 @@ DASLParser >> callExpression [
 DASLParser >> codeBlock [
 	^ super codeBlock ==> [ :block | DASLCodeBlock new
 			position: (self positionFromToken: block first);
-			name: block second value;
-			interfaceList: block third;
-			body: block fifth;
+			attributes: block second;
+			name: block third value;
+			interfaceList: block fourth;
+			body: block sixth;
 			yourself ]
 ]
 
@@ -268,9 +284,10 @@ DASLParser >> termExpression [
 DASLParser >> uniform [
 	^ super uniform ==> [ :block | DASLUniformBlock new
 			position: (self positionFromToken: block first);
-			name: block second value;
-			interfaceList: block third;
-			body: block fifth;
+			attributes: block second;
+			name: block third value;
+			interfaceList: block fourth;
+			body: block sixth;
 			yourself ]
 ]
 

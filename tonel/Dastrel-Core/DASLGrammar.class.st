@@ -84,7 +84,10 @@ Class {
 		'kwReturn',
 		'varInitialValue',
 		'usingAliasStatement',
-		'usingExpressionStatement'
+		'usingExpressionStatement',
+		'blockAttributes',
+		'attributeKeyAndValue',
+		'attributeKeyAndValues'
 	],
 	#classVars : [
 		'Keywords'
@@ -130,6 +133,16 @@ DASLGrammar >> assignmentOperator [
 		$* asParser / $/ asParser / $% asParser /
 		'<<' asParser / '>>' asParser /
 		$& asParser / $^ asParser / $| asParser) optional, $= asParser) token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> attributeKeyAndValue [
+	^ identifier , (equalAssign , literalExpression) optional
+]
+
+{ #category : #grammar }
+DASLGrammar >> attributeKeyAndValues [
+	^ attributeKeyAndValue , (comma , attributeKeyAndValue) star
 ]
 
 { #category : #grammar }
@@ -190,6 +203,11 @@ DASLGrammar >> binaryExpression [
 ]
 
 { #category : #grammar }
+DASLGrammar >> blockAttributes [
+	^ leftParent , attributeKeyAndValues , rightParent
+]
+
+{ #category : #grammar }
 DASLGrammar >> blockVariable [
 	^ varFlowDirection optional , type , identifier , semicolon
 ]
@@ -206,7 +224,7 @@ DASLGrammar >> callExpression [
 
 { #category : #grammar }
 DASLGrammar >> codeBlock [
-	^ kwCodeBlock , identifier , interfaceImplementations optional, leftCBracket, codeBody , rightCBracket
+	^ kwCodeBlock , blockAttributes optional , identifier , interfaceImplementations optional, leftCBracket, codeBody , rightCBracket
 ]
 
 { #category : #grammar }
@@ -571,7 +589,7 @@ DASLGrammar >> unaryExpression [
 
 { #category : #grammar }
 DASLGrammar >> uniform [
-	^ kwUniform , identifier , interfaceImplementations optional, leftCBracket, uniformBody , rightCBracket
+	^ kwUniform , blockAttributes optional , identifier , interfaceImplementations optional, leftCBracket, uniformBody , rightCBracket
 ]
 
 { #category : #grammar }

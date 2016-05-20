@@ -5,10 +5,21 @@ Class {
 		'name',
 		'inputs',
 		'outputs',
-		'scope'
+		'scope',
+		'attributes'
 	],
 	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #accessing }
+DASLModule >> attributes [
+	^ attributes
+]
+
+{ #category : #accessing }
+DASLModule >> attributes: anObject [
+	attributes := anObject
+]
 
 { #category : #accessing }
 DASLModule >> inputs [

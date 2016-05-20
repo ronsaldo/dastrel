@@ -269,19 +269,17 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	ssaModule add: globalVar.
 	uniformBlock codegenValue: globalVar.
 	
-	
-	uniformBlock body do: [ :var | self generateUniformVar: var structVar: globalVar].
+	uniformBlock body do: [ :var |
+		var codegenValue: [:currentBuilder |
+			currentBuilder getReference: globalVar element: (DAIRConstantValue int: var fieldIndex)
+		]
+	].
 
 ]
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 	translationUnit modules select: #isUniformBlock thenDo: [ :block | self generateUniformBlock: block ]
-]
-
-{ #category : #visitor }
-DASLSSACodegenVisitor >> generateUniformVar: var structVar: structGlobalVar [
-	var codegenValue: (DAIRConstantGetElementReference reference: structGlobalVar index: (DAIRConstant int: var fieldIndex))
 ]
 
 { #category : #visitor }
@@ -347,7 +345,10 @@ DASLSSACodegenVisitor >> visitFloat: literal [
 DASLSSACodegenVisitor >> visitIdentifier: identifier [
 	| binding |
 	binding := identifier binding.
-	^ binding isType ifTrue: [ binding ] ifFalse: [ binding codegenValue ].
+	^ binding isType ifTrue: [ binding ] ifFalse: [
+		binding codegenValue isClosure ifTrue: [ ^ binding codegenValue value: builder ] ifFalse: [ ^ binding codegenValue ]
+		
+	].
 ]
 
 { #category : #visitor }
@@ -369,7 +370,8 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	| globalRefValue baseReference |
 	globalRefValue := memberAccess globalReferenceValue.
 	globalRefValue ifNotNil: [
-		globalRefValue codegenValue ifNotNil: [ ^ globalRefValue codegenValue]
+		globalRefValue codegenValue ifNotNil: [ 
+			globalRefValue codegenValue isClosure ifTrue: [ ^ globalRefValue codegenValue value: builder ] ifFalse: [ ^ globalRefValue codegenValue ]]
 	].
 	
 	baseReference := memberAccess reference accept: self.

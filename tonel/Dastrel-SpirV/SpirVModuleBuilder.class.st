@@ -11,7 +11,10 @@ Class {
 		'constantsInstructions',
 		'globalsInstructions',
 		'currentFunctionInstructions',
-		'glsl450ExtensionId'
+		'glsl450ExtensionId',
+		'capabilityInstructions',
+		'executionModeInstructions',
+		'entryPointInstructions'
 	],
 	#pools : [
 		'SpirVConstants'
@@ -35,7 +38,7 @@ SpirVModuleBuilder >> addAnnotationInstruction: anInstruction [
 
 { #category : #adding }
 SpirVModuleBuilder >> addCapability: capability [
-	self addPrologueInstruction: (SpirVInstruction opcode: SpvOpCapability operands: {capability}).
+	capabilityInstructions add: (SpirVInstruction opcode: SpvOpCapability operands: {capability}).
 	
 ]
 
@@ -48,6 +51,18 @@ SpirVModuleBuilder >> addConstantInstruction: anInstruction [
 { #category : #adding }
 SpirVModuleBuilder >> addDebugInstruction: anInstruction [
 	debugInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addEntryPointInstruction: anInstruction [
+	entryPointInstructions add: anInstruction.
+	^ anInstruction resultId
+]
+
+{ #category : #adding }
+SpirVModuleBuilder >> addExecutionModeInstruction: anInstruction [
+	executionModeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
@@ -92,7 +107,10 @@ SpirVModuleBuilder >> createDefaultPrologue [
 
 { #category : #building }
 SpirVModuleBuilder >> finish [
+	module addInstructions: capabilityInstructions.
 	module addInstructions: prologueInstructions.
+	module addInstructions: entryPointInstructions.
+	module addInstructions: executionModeInstructions.
 	module addInstructions: debugInstructions.
 	module addInstructions: annotationInstructions.
 	module addInstructions: typeInstructions.
@@ -117,7 +135,10 @@ SpirVModuleBuilder >> functionDo: aBlock [
 SpirVModuleBuilder >> initialize [
 	super initialize.
 	module := SpirVModule new.
+	capabilityInstructions := OrderedCollection new.
 	prologueInstructions := OrderedCollection new.
+	entryPointInstructions := OrderedCollection new.
+	executionModeInstructions := OrderedCollection new.
 	debugInstructions := OrderedCollection new.
 	annotationInstructions := OrderedCollection new.
 	typeInstructions := OrderedCollection new.
@@ -125,11 +146,6 @@ SpirVModuleBuilder >> initialize [
 	globalsInstructions := OrderedCollection new.
 	functionInstructions := OrderedCollection new.
 	self createDefaultPrologue.
-]
-
-{ #category : #'control flow' }
-SpirVModuleBuilder >> label: aLabel [
-	^ self operation: SpvOpLabel result: aLabel
 ]
 
 { #category : #building }

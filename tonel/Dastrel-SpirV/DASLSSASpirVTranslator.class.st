@@ -6,7 +6,8 @@ Class {
 		'builder',
 		'basicBlockDictionary',
 		'instructionDictionary',
-		'currentFunction'
+		'currentFunction',
+		'interfaceList'
 	],
 	#classVars : [
 		'BinaryOperationMap',
@@ -122,6 +123,7 @@ DASLSSASpirVTranslator >> initialize [
 	translatedValues := Dictionary new.
 	basicBlockDictionary := Dictionary new.
 	instructionDictionary := Dictionary new.
+	interfaceList := OrderedCollection new.
 ]
 
 { #category : #'as yet unclassified' }
@@ -301,6 +303,30 @@ DASLSSASpirVTranslator >> visitFunction: function [
 		
 		builder addFunctionInstruction: (SpirVInstruction opcode: SpvOpFunctionEnd).
 		
+		function propertyAt: #vertex ifPresent: [ :dummy |
+			builder addEntryPointInstruction: (SpirVInstruction
+				opcode: SpvOpEntryPoint
+				operands: { SpvExecutionModelVertex . id . } , function name asSpirVStringLiteral , interfaceList
+			).
+		].
+		function propertyAt: #fragment ifPresent: [ :dummy |
+			builder addEntryPointInstruction: (SpirVInstruction
+				opcode: SpvOpEntryPoint
+				operands: { SpvExecutionModelFragment . id . } , function name asSpirVStringLiteral , interfaceList
+			).
+		].
+		function propertyAt: #geometry ifPresent: [ :dummy |
+			self halt.
+		].
+		function propertyAt: #tcontrol ifPresent: [ :dummy |
+			self halt.
+		].
+		function propertyAt: #teval ifPresent: [ :dummy |
+			self halt.
+		].
+		function propertyAt: #compute ifPresent: [ :dummy |
+			self halt.
+		].
 	]
 ]
 
@@ -363,6 +389,7 @@ DASLSSASpirVTranslator >> visitGlobalVariable: globalVariable [
 		).
 		
 		globalVariable propertyAt: #location ifPresent: [ :location |
+			interfaceList add: id.
 			location >= 0 ifTrue: [ 
 				builder addAnnotationInstruction: (SpirVInstruction
 					opcode: SpvOpDecorate
@@ -374,7 +401,21 @@ DASLSSASpirVTranslator >> visitGlobalVariable: globalVariable [
 					operands: { id . SpvDecorationBuiltIn . -1 - location }
 				).
 			]
-		]
+		].
+	
+		globalVariable propertyAt: #binding ifPresent: [ :binding |
+			builder addAnnotationInstruction: (SpirVInstruction
+				opcode: SpvOpDecorate
+				operands: { id . SpvDecorationBinding  . binding }
+			).
+		].
+	
+		globalVariable propertyAt: #set ifPresent: [ :bindingSet |
+			builder addAnnotationInstruction: (SpirVInstruction
+				opcode: SpvOpDecorate
+				operands: { id . SpvDecorationDescriptorSet  . bindingSet }
+			).
+		].
 	]
 ]
 

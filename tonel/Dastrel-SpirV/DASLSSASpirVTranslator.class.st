@@ -211,21 +211,6 @@ DASLSSASpirVTranslator >> visitCall: callInstruction [
 ]
 
 { #category : #visitor }
-DASLSSASpirVTranslator >> visitConstantGetElementReference: constantGetElementRef [
-	| resultType pointer index |
-	^ self valueTranslation: constantGetElementRef do: [ :id |
-		pointer := self translateValue: constantGetElementRef reference.
-		index := self translateValue: constantGetElementRef index.
-		resultType := self translateValue: constantGetElementRef type.
-		builder addConstantInstruction: (SpirVInstruction
-			opcode: SpvOpInBoundsAccessChain
-			type: resultType
-			result: id
-			operands: { pointer . index })
-	]
-]
-
-{ #category : #visitor }
 DASLSSASpirVTranslator >> visitConstantValue: constantValue [
 	| value type encodedValue |
 	^ self valueTranslation: constantValue do: [ :id |
@@ -341,6 +326,21 @@ DASLSSASpirVTranslator >> visitFunctionType: functionType [
 			opcode: SpvOpTypeFunction
 			result: id
 			operands: {resultType} , arguments)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitGetElementReference: getElementRef [
+	| resultType pointer index |
+	^ self instructionTranslation: getElementRef do: [ :id |
+		pointer := self translateValue: getElementRef reference.
+		index := self translateValue: getElementRef index.
+		resultType := self translateValue: getElementRef type.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpInBoundsAccessChain
+			type: resultType
+			result: id
+			operands: { pointer . index })
 	]
 ]
 

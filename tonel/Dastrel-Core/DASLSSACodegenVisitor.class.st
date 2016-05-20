@@ -72,7 +72,7 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 		loadedVector := self coerce: vectorOrScalar into: vectorOrScalarTypeNoRef.
 		self assert: vectorOrScalarTypeNoRef baseType = typeElement.
 		1 to: vectorOrScalarTypeNoRef elements do: [ :i |
-			expandedArguments add: (builder extractVector: loadedVector element: (builder constInt: i))
+			expandedArguments add: (builder extractVector: loadedVector element: (builder constInt: i-1))
 		].
 		^ self
 	].
@@ -130,7 +130,7 @@ DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 		builder isLastTerminator ifFalse: [ builder returnVoid ]
 	].
 
-	allocaBuilder jump: entryBlock
+	allocaBuilder jump: contentBlock
 
 ]
 
@@ -182,7 +182,7 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 		]
 	].
 
-	allocaBuilder jump: entryBlock
+	allocaBuilder jump: contentBlock
 ]
 
 { #category : #visitor }

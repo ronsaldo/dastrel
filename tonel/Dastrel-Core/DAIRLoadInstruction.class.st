@@ -28,6 +28,11 @@ DAIRLoadInstruction >> type [
 ]
 
 { #category : #accessing }
+DAIRLoadInstruction >> variable [
+	^ parameters first
+]
+
+{ #category : #accessing }
 DAIRLoadInstruction >> variable: variableReference [
 	| refType |
 	self parameters: { variableReference }.

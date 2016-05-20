@@ -25,6 +25,11 @@ DAIRValue >> isConstant [
 ]
 
 { #category : #testing }
+DAIRValue >> isConstantValue [
+	^ false
+]
+
+{ #category : #testing }
 DAIRValue >> isInstruction [
 	^ false
 ]

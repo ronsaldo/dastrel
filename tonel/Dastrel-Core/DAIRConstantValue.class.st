@@ -23,6 +23,11 @@ DAIRConstantValue >> hash [
 	^ (self class hash bitXor: type hash) bitXor: value hash
 ]
 
+{ #category : #testing }
+DAIRConstantValue >> isConstantValue [
+	^ true
+]
+
 { #category : #printing }
 DAIRConstantValue >> printOn: aStream [
 	aStream nextPutAll: 'constant '; print: type; space; print: value

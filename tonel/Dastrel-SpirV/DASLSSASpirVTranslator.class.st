@@ -5,9 +5,11 @@ Class {
 		'translatedValues',
 		'builder',
 		'basicBlockDictionary',
-		'instructionDictionary'
+		'instructionDictionary',
+		'currentFunction'
 	],
 	#classVars : [
+		'BinaryOperationMap',
 		'StorageClassMap'
 	],
 	#pools : [
@@ -36,7 +38,65 @@ DASLSSASpirVTranslator class >> initialize [
 		pushConstant 9
 		atomicCounter 10
 		image 11
-	)
+	).
+	
+	BinaryOperationMap := Dictionary new.
+	#(
+		add 		SpvOpIAdd
+		sub 		SpvOpISub 
+		mul 		SpvOpIMul
+		div 		SpvOpSDiv
+		udiv 		SpvOpUDiv
+		rem 		SpvOpSRem
+		urem 		SpvOpURem
+
+		bitand 	SpvOpBitwiseAnd
+		bitor		SpvOpBitwiseOr
+		bitxor 	SpvOpBitwiseXor
+
+		shiftleft 	SpvOpShiftLeftLogical
+		shiftright 	SpvOpShiftRightLogical
+		ashiftright 	SpvOpShiftRightArithmetic
+
+		ieq SpvOpIEqual
+		ine SpvOpINotEqual
+
+		ilt SpvOpSLessThan
+		ile SpvOpSLessThanEqual
+		igt SpvOpSGreaterThan
+		ige SpvOpSGreaterThanEqual
+
+		ult SpvOpULessThan
+		ule SpvOpULessThanEqual
+		ugt SpvOpUGreaterThan
+		uge SpvOpUGreaterThanEqual
+
+		fadd 		SpvOpFdd
+		fsub 		SpvOpFSub
+		fmul 		SpvOpFMul
+		fdiv 		SpvOpFDiv
+		frem 		SpvOpFRem
+				
+		uflt SpvOpFUnordLessThan
+		ufle SpvOpFUnordLessThanEqual
+		ufeq SpvOpFUnordEqual
+		ufne SpvOpFUnordNotEqual
+		ufgt SpvOpFUnordGreaterThan
+		ufge SpvOpFUnordGreaterThanEqual
+
+		oflt SpvOpFOrdLessThan
+		ofle SpvOpFOrdLessThanEqual
+		ofeq SpvOpFOrdEqual
+		ofne SpvOpFOrdNotEqual
+		ofgt SpvOpFOrdGreaterThan
+		ofge SpvOpFOrdGreaterThanEqual
+		
+		mulMatrixMatrix SpvOpMatrixTimesMatrix
+		mulMatrixVector SpvOpMatrixTimesVector
+		mulVectorMatrix SpvOpVectorTimesMatrix
+	) pairsDo: [ :k :v |
+		BinaryOperationMap at: k put: (SpirVConstants bindingOf: v) value
+	]
 ]
 
 { #category : #'as yet unclassified' }
@@ -45,9 +105,14 @@ DASLSSASpirVTranslator >> basicBlockLabelId: basicBlock [
 ]
 
 { #category : #'as yet unclassified' }
-DASLSSASpirVTranslator >> functionTranslation: aValue do: aBlock [
-	^ self valueTranslation: aValue do: [:id |
+DASLSSASpirVTranslator >> functionTranslation: aFunction do: aBlock [
+	| oldFunction |
+	^ self valueTranslation: aFunction do: [:id |
+		oldFunction := currentFunction.
+		currentFunction := aFunction.
+		[
 		builder functionDo: [ aBlock value: id]
+		] ensure: [ currentFunction := aFunction ]
 	]
 ]
 
@@ -100,6 +165,67 @@ DASLSSASpirVTranslator >> valueTranslation: aValue do: aBlock [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitAlloca: allocaInstruction [
+	| resultType |
+	^ self instructionTranslation: allocaInstruction do: [ :id |
+		resultType := self translateValue: allocaInstruction type.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpVariable
+			type: resultType
+			result: id
+			operands: { SpvStorageClassFunction })
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitBinaryOperation: binaryOp [
+	| opcode resultType left right |
+	^ self instructionTranslation: binaryOp do: [ :id |
+		opcode := BinaryOperationMap at: binaryOp operation.
+		resultType := self translateValue: binaryOp type.
+		left := self translateValue: binaryOp left.
+		right := self translateValue: binaryOp right.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: opcode
+			type: resultType
+			result: id
+			operands: { left . right }
+		)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitCall: callInstruction [
+	| resultType function arguments |
+	^ self instructionTranslation: callInstruction do: [ :id |
+		resultType := self translateValue: callInstruction type.
+		function := self translateValue: callInstruction functionValue.
+		arguments := callInstruction arguments collect: [:arg | self translateValue: arg].
+		
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpFunctionCall
+			type: resultType
+			result: id
+			operands: { function } , arguments)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitConstantGetElementReference: constantGetElementRef [
+	| resultType pointer index |
+	^ self valueTranslation: constantGetElementRef do: [ :id |
+		pointer := self translateValue: constantGetElementRef reference.
+		index := self translateValue: constantGetElementRef index.
+		resultType := self translateValue: constantGetElementRef type.
+		builder addConstantInstruction: (SpirVInstruction
+			opcode: SpvOpInBoundsAccessChain
+			type: resultType
+			result: id
+			operands: { pointer . index })
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitConstantValue: constantValue [
 	| value type encodedValue |
 	^ self valueTranslation: constantValue do: [ :id |
@@ -138,6 +264,31 @@ DASLSSASpirVTranslator >> visitConstantValue: constantValue [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitExtractVectorElement: extractElement [
+	| resultType vector index |
+	^ self instructionTranslation: extractElement do: [ :id |
+		resultType := self translateValue: extractElement type.
+		vector := self translateValue: extractElement vector.
+		extractElement index isConstantValue ifTrue: [
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpCompositeExtract
+				type: resultType
+				result: id
+				operands: { vector . extractElement index value }
+			)
+		] ifFalse: [ 
+			index := self translateValue: extractElement index.
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpVectorExtractDynamic
+				type: resultType
+				result: id
+				operands: { vector . index }
+			)
+		]
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitFloatType: floatType [
 	^ self valueTranslation: floatType do: [ :id |
 		builder addTypeInstruction: (SpirVInstruction opcode: SpvOpTypeFloat result: id operands: {floatType size})
@@ -158,7 +309,8 @@ DASLSSASpirVTranslator >> visitFunction: function [
 			operands: { SpvFunctionControlNone . functionType }
 		).
 		
-		function arguments do: [ :arg | self translateValue: arg ].
+		
+		currentFunction arguments do: [ :arg | self translateValue: arg ].
 		
 		function basicBlocks do: [ :basicBlock | self translateBasicBlock: basicBlock ].
 		
@@ -212,17 +364,24 @@ DASLSSASpirVTranslator >> visitGlobalVariable: globalVariable [
 		
 		globalVariable propertyAt: #location ifPresent: [ :location |
 			location >= 0 ifTrue: [ 
-				builder addGlobalInstruction: (SpirVInstruction
+				builder addAnnotationInstruction: (SpirVInstruction
 					opcode: SpvOpDecorate
 					operands: { id . SpvDecorationLocation . location }
 				).
 			] ifFalse: [
-				builder addGlobalInstruction: (SpirVInstruction
+				builder addAnnotationInstruction: (SpirVInstruction
 					opcode: SpvOpDecorate
 					operands: { id . SpvDecorationBuiltIn . -1 - location }
 				).
 			]
 		]
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitIntegerType: integerType [
+	^ self valueTranslation: integerType do: [ :id |
+		builder addTypeInstruction: (SpirVInstruction opcode: SpvOpTypeInt result: id operands: {integerType size . integerType isSigned asBit})
 	]
 ]
 
@@ -235,6 +394,20 @@ DASLSSASpirVTranslator >> visitJump: jumpInstruction [
 			opcode: SpvOpBranch
 			operands: { destination }
 		)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitLoad: loadInstruction [
+	| variable resultType |
+	^ self instructionTranslation: loadInstruction do: [ :id |
+		variable := self translateValue: loadInstruction variable.
+		resultType := self translateValue: loadInstruction type.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpLoad
+			type: resultType
+			result: id
+			operands: { variable })
 	]
 ]
 
@@ -276,6 +449,17 @@ DASLSSASpirVTranslator >> visitReferenceType: referenceType [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitReturn: returnInstruction [
+	| value |
+	^ self instructionTranslation: returnInstruction do: [ :id |
+		value := self translateValue: returnInstruction value.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpReturnValue
+			operands: { value })
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitReturnVoid: returnVoidInstruction [
 	^ self instructionTranslation: returnVoidInstruction do: [ :id |
 		builder addFunctionInstruction: (SpirVInstruction
@@ -291,7 +475,7 @@ DASLSSASpirVTranslator >> visitStore: storeInstruction [
 		variable := self translateValue: storeInstruction variable.
 		builder addFunctionInstruction: (SpirVInstruction
 			opcode: SpvOpStore
-			operands: { value . variable })
+			operands: { variable . value })
 	]
 ]
 

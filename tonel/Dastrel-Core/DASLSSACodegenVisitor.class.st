@@ -115,6 +115,10 @@ DASLSSACodegenVisitor >> generateCastOrConstructionOf: type arguments: argumentV
 DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 	| contentBlock |
 	currentFunction := aCodeBlock codegenValue.
+	aCodeBlock attributes keysAndValuesDo: [ :key :value |
+		currentFunction propertyAt: key value asSymbol put: value value
+	].
+
 	builder := DAIRBuilder on: currentFunction.
 
 	entryBlock := builder newBasicBlock: #entry.
@@ -266,6 +270,10 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	elementTypes := uniformBlock body collect: #type.
 	blockType := DASLStructureType types: elementTypes.
 	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
+	uniformBlock attributes keysAndValuesDo: [ :key :value |
+		globalVar propertyAt: key value asSymbol put: value value
+	].
+
 	ssaModule add: globalVar.
 	uniformBlock codegenValue: globalVar.
 	

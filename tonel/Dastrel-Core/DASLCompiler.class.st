@@ -2,11 +2,13 @@ Class {
 	#name : #DASLCompiler,
 	#superclass : #Object,
 	#instVars : [
+		'compilationContext',
 		'sourceCode',
 		'ast',
 		'parser',
 		'codeGenerator',
-		'generatedCode'
+		'generatedCode',
+		'currentFileName'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -31,6 +33,16 @@ DASLCompiler >> codeGenerator: anObject [
 	codeGenerator := anObject
 ]
 
+{ #category : #accessing }
+DASLCompiler >> compilationContext [
+	^ compilationContext
+]
+
+{ #category : #accessing }
+DASLCompiler >> compilationContext: anObject [
+	compilationContext := anObject
+]
+
 { #category : #'public access' }
 DASLCompiler >> compile [
 	self parse;
@@ -40,12 +52,13 @@ DASLCompiler >> compile [
 
 { #category : #accessing }
 DASLCompiler >> fileName: fileName [
-	parser fileName: fileName
+	parser fileName: fileName.
+	currentFileName := fileName.
 ]
 
 { #category : #'public access' }
 DASLCompiler >> generateCode [
-	generatedCode := ast accept: codeGenerator.
+	generatedCode := codeGenerator passOn: ast.
 
 ]
 
@@ -64,11 +77,19 @@ DASLCompiler >> hlslTarget [
 	codeGenerator := DASLHLSLCodegenVisitor new.
 ]
 
+{ #category : #'public access' }
+DASLCompiler >> importCompilation [
+	self parse;
+		semanticAnalysis.
+	^ ast
+]
+
 { #category : #initialization }
 DASLCompiler >> initialize [
 	super initialize.
 	
 	parser := DASLParser new.
+	compilationContext := DASLCompilationContext new.
 ]
 
 { #category : #'public access' }
@@ -79,13 +100,15 @@ DASLCompiler >> metalTarget [
 { #category : #parsing }
 DASLCompiler >> parse [
 	ast := parser parse: sourceCode.
+	ast fullPath: currentFileName.
+	compilationContext addTranslationUnit: ast.
 ]
 
 { #category : #'public access' }
 DASLCompiler >> semanticAnalysis [
-	DASLModuleSemanticVisitor passOn: ast.
-	DASLBlockPublicSemanticVisitor passOn: ast.
-	DASLBlockSemanticVisitor passOn: ast.
+	DASLModuleSemanticVisitor for: compilationContext passOn: ast.
+	DASLBlockPublicSemanticVisitor for: compilationContext passOn: ast.
+	DASLBlockSemanticVisitor for: compilationContext passOn: ast.
 ]
 
 { #category : #accessing }
@@ -100,7 +123,7 @@ DASLCompiler >> sourceCode: anObject [
 
 { #category : #accessing }
 DASLCompiler >> sourceFromFileNamed: aFileName [
-	self fileName: aFileName;
+	self fileName: aFileName asFileReference asAbsolute fullName;
 		sourceCode: aFileName asFileReference contents
 ]
 

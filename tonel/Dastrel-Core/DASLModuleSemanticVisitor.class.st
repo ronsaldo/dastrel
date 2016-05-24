@@ -1,6 +1,10 @@
 Class {
 	#name : #DASLModuleSemanticVisitor,
 	#superclass : #DASLSemanticVisitor,
+	#instVars : [
+		'currentDirectory',
+		'currentTranslationUnit'
+	],
 	#category : #'Dastrel-Core-Semantic'
 }
 
@@ -35,6 +39,15 @@ DASLModuleSemanticVisitor >> visitGraphBlock: graphBlock [
 ]
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitImportStatement: importStatement [
+	| importedFileName |
+	importedFileName := currentDirectory / (importStatement packageName , '.dastrel').
+	importStatement importedUnit: (compilationContext importTranslationUnit: importedFileName).
+	currentScope addImportScope: importStatement importedUnit package.
+	currentTranslationUnit addImportedUnit: importStatement importedUnit.
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitInterface: interface [
 	currentScope at: interface name put: interface ifPresent: [
 		self error: 'interface overrides a previously defined symbol' at: interface
@@ -51,6 +64,9 @@ DASLModuleSemanticVisitor >> visitSemanticBlock: semanticBlock [
 { #category : #visitor }
 DASLModuleSemanticVisitor >> visitTranslationUnit: translationUnit [
 	| builtInScope packageScope |
+	currentDirectory := translationUnit fullPath asFileReference parent.
+	currentTranslationUnit := translationUnit.
+	self assert: currentDirectory isDirectory.
 	builtInScope := DASLBuiltInScope new.
 	packageScope := DASLPackageScope new parentScope: builtInScope; node: translationUnit.
 	translationUnit package: packageScope.

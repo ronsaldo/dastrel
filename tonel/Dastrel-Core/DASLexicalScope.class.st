@@ -4,10 +4,16 @@ Class {
 	#instVars : [
 		'symbols',
 		'node',
-		'useScopes'
+		'useScopes',
+		'importScopes'
 	],
 	#category : #'Dastrel-Core-Semantic'
 }
+
+{ #category : #adding }
+DASLexicalScope >> addImportScope: importScope [
+	importScopes add: importScope.
+]
 
 { #category : #adding }
 DASLexicalScope >> addUseScope: useScope [
@@ -25,6 +31,7 @@ DASLexicalScope >> initialize [
 	super initialize.
 	symbols := IdentityDictionary new.
 	useScopes := OrderedCollection new.
+	importScopes := OrderedCollection new.
 ]
 
 { #category : #'symbol lookup' }
@@ -39,6 +46,10 @@ DASLexicalScope >> lookSymbolRecursively: aSymbol [
 	result ifNotNil: [ ^ result  ].
 	useScopes do: [ :scope |
 		result := scope lookSymbolRecursively: aSymbol.
+		result ifNotNil: [ ^ result ]
+	].
+	importScopes do: [ :scope |
+		result := scope lookSymbol: aSymbol.
 		result ifNotNil: [ ^ result ]
 	].
 	^ result.

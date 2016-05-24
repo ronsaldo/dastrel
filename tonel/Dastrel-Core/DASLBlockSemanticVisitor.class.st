@@ -97,6 +97,11 @@ DASLBlockSemanticVisitor >> visitFunction: function [
 	currentFunction := nil
 ]
 
+{ #category : #'as yet unclassified' }
+DASLBlockSemanticVisitor >> visitImportStatement: importStatement [
+	"Nothing to do"
+]
+
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitInterface: interface [
 ]

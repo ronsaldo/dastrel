@@ -37,37 +37,12 @@ DASLModule >> isBuiltInFunction [
 ]
 
 { #category : #testing }
-DASLModule >> isCodeBlock [
-	^ false
-]
-
-{ #category : #testing }
 DASLModule >> isFunction [
 	^ false
 ]
 
 { #category : #testing }
-DASLModule >> isGlobalConnectionBlock [
-	^ false
-]
-
-{ #category : #testing }
 DASLModule >> isGraphBlock [
-	^ false
-]
-
-{ #category : #testing }
-DASLModule >> isInterface [
-	^ false
-]
-
-{ #category : #testing }
-DASLModule >> isSemanticBlock [
-	^ false
-]
-
-{ #category : #testing }
-DASLModule >> isUniformBlock [
 	^ false
 ]
 

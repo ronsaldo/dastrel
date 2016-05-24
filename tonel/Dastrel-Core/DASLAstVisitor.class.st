@@ -105,6 +105,11 @@ DASLAstVisitor >> visitIdentifier: identifier [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitImportStatement: usingStatement [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitInteger: integer [
 	self subclassResponsibility
 ]

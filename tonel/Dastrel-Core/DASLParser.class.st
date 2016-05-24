@@ -161,6 +161,14 @@ DASLParser >> identifier [
 ]
 
 { #category : #grammar }
+DASLParser >> import [
+	^ super import ==> [ :importExpr |
+		DASLImportStatement new
+			position: importExpr;
+			packageName: importExpr second value ]
+]
+
+{ #category : #grammar }
 DASLParser >> inOutVariable [
 	^ super inOutVariable ==> [ :local | DASLLocalDeclStatement new
 			position: local first position;

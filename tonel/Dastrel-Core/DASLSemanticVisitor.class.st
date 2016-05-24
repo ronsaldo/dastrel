@@ -2,10 +2,16 @@ Class {
 	#name : #DASLSemanticVisitor,
 	#superclass : #DASLAstVisitor,
 	#instVars : [
+		'compilationContext',
 		'currentScope'
 	],
 	#category : #'Dastrel-Core-Semantic'
 }
+
+{ #category : #'as yet unclassified' }
+DASLSemanticVisitor class >> for: compilationContext passOn: ast [
+	^ self new compilationContext: compilationContext; passOn: ast
+]
 
 { #category : #resolving }
 DASLSemanticVisitor >> adjustTypeForInference: type [
@@ -32,6 +38,16 @@ DASLSemanticVisitor >> compareAlmostExactTypes: functionTypes with: valueRefType
 	].
 
 	^ true
+]
+
+{ #category : #accessing }
+DASLSemanticVisitor >> compilationContext [
+	^ compilationContext
+]
+
+{ #category : #accessing }
+DASLSemanticVisitor >> compilationContext: anObject [
+	compilationContext := anObject
 ]
 
 { #category : #accessing }

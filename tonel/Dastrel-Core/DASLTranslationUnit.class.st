@@ -3,7 +3,9 @@ Class {
 	#superclass : #DASLAstNode,
 	#instVars : [
 		'modules',
-		'package'
+		'package',
+		'fullPath',
+		'importedUnits'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -11,6 +13,32 @@ Class {
 { #category : #visitor }
 DASLTranslationUnit >> accept: aVisitor [
 	^ aVisitor visitTranslationUnit: self
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> addImportedUnit: aTranslationUnit [
+	importedUnits add: aTranslationUnit
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> fullPath [
+	^ fullPath
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> fullPath: anObject [
+	fullPath := anObject
+]
+
+{ #category : #accessing }
+DASLTranslationUnit >> importedUnits [
+	^ importedUnits
+]
+
+{ #category : #initialization }
+DASLTranslationUnit >> initialize [
+	super initialize.
+	importedUnits := Set new.
 ]
 
 { #category : #accessing }

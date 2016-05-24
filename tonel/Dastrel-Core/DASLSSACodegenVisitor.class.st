@@ -6,7 +6,8 @@ Class {
 		'currentFunction',
 		'builder',
 		'entryBlock',
-		'allocaBuilder'
+		'allocaBuilder',
+		'visitedTranslationUnits'
 	],
 	#classVars : [
 		'BinaryOperationMap'
@@ -290,6 +291,18 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 	translationUnit modules select: #isUniformBlock thenDo: [ :block | self generateUniformBlock: block ]
 ]
 
+{ #category : #initialization }
+DASLSSACodegenVisitor >> initialize [
+	super initialize.
+	visitedTranslationUnits := Set new.
+]
+
+{ #category : #compilation }
+DASLSSACodegenVisitor >> passOn: ast [
+	ssaModule := DAIRModule new.
+	^ ast accept: self.
+]
+
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitAssignment: assignment [
 	| value variable coercedValued |
@@ -406,7 +419,9 @@ DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
-	ssaModule := DAIRModule new.
+	(visitedTranslationUnits includes: translationUnit) ifTrue: [ ^ self ].
+	visitedTranslationUnits add: translationUnit.
+	translationUnit importedUnits do: [ :imported | imported accept: self ].
 	
 	self
 		generateUniformBlocks: translationUnit;

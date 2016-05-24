@@ -19,7 +19,37 @@ DASLAstNode >> initialize [
 ]
 
 { #category : #testing }
+DASLAstNode >> isBuiltInFunction [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isCodeBlock [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isFunction [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isFunctionGroup [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isGlobalConnectionBlock [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isGraphBlock [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isInterface [
 	^ false
 ]
 
@@ -29,7 +59,17 @@ DASLAstNode >> isLocalDeclaration [
 ]
 
 { #category : #testing }
+DASLAstNode >> isSemanticBlock [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isType [
+	^ false
+]
+
+{ #category : #testing }
+DASLAstNode >> isUniformBlock [
 	^ false
 ]
 

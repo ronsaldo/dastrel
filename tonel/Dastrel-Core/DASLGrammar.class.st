@@ -27,7 +27,6 @@ Class {
 		'leftParent',
 		'rightParent',
 		'semicolon',
-		'globalBlocks',
 		'interface',
 		'kwUniform',
 		'kwSemantic',
@@ -90,7 +89,10 @@ Class {
 		'attributeKeyAndValues',
 		'kwLet',
 		'optionalType',
-		'inOutVariable'
+		'inOutVariable',
+		'globalBlock',
+		'kwImport',
+		'import'
 	],
 	#classVars : [
 		'Keywords'
@@ -113,6 +115,8 @@ DASLGrammar class >> initialize [
 		function code_block graph_block
 		using discard return
 		let const
+		import
+		if for while switch break continue
 	).
 ]
 
@@ -327,8 +331,8 @@ DASLGrammar >> functionReturnTypes [
 ]
 
 { #category : #grammar }
-DASLGrammar >> globalBlocks [
-	^ interface / uniform / semantic / codeBlock / function
+DASLGrammar >> globalBlock [
+	^ import / interface / uniform / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -344,6 +348,11 @@ DASLGrammar >> identifier [
 { #category : #ignorables }
 DASLGrammar >> ignorable [
 	^ singleLineComment / #space asParser
+]
+
+{ #category : #grammar }
+DASLGrammar >> import [
+	^ kwImport , identifier , semicolon
 ]
 
 { #category : #grammar }
@@ -409,6 +418,11 @@ DASLGrammar >> kwGraphBlock [
 { #category : #keywords }
 DASLGrammar >> kwImplements [
 	^ self keywordParser: 'implements'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwImport [
+	^ self keywordParser: 'import'
 ]
 
 { #category : #keywords }
@@ -516,7 +530,7 @@ DASLGrammar >> operate: left with: right do: operation [
 	^ { operation . left . right }
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 DASLGrammar >> optionalType [
 	^ (colon , type) optional
 ]
@@ -583,7 +597,7 @@ DASLGrammar >> singleLineComment [
 
 { #category : #grammar }
 DASLGrammar >> start [
-	^ globalBlocks star end
+	^ globalBlock star end
 ]
 
 { #category : #grammar }

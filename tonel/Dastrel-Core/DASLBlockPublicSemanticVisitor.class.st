@@ -60,6 +60,11 @@ DASLBlockPublicSemanticVisitor >> visitFunctionPrototype: functionPrototype [
 ]
 
 { #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitImportStatement: importStatement [
+	"nothing to do"
+]
+
+{ #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitInterface: interface [
 	interface interfaceList do: [ :iface | iface accept: self ].
 	

@@ -87,7 +87,10 @@ Class {
 		'usingExpressionStatement',
 		'blockAttributes',
 		'attributeKeyAndValue',
-		'attributeKeyAndValues'
+		'attributeKeyAndValues',
+		'kwLet',
+		'optionalType',
+		'inOutVariable'
 	],
 	#classVars : [
 		'Keywords'
@@ -109,6 +112,7 @@ DASLGrammar class >> initialize [
 		sizeof alignof
 		function code_block graph_block
 		using discard return
+		let const
 	).
 ]
 
@@ -209,7 +213,7 @@ DASLGrammar >> blockAttributes [
 
 { #category : #grammar }
 DASLGrammar >> blockVariable [
-	^ varFlowDirection optional , type , identifier , semicolon
+	^ varFlowDirection optional , identifier , colon , type , semicolon
 ]
 
 { #category : #grammar }
@@ -234,7 +238,7 @@ DASLGrammar >> codeBody [
 
 { #category : #grammar }
 DASLGrammar >> codeStatement [
-	^ usingStatement / discardStatement / returnStatement / localVariable / expressionStatement
+	^ usingStatement / discardStatement / returnStatement / localVariable / inOutVariable / expressionStatement
 ]
 
 { #category : #tokens }
@@ -304,7 +308,7 @@ DASLGrammar >> function [
 
 { #category : #grammar }
 DASLGrammar >> functionArgumentDecl [
-	^ type , identifier
+	^ identifier , colon , type
 ]
 
 { #category : #grammar }
@@ -340,6 +344,11 @@ DASLGrammar >> identifier [
 { #category : #ignorables }
 DASLGrammar >> ignorable [
 	^ singleLineComment / #space asParser
+]
+
+{ #category : #grammar }
+DASLGrammar >> inOutVariable [
+	^ varFlowDirection , identifier , optionalType , varInitialValue optional, semicolon
 ]
 
 { #category : #tokens }
@@ -413,6 +422,11 @@ DASLGrammar >> kwInterface [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwLet [
+	^ self keywordParser: 'let'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwOut [
 	^ self keywordParser: 'out'
 ]
@@ -464,7 +478,7 @@ DASLGrammar >> literalExpression [
 
 { #category : #grammar }
 DASLGrammar >> localVariable [
-	^ varFlowDirection optional , type , identifier , varInitialValue optional, semicolon
+	^ kwLet , identifier , optionalType , varInitialValue optional, semicolon
 ]
 
 { #category : #grammar }
@@ -500,6 +514,11 @@ DASLGrammar >> numberSign [
 { #category : #grammar }
 DASLGrammar >> operate: left with: right do: operation [
 	^ { operation . left . right }
+]
+
+{ #category : #'as yet unclassified' }
+DASLGrammar >> optionalType [
+	^ (colon , type) optional
 ]
 
 { #category : #grammar }

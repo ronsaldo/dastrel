@@ -129,6 +129,10 @@ DASLSemanticVisitor >> visitInteger: integerLiteral [
 ]
 
 { #category : #visitor }
+DASLSemanticVisitor >> visitLiteralType: stringLiteral [
+]
+
+{ #category : #visitor }
 DASLSemanticVisitor >> visitString: stringLiteral [
 ]
 

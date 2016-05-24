@@ -45,8 +45,8 @@ DASLParser >> blockVariable [
 	^ super blockVariable ==> [:var | DASLFieldDefinition new
 			position: var second position;
 			flow: var first;
-			type: var second;
-			name: var third value;
+			type: var fourth;
+			name: var second value;
 			yourself]
 ]
 
@@ -130,8 +130,8 @@ DASLParser >> function [
 DASLParser >> functionArgumentDecl [
 	^ super functionArgumentDecl ==> [ :decl | DASLFunctionArgument new
 			position: decl first position;
-			type: decl first;
-			name: decl second value;
+			type: decl third;
+			name: decl first value;
 			yourself ]
 ]
 
@@ -158,6 +158,17 @@ DASLParser >> functionReturnTypes [
 { #category : #tokens }
 DASLParser >> identifier [
 	^ super identifier ==> [ :token | DASLIdentifier position: (self positionFromToken: token) token: token inputValue ]
+]
+
+{ #category : #grammar }
+DASLParser >> inOutVariable [
+	^ super inOutVariable ==> [ :local | DASLLocalDeclStatement new
+			position: local first position;
+			flow: local first;
+			type: local third;
+			name:  local second value;
+			initialValue: local fourth;
+			yourself]
 ]
 
 { #category : #initialization }
@@ -189,10 +200,9 @@ DASLParser >> interfaceImplementations [
 { #category : #grammar }
 DASLParser >> localVariable [
 	^ super localVariable ==> [ :local | DASLLocalDeclStatement new
-			position: local second position;
-			flow: local first;
-			type: local second;
-			name:  local third value;
+			position: local first;
+			type: local third;
+			name:  local second value;
 			initialValue: local fourth;
 			yourself]
 ]
@@ -214,6 +224,13 @@ DASLParser >> operate: left with: right do: operation [
 		right: right;
 		yourself
 		
+]
+
+{ #category : #grammar }
+DASLParser >> optionalType [
+	^ super optionalType ==> [ :typeExpr |
+		typeExpr ifNil: [ DASLLiteralType type: DASLType autoType ] ifNotNil: [ typeExpr second ]
+	]
 ]
 
 { #category : #utility }

@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLSpirVCodegenVisitor >> visitTranslationUnit: translationUnit [
+DASLSpirVCodegenVisitor >> passOn: ast [
 	| ssaModule |
-	ssaModule := translationUnit accept: (DASLSSACodegenVisitor new).
+	ssaModule := DASLSSACodegenVisitor passOn: ast.
 	^ DASLSSASpirVTranslator new translateSSAModule: ssaModule
 ]

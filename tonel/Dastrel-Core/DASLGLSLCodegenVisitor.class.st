@@ -2,6 +2,7 @@ Class {
 	#name : #DASLGLSLCodegenVisitor,
 	#superclass : #DASLHighLevelCodegenVisitor,
 	#classVars : [
+		'SpecialSemanticVariableMap',
 		'TypeDictionary',
 		'TypeMapping'
 	],
@@ -36,7 +37,11 @@ DASLGLSLCodegenVisitor class >> initialize [
 	builtInTypes := DASLType builtInTypes.
 	TypeMapping pairsDo: [ :myName :mappedName |
 		TypeDictionary at: (builtInTypes at: myName) put: mappedName
-	]
+	].
+
+	SpecialSemanticVariableMap := Dictionary newFromPairs: #(
+		-1 gl_Position
+	)
 ]
 
 { #category : #'code generation' }
@@ -88,8 +93,10 @@ DASLGLSLCodegenVisitor >> generateGraphBlockPrototype: uniformBlock [
 ]
 
 { #category : #'code generation' }
-DASLGLSLCodegenVisitor >> generatePrologue: translationUnit [
-	self printLine: '#version 450';
+DASLGLSLCodegenVisitor >> generatePrologue [
+	self printLine: '#version 400';
+		printLine: '#extension GL_ARB_separate_shader_objects : enable';
+		printLine: '#extension GL_ARB_shading_language_420pack : enable';
 		newline
 ]
 
@@ -105,6 +112,11 @@ DASLGLSLCodegenVisitor >> generateSemanticBlock: semanticBlock [
 DASLGLSLCodegenVisitor >> generateSemanticVar: semanticVar prefix: prefix [
 	| flow glslType name varString |
 	flow := semanticVar flow.
+	flow location < 0 ifTrue: [
+		semanticVar codegenValue: (SpecialSemanticVariableMap at: flow location).
+		^ self.
+	].
+
 	varString := ByteString streamContents: [ :out |
 		flow location >= 0 ifTrue: [ 
 			out nextPutAll: 'layout(location = ';
@@ -165,7 +177,7 @@ DASLGLSLCodegenVisitor >> printCodeBlockPrototype: codeBlock [
 		printString: '()'
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
 DASLGLSLCodegenVisitor >> visitFloat: floatLiteral [
 	^ floatLiteral value printString
 ]
@@ -202,7 +214,7 @@ DASLGLSLCodegenVisitor >> visitFunctionPrototype: prototype [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
 DASLGLSLCodegenVisitor >> visitInteger: integerLiteral [
 	^ integerLiteral value printString
 ]

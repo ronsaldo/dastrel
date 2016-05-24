@@ -5,7 +5,8 @@ Class {
 		'outputStream',
 		'gensymCount',
 		'tabCount',
-		'currentFunction'
+		'currentFunction',
+		'visitedTranslationUnits'
 	],
 	#category : #'Dastrel-Core-Codegen'
 }
@@ -33,6 +34,11 @@ DASLHighLevelCodegenVisitor >> generateCodeBlockPrototypes: translationUnit [
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateCodeBlocks: translationUnit [
 	translationUnit modules select: #isCodeBlock thenDo: [ :block | self generateCodeBlock: block ]
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateCommon [
+	self generatePrologue
 ]
 
 { #category : #'code generation' }
@@ -96,7 +102,6 @@ DASLHighLevelCodegenVisitor >> generateSemanticBlocks: translationUnit [
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 	self
-		generatePrologue: translationUnit;
 		generateUniformBlocks: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;
@@ -135,6 +140,7 @@ DASLHighLevelCodegenVisitor >> initialize [
 	super initialize.
 	gensymCount := 0.
 	tabCount := 0.
+	visitedTranslationUnits := Set new.
 	
 ]
 
@@ -146,6 +152,15 @@ DASLHighLevelCodegenVisitor >> mapType: aType [
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> newline [
 	outputStream lf
+]
+
+{ #category : #'as yet unclassified' }
+DASLHighLevelCodegenVisitor >> passOn: anAst [
+	^ ByteString streamContents: [ :out |
+		outputStream := out.
+		self generateCommon.
+		anAst accept: self.
+	]
 ]
 
 { #category : #visitor }
@@ -273,11 +288,13 @@ DASLHighLevelCodegenVisitor >> visitReturnStatement: returnStatement [
 
 { #category : #visitor }
 DASLHighLevelCodegenVisitor >> visitTranslationUnit: translationUnit [
+	(visitedTranslationUnits includes: translationUnit) ifTrue: [ ^ self ].
+	visitedTranslationUnits add: translationUnit.
+	translationUnit importedUnits do: [ :unit | unit accept: self ].
+	
 	self prepareCodeGeneration: translationUnit.
-	^ ByteString streamContents: [ :out |
-		outputStream := out.
-		self generateTranslationUnit: translationUnit
-	]
+	self generateTranslationUnit: translationUnit.
+
 ]
 
 { #category : #'code generation' }

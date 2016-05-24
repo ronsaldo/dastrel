@@ -32,6 +32,7 @@ SpirVModuleBuilder class >> build: aBlock [
 
 { #category : #adding }
 SpirVModuleBuilder >> addAnnotationInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	annotationInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
@@ -44,48 +45,56 @@ SpirVModuleBuilder >> addCapability: capability [
 
 { #category : #adding }
 SpirVModuleBuilder >> addConstantInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	constantsInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addDebugInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	debugInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addEntryPointInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	entryPointInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addExecutionModeInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	executionModeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addFunctionInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	currentFunctionInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addGlobalInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	globalsInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addPrologueInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	prologueInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
 { #category : #adding }
 SpirVModuleBuilder >> addTypeInstruction: anInstruction [
+	self assert: anInstruction opcode isNotNil.
 	typeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]

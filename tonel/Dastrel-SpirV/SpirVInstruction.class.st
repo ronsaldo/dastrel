@@ -79,6 +79,11 @@ SpirVInstruction >> operands: anObject [
 	operands := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+SpirVInstruction >> printOn: aStream [
+	aStream print: opcode
+]
+
 { #category : #accessing }
 SpirVInstruction >> resultId [
 	^ resultId

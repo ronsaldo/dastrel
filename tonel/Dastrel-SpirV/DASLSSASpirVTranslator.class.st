@@ -26,6 +26,8 @@ DASLSSASpirVTranslator class >> initialize [
 	"
 	super initialize.
 	
+	(Smalltalk at: #SpirVConstants) initialize.
+	
 	StorageClassMap := IdentityDictionary newFromPairs: #(
 		uniformConstant 0
 		input 1

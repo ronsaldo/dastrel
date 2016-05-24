@@ -215,6 +215,21 @@ DASLSSASpirVTranslator >> visitCall: callInstruction [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitCombineSamplerWithTexture: combineSampler [
+	| sampler texture resultType |
+	^ self instructionTranslation: combineSampler do: [ :id |
+		sampler := self translateValue: combineSampler sampler.
+		texture := self translateValue: combineSampler texture.
+		resultType := self translateValue: combineSampler type.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpSampledImage
+			type: resultType
+			result: id
+			operands: { texture . sampler })
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitConstantValue: constantValue [
 	| value type encodedValue |
 	^ self valueTranslation: constantValue do: [ :id |
@@ -511,6 +526,44 @@ DASLSSASpirVTranslator >> visitReturnVoid: returnVoidInstruction [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitSampleImplicitLod: sampleImplicitLod [
+	| sampledTexture texcoord resultType |
+	^ self instructionTranslation: sampleImplicitLod do: [ :id |
+		sampledTexture := self translateValue: sampleImplicitLod sampledTexture.
+		texcoord := self translateValue: sampleImplicitLod texcoord.
+		resultType := self translateValue: sampleImplicitLod type.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpImageSampleImplicitLod
+			type: resultType
+			result: id
+			operands: { sampledTexture . texcoord })
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitSampledTextureType: sampledTextureType [
+	| textureType |
+	^ self valueTranslation: sampledTextureType do: [ :id |
+		textureType := self translateValue: sampledTextureType texture.
+		builder addTypeInstruction: (SpirVInstruction
+			opcode: SpvOpTypeSampledImage
+			result: id
+			operands: { textureType }
+		)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitSamplerType: samplerType [
+	^ self valueTranslation: samplerType do: [ :id |
+		builder addTypeInstruction: (SpirVInstruction
+			opcode: SpvOpTypeSampler
+			result: id
+		)
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitStore: storeInstruction [
 	| value variable |
 	^ self instructionTranslation: storeInstruction do: [ :id |
@@ -532,6 +585,26 @@ DASLSSASpirVTranslator >> visitStructureType: structureType [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitTextureType: textureType [
+	| sampledType |
+	^ self valueTranslation: textureType do: [ :id |
+		sampledType := self translateValue: textureType sampledType.
+		builder addTypeInstruction: (SpirVInstruction
+			opcode: SpvOpTypeImage
+			result: id
+			operands: {
+				sampledType .
+				textureType dimensions - 1.
+				textureType depth asBit .
+				textureType array asBit .
+				textureType multisample asBit .
+				textureType sampled asBit .
+				"Unknown format" 0}
+		)
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitVectorType: vectorType [
 	| baseType |
 	^ self valueTranslation: vectorType do: [ :id |
@@ -542,7 +615,6 @@ DASLSSASpirVTranslator >> visitVectorType: vectorType [
 
 { #category : #visitor }
 DASLSSASpirVTranslator >> visitVoidType: voidType [
-	| resultType arguments |
 	^ self valueTranslation: voidType do: [ :id |
 		builder addTypeInstruction: (SpirVInstruction
 			opcode: SpvOpTypeVoid

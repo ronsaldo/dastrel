@@ -92,7 +92,8 @@ Class {
 		'inOutVariable',
 		'globalBlock',
 		'kwImport',
-		'import'
+		'import',
+		'uniformGlobal'
 	],
 	#classVars : [
 		'Keywords'
@@ -332,7 +333,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / interface / uniform / semantic / codeBlock / function
+	^ import / interface / uniformGlobal / uniform / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -628,6 +629,11 @@ DASLGrammar >> uniform [
 { #category : #grammar }
 DASLGrammar >> uniformBody [
 	^ blockVariable star
+]
+
+{ #category : #grammar }
+DASLGrammar >> uniformGlobal [
+	^ kwUniform , blockAttributes optional , identifier , colon , type, semicolon
 ]
 
 { #category : #grammar }

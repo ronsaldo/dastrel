@@ -41,12 +41,6 @@ DAIRGlobalVariable >> valueType [
 ]
 
 { #category : #accessing }
-DAIRGlobalVariable >> valueType: aType [
-	valueType := aType.
-	type := DASLReferenceType baseType: valueType.
-]
-
-{ #category : #accessing }
 DAIRGlobalVariable >> valueType: aType storage: storageClass [
 	valueType := aType.
 	type := DASLReferenceType baseType: valueType storage: storageClass.

@@ -112,12 +112,12 @@ DAIRBinaryOperation >> computeTypeFor: anOperation left: leftOperand right: righ
 	leftType ~= rightType ifTrue: [ self error: 'Unsupported binary operation whose operands have a different type.' ].
 	
 	((operationType == #integer) or: [ operationType == #integerComp ]) ifTrue: [ 
-		leftType isIntegerType ifFalse: [ self error: 'Binary operation ' , anOperation , ' requires integer operands.' ].
+		(leftType isIntegerType or: [leftType isVectorType and: [leftType baseType isIntegerType ] ]) ifFalse: [ self error: 'Binary operation ' , anOperation , ' requires integer operands.' ].
 		^ operationType == #integerComp ifTrue: [ DASLType boolType ] ifFalse: [ leftType ]
 	].
 
 	((operationType == #float) or: [ operationType == #floatComp ]) ifTrue: [ 
-		leftType isFloatType ifFalse: [ self error: 'Binary operation ' , anOperation , ' requires integer operands.' ].
+		(leftType isFloatType or: [leftType isVectorType and: [leftType baseType isFloatType ] ]) ifFalse: [ self error: 'Binary operation ' , anOperation , ' requires floating point operands.' ].
 		^ operationType == #floatComp ifTrue: [ DASLType boolType ] ifFalse: [ leftType ]
 	].
 

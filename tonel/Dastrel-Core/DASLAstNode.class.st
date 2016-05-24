@@ -73,6 +73,11 @@ DASLAstNode >> isUniformBlock [
 	^ false
 ]
 
+{ #category : #testing }
+DASLAstNode >> isUniformGlobal [
+	^ false
+]
+
 { #category : #accessing }
 DASLAstNode >> position [
 	^ position

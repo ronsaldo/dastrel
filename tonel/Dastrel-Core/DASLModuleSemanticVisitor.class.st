@@ -81,3 +81,10 @@ DASLModuleSemanticVisitor >> visitUniformBlock: uniformBlock [
 		self error: 'uniform block overrides a previously defined symbol' at: uniformBlock
 	].
 ]
+
+{ #category : #visitor }
+DASLModuleSemanticVisitor >> visitUniformGlobal: uniformGlobal [
+	currentScope at: uniformGlobal name put: uniformGlobal ifPresent: [
+		self error: 'uniform global overrides a previously defined symbol' at: uniformGlobal
+	].
+]

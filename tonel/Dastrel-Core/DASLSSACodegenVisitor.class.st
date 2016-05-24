@@ -83,12 +83,22 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 ]
 
 { #category : #visitor }
-DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction arguments: arguments [
-	| functionType expectedArgumentTypes coercedArguments leftValue rightValue |
+DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument arguments: arguments [
+	| functionType expectedArgumentTypes coercedArguments leftValue rightValue selfType selfBaseType |
 	functionType := builtInFunction functionType.
 	expectedArgumentTypes := functionType arguments.
 	coercedArguments := arguments collectWithIndex: [ :argument :index |
 		self coerce: argument into: (expectedArgumentTypes at: index)
+	].
+
+	selfArgument ifNotNil: [
+		selfType := selfArgument type.
+		self assert: selfType isReferenceType.
+		selfBaseType := selfType baseType.
+		selfBaseType isSamplerType ifTrue: [
+			self assert: arguments size >= 1.
+			^ self generateSampler: selfArgument operation: builtInFunction name argument: arguments.
+		].
 	].
 
 	(arguments size = 2 and: [BinaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
@@ -236,11 +246,25 @@ DASLSSACodegenVisitor >> generateMultiplication: leftValue with: rightValue [
 		^ builder mulVector: leftValue withMatrix: rightValue.
 	].
 
-	leftType isFloatType ifTrue: [ 
+	(leftType isFloatType or: [ leftType isVectorType  and: [leftType baseType isFloatType ] ]) ifTrue: [ 
 		^ builder fmul: leftValue with: rightValue 
 	] ifFalse: [
 		^ builder mul: leftValue with: rightValue
 	]
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateSampler: sampler operation: operation argument: arguments [
+	| texture loadedSampler combinedSampler texcoord |
+	texture := arguments first.
+	texcoord := arguments second.
+	loadedSampler := builder load: sampler.
+	combinedSampler := builder combineSampler: loadedSampler with: texture.
+	operation = #sample ifTrue: [ 
+		^ builder sample: combinedSampler implicitLodAtCoord: texcoord
+	].
+	self halt.
+	
 ]
 
 { #category : #visitor }
@@ -291,6 +315,24 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 	translationUnit modules select: #isUniformBlock thenDo: [ :block | self generateUniformBlock: block ]
 ]
 
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
+	| globalVar |
+	globalVar := DAIRGlobalVariable name: uniformGlobal name valueType: uniformGlobal type storage: DASLType uniformConstantStorage.
+	uniformGlobal codegenValue: globalVar.
+	uniformGlobal attributes keysAndValuesDo: [ :key :value |
+		globalVar propertyAt: key value asSymbol put: value value
+	].
+
+	ssaModule add: globalVar.
+
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateUniformGlobals: translationUnit [
+	translationUnit modules select: #isUniformGlobal thenDo: [ :block | self generateUniformGlobal: block ]
+]
+
 { #category : #initialization }
 DASLSSACodegenVisitor >> initialize [
 	super initialize.
@@ -315,7 +357,7 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitBinaryOperation: binaryOperation [
-	^ self generateBuiltInCall: binaryOperation builtInFunction arguments: {
+	^ self generateBuiltInCall: binaryOperation builtInFunction self: nil arguments: {
 		binaryOperation left accept: self.
 		binaryOperation right accept: self.
 	}
@@ -324,11 +366,15 @@ DASLSSACodegenVisitor >> visitBinaryOperation: binaryOperation [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitCallExpression: callExpression [
-	| function arguments functionRefType functionType expectedArgumentTypes coercedArguments |
+	| function arguments functionRefType functionType expectedArgumentTypes coercedArguments callSelf |
 	function := callExpression solvedFunction ifNotNil: [
 		callExpression solvedFunction isBuiltInFunction ifTrue: [ 
 			arguments := callExpression arguments collect: [ :arg | arg accept: self ].
-			^ self generateBuiltInCall: callExpression solvedFunction arguments: arguments
+			callSelf := nil.
+			callExpression solvedFunction isMember ifTrue: [
+				callSelf := callExpression reference accept: self. 
+			].
+			^ self generateBuiltInCall: callExpression solvedFunction self: callSelf arguments: arguments
 		].
 	
 		callExpression solvedFunction codegenValue
@@ -396,6 +442,7 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	].
 	
 	baseReference := memberAccess reference accept: self.
+	memberAccess type isFunctionGroupType ifTrue: [ ^ baseReference ].
 	^ builder getReference: baseReference element: (builder constInt: memberAccess memberIndex).
 ]
 
@@ -425,6 +472,7 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 	
 	self
 		generateUniformBlocks: translationUnit;
+		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;
 		generateCodeBlockPrototypes: translationUnit;

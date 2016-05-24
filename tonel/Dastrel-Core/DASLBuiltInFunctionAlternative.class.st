@@ -5,7 +5,8 @@ Class {
 		'argumentTypes',
 		'returnType',
 		'coercionType',
-		'options'
+		'options',
+		'isMember'
 	],
 	#category : #'Dastrel-Core-Builtin'
 }
@@ -30,7 +31,8 @@ DASLBuiltInFunctionAlternative >> asBuiltInFunction [
 	^ DASLBuiltInFunction new
 		functionType: self functionType;
 		coercionType: coercionType;
-		builtInOptions: options
+		builtInOptions: options;
+		isMember: isMember;
 		yourself
 ]
 
@@ -122,6 +124,16 @@ DASLBuiltInFunctionAlternative >> isGeneric [
 		argType isPlaceholderType ifTrue: [ ^ true ]
 	].
 	^ false
+]
+
+{ #category : #accessing }
+DASLBuiltInFunctionAlternative >> isMember [
+	^ isMember
+]
+
+{ #category : #accessing }
+DASLBuiltInFunctionAlternative >> isMember: anObject [
+	isMember := anObject
 ]
 
 { #category : #accessing }

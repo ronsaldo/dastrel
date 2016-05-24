@@ -19,7 +19,14 @@ Class {
 		'OutputStorage',
 		'PrivateStorage',
 		'PushConstantStorage',
+		'SamplerType',
 		'ShortType',
+		'Textured1DArrayType',
+		'Textured1DType',
+		'Textured2DArrayType',
+		'Textured2DType',
+		'Textured3DArrayType',
+		'Textured3DType',
 		'UCharType',
 		'UIntType',
 		'ULongType',
@@ -98,7 +105,7 @@ DASLType class >> initialize [
 	"
 	super initialize.
 	
-	UniformConstantStorage := #uniform.
+	UniformConstantStorage := #uniformConstant.
 	UniformStorage := 	#uniform.
 	InputStorage := #input.
 	OutputStorage := #output.
@@ -113,7 +120,13 @@ DASLType class >> initialize [
 	ImageStorage := #image.
 	
 	BuiltInTypes := IdentityDictionary new.
-	(self primitiveTypes , self vectorTypes , self matrixTypes )do: [ :type | BuiltInTypes at: type name put: type ]
+	(
+		self primitiveTypes,
+		self vectorTypes,
+		self matrixTypes,
+		self textureAndSamplerTypes
+	) do: [ :type | BuiltInTypes at: type name put: type ]
+	
 ]
 
 { #category : #'storage classes' }
@@ -197,8 +210,35 @@ DASLType class >> pushConstantStorage [
 ]
 
 { #category : #'built in types' }
+DASLType class >> samplerType [
+	^ SamplerType
+]
+
+{ #category : #'built in types' }
 DASLType class >> shortType [
 	^ ShortType
+]
+
+{ #category : #'built in types' }
+DASLType class >> textureAndSamplerTypes [
+	SamplerType := DASLSamplerType new name: #sampler.
+
+	Textured1DType := DASLTextureType new name: #texture1D; sampledType: FloatType; dimensions: 1; array: false; depth: false; multisample: false; sampled: true.	
+	Textured1DArrayType := DASLTextureType new name: #texture1DArray; sampledType: FloatType; dimensions: 1; array: true; depth: false; multisample: false; sampled: true.
+	Textured2DType := DASLTextureType new name: #texture2D; dimensions: 2; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
+	Textured2DArrayType := DASLTextureType new name: #texture2DArray; sampledType: FloatType; dimensions: 2; array: true; depth: false; multisample: false; sampled: true.
+	Textured3DType := DASLTextureType new name: #texture3D; dimensions: 3; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
+	Textured3DArrayType := DASLTextureType new name: #texture3DArray; sampledType: FloatType; dimensions: 3; array: true; depth: false; multisample: false; sampled: true.
+	
+	^ {
+		SamplerType .
+		Textured1DType .
+		Textured1DArrayType .
+		Textured2DType .
+		Textured2DArrayType .
+		Textured3DType .
+		Textured3DType .
+	}
 ]
 
 { #category : #'built in types' }
@@ -317,6 +357,21 @@ DASLType >> isPrimitiveType [
 
 { #category : #testing }
 DASLType >> isReferenceType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isSampledTextureType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isSamplerType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isTextureType [
 	^ false
 ]
 

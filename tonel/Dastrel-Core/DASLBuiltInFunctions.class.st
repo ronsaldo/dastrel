@@ -102,3 +102,20 @@ DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 		)
 	)
 ]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInSamplerFunctions [
+	^ DASLBuiltInFunctionPrototypeParser new parsePrototypes: self builtInSamplerPrototypes
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInSamplerPrototypes [
+	^ #(
+		(
+			(sample) (member)
+			(texture1D float => float4)
+			(texture2D float2 => float4)
+			(texture3D float3 => float4)
+		)
+	)
+]

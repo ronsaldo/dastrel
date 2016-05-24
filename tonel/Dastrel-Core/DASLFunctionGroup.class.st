@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLModule,
 	#instVars : [
 		'alternatives',
-		'isOperation'
+		'isOperation',
+		'isMember'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -42,11 +43,22 @@ DASLFunctionGroup >> codegenValue [
 DASLFunctionGroup >> initialize [
 	super initialize.
 	alternatives := OrderedCollection new.
+	isMember := false.
 ]
 
 { #category : #testing }
 DASLFunctionGroup >> isFunctionGroup [
 	^ true
+]
+
+{ #category : #accessing }
+DASLFunctionGroup >> isMember [
+	^ isMember
+]
+
+{ #category : #accessing }
+DASLFunctionGroup >> isMember: anObject [
+	isMember := anObject
 ]
 
 { #category : #accessing }

@@ -55,6 +55,16 @@ DAIRBuilder >> call: functionValue arguments: arguments name: resultName [
 	^ self addInstruction: (DAIRCall function: functionValue arguments: arguments) name: resultName
 ]
 
+{ #category : #instructions }
+DAIRBuilder >> combineSampler: sampler with: texture [
+	^ self combineSampler: sampler with: texture name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> combineSampler: sampler with: texture name: resultName [
+	^ self addInstruction: (DAIRCombineSamplerWithTexture sampler: sampler texture: texture) name: resultName
+]
+
 { #category : #constants }
 DAIRBuilder >> constBool: aValue [
 	^ DAIRConstant bool: aValue
@@ -317,6 +327,16 @@ DAIRBuilder >> returnVoid [
 { #category : #instructions }
 DAIRBuilder >> returnVoid: resultName [
 	^ self addInstruction: DAIRReturnVoid new name: resultName
+]
+
+{ #category : #instructions }
+DAIRBuilder >> sample: combinedSampler implicitLodAtCoord: texcoord [
+	^ self sample: combinedSampler implicitLodAtCoord: texcoord name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> sample: combinedSampler implicitLodAtCoord: texcoord name: resultName [
+	^ self addInstruction: (DAIRSampleImplicitLod sampledTexture: combinedSampler texcoord: texcoord) name: resultName
 ]
 
 { #category : #instructions }

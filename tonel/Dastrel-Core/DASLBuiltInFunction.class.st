@@ -5,7 +5,8 @@ Class {
 		'functionType',
 		'coercionType',
 		'operation',
-		'builtInOptions'
+		'builtInOptions',
+		'isMember'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -45,9 +46,25 @@ DASLBuiltInFunction >> functionType: anObject [
 	functionType := anObject
 ]
 
+{ #category : #initialization }
+DASLBuiltInFunction >> initialize [
+	super initialize.
+	isMember := false.
+]
+
 { #category : #testing }
 DASLBuiltInFunction >> isBuiltInFunction [
 	^ true
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> isMember [
+	^ isMember
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> isMember: anObject [
+	isMember := anObject
 ]
 
 { #category : #accessing }
@@ -58,4 +75,9 @@ DASLBuiltInFunction >> operation [
 { #category : #accessing }
 DASLBuiltInFunction >> operation: anObject [
 	operation := anObject
+]
+
+{ #category : #printing }
+DASLBuiltInFunction >> printOn: aStream [
+	aStream print: functionType 
 ]

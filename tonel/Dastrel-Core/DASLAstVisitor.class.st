@@ -170,6 +170,11 @@ DASLAstVisitor >> visitUniformBlock: uniformBlock [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitUniformGlobal: uniformGlobal [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitUsingStatement: usingStatement [
 	self subclassResponsibility
 ]

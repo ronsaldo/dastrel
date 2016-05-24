@@ -12,6 +12,11 @@ Class {
 }
 
 { #category : #construction }
+DASLVectorType class >> baseType: aBaseType elements: numElements [
+	^ self baseType: aBaseType elements: numElements alignment: aBaseType alignment
+]
+
+{ #category : #construction }
 DASLVectorType class >> baseType: aBaseType elements: numElements alignment: anAlignment [
 	^ self new
 		baseType: aBaseType;

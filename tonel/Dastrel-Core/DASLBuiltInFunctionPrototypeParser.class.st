@@ -19,7 +19,21 @@ DASLBuiltInFunctionPrototypeParser >> addSupportedTypes [
 
 { #category : #expansion }
 DASLBuiltInFunctionPrototypeParser >> expandToVectorVersions: alternatives [
-	^ alternatives
+	| expandedVersions newAlternative valid |
+	expandedVersions := OrderedCollection new.
+	alternatives do: [ :alternative |
+		expandedVersions add: alternative.
+		2 to: 4 do: [ :i |
+			newAlternative := alternative copy.
+			valid := true.
+			newAlternative argumentTypes: (alternative argumentTypes collect: [:arg |
+				DASLType builtInTypes at: (arg name , i printString) asSymbol ifAbsent: [
+					valid := false.
+					nil] ]).
+			valid ifTrue: [ expandedVersions add: newAlternative ]
+		].
+	].
+	^ expandedVersions
 ]
 
 { #category : #parsing }
@@ -95,7 +109,8 @@ DASLBuiltInFunctionPrototypeParser >> parseAlternativeSignature: overloadAlterna
 		argumentTypes: (argumentTypes collect: [ :typeName | self parseType: typeName ]);
 		coercionType: (self parseType: coercionType);
 		returnType: (self parseType: returnType);
-		options: options
+		options: options;
+		isMember: (self hasOption: #member);
 		yourself
 
 ]

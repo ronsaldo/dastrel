@@ -2,7 +2,8 @@ Class {
 	#name : #DASLBlockSemanticVisitor,
 	#superclass : #DASLSemanticVisitor,
 	#instVars : [
-		'currentFunction'
+		'currentFunction',
+		'samplerBuiltIns'
 	],
 	#category : #'Dastrel-Core-Semantic'
 }
@@ -18,6 +19,13 @@ DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes a
 
 	self halt.
 	self error: 'Failed to find suitable function overload for "',  functionGroup ,'".' name at: position.
+]
+
+{ #category : #initialization }
+DASLBlockSemanticVisitor >> initialize [
+	super initialize.
+	samplerBuiltIns := DASLBuiltInFunctions builtInSamplerFunctions.
+
 ]
 
 { #category : #visitor }
@@ -97,7 +105,7 @@ DASLBlockSemanticVisitor >> visitFunction: function [
 	currentFunction := nil
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitImportStatement: importStatement [
 	"Nothing to do"
 ]
@@ -128,7 +136,7 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
-	| referencedType member |
+	| referencedType member baseType samplerFunction |
 	memberAccess reference accept: self.
 	
 	referencedType := memberAccess reference type.
@@ -145,6 +153,16 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 		].
 	
 		self error: 'cannot access member of non global connection block.' at: memberAccess.
+	].
+
+	baseType := referencedType.
+	referencedType isReferenceType ifTrue: [ baseType := referencedType baseType ].
+	baseType isSamplerType ifTrue: [
+		samplerFunction := samplerBuiltIns at: memberAccess memberName ifAbsent: [ 
+			self error: 'failed to find sampler member named ' , memberAccess memberName at: memberAccess.
+		]. 
+		memberAccess type: samplerFunction referenceType.
+		^ self
 	].
 
 	self halt.
@@ -191,6 +209,11 @@ DASLBlockSemanticVisitor >> visitTranslationUnit: translationUnit [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitUniformBlock: interface [
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitUniformGlobal: uniformGlobal [
+	"Nothing to do"
 ]
 
 { #category : #visitor }

@@ -121,3 +121,8 @@ DASLBlockPublicSemanticVisitor >> visitUniformBlock: uniformBlock [
 	].
 
 ]
+
+{ #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitUniformGlobal: uniformGlobal [
+	self resolveTypeOf: uniformGlobal.
+]

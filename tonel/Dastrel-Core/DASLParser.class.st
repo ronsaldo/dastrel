@@ -208,7 +208,7 @@ DASLParser >> interfaceImplementations [
 { #category : #grammar }
 DASLParser >> localVariable [
 	^ super localVariable ==> [ :local | DASLLocalDeclStatement new
-			position: local first;
+			position: (self positionFromToken: local first);
 			type: local third;
 			name:  local second value;
 			initialValue: local fourth;
@@ -313,6 +313,16 @@ DASLParser >> uniform [
 			name: block third value;
 			interfaceList: block fourth;
 			body: block sixth;
+			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> uniformGlobal [
+	^ super uniformGlobal ==> [ :global | DASLUniformGlobal new
+			position: (self positionFromToken: global first);
+			attributes: global second;
+			name: global third value;
+			type: global fifth;
 			yourself ]
 ]
 

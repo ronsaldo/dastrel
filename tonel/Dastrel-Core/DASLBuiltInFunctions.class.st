@@ -8,6 +8,26 @@ Class {
 DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 	^ #(
 		(
+			(#'pre+') (expandToVector operation)
+			(smallInt => int)
+			(smallUInt => uint)
+			(long => long)
+			(ulong => ulong)
+			(float => float)
+			(double => double)
+		)
+
+		(
+			(#'pre-') (expandToVector operation)
+			(smallInt => int)
+			(smallUInt => int)
+			(long => long)
+			(ulong => long)
+			(float => float)
+			(double => double)
+		)
+		
+		(
 			(+ * %) (ignoreOrder expandToVector operation)
 			(smallInt smallInt => int)
 			(smallUInt smallUInt => uint)
@@ -60,7 +80,8 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 { #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 	^ self builtInArithmeticFunctions , self builtInLogicalFunctions ,
-	self builtInMatrixMultiplicationFunctions
+	self builtInMatrixMultiplicationFunctions ,
+	self builtInMathFunctions
 ]
 
 { #category : #'builtin functions' }
@@ -72,7 +93,7 @@ DASLBuiltInFunctions class >> builtInFunctions [
 DASLBuiltInFunctions class >> builtInLogicalFunctions [
 	^ #(
 		(
-			(!) (operation)
+			(#'pre!') (operation)
 			(bool => bool)
 		)
 
@@ -81,6 +102,26 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 			(bool bool => bool)
 		)
 	
+	)
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInMathFunctions [
+	^ #(
+		(
+			(smoothstep) (expandToVector)
+			(float float float => float)
+			(double double double => double)
+		)
+		(
+			(smoothstep) ()
+			(float float float2 => float2)
+			(float float float3 => float3)
+			(float float float4 => float4)
+			(double double double2 => double2)
+			(double double double3 => double3)
+			(double double double4 => double4)
+		)
 	)
 ]
 

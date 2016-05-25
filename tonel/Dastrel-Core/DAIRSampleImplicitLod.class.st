@@ -29,10 +29,11 @@ DAIRSampleImplicitLod >> sampledTexture [
 
 { #category : #construction }
 DAIRSampleImplicitLod >> sampledTexture: sampledTexture texcoord: texcoord [
+	| sampledTextureType |
 	self parameters: { sampledTexture . texcoord }.
-	self flag: 'TODO: Support more result types than float4'.
-	type := DASLType builtInTypes at: #float4.
-	
+	sampledTextureType := sampledTexture type.
+	self assert: sampledTextureType isSampledTextureType.
+	type := DASLVectorType baseType: sampledTextureType texture sampledType elements: 4
 ]
 
 { #category : #accessing }

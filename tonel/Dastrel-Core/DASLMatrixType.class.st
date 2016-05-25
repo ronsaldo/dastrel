@@ -13,6 +13,13 @@ Class {
 }
 
 { #category : #construction }
+DASLMatrixType class >> baseType: aBaseType rows: numRows columns: numColumns [
+	| alignmentMultiplier |
+	alignmentMultiplier := numRows ~= 3 ifTrue: [ numRows ] ifFalse: [ 4 ].
+	^ self baseType: aBaseType rows: numRows columns: numColumns alignment: aBaseType alignment * alignmentMultiplier
+]
+
+{ #category : #construction }
 DASLMatrixType class >> baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment [
 	^ self new
 		baseType: aBaseType;
@@ -21,11 +28,6 @@ DASLMatrixType class >> baseType: aBaseType rows: numRows columns: numColumns al
 		alignment: anAlignment;
 		size: (aBaseType size * numColumns alignedTo: anAlignment) * numRows;
 		yourself
-]
-
-{ #category : #construction }
-DASLMatrixType class >> name: aName baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment [
-	^ (self baseType: aBaseType rows: numRows columns: numColumns alignment: anAlignment) name: aName; yourself
 ]
 
 { #category : #comparing }
@@ -65,7 +67,7 @@ DASLMatrixType >> baseType: anObject [
 
 { #category : #accessing }
 DASLMatrixType >> columnType [
-	^ DASLVectorType baseType: baseType elements: rows alignment: alignment
+	^ DASLVectorType baseType: baseType elements: rows
 ]
 
 { #category : #accessing }
@@ -90,17 +92,12 @@ DASLMatrixType >> isMatrixType [
 
 { #category : #accessing }
 DASLMatrixType >> name [
-	^ name
-]
-
-{ #category : #accessing }
-DASLMatrixType >> name: anObject [
-	name := anObject
+	^ self printString asSymbol
 ]
 
 { #category : #printing }
 DASLMatrixType >> printOn: aStream [
-	aStream nextPutAll: 'matrix!<'; print: baseType; nextPutAll: ', '; print: rows; nextPutAll: ', '; print: columns; nextPutAll: '>'
+	aStream print: baseType; print: rows; nextPut: $x; print: columns
 ]
 
 { #category : #accessing }

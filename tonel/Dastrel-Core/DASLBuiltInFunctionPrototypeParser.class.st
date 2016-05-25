@@ -19,18 +19,15 @@ DASLBuiltInFunctionPrototypeParser >> addSupportedTypes [
 
 { #category : #expansion }
 DASLBuiltInFunctionPrototypeParser >> expandToVectorVersions: alternatives [
-	| expandedVersions newAlternative valid |
+	| expandedVersions newAlternative |
 	expandedVersions := OrderedCollection new.
 	alternatives do: [ :alternative |
 		expandedVersions add: alternative.
 		2 to: 4 do: [ :i |
 			newAlternative := alternative copy.
-			valid := true.
 			newAlternative argumentTypes: (alternative argumentTypes collect: [:arg |
-				DASLType builtInTypes at: (arg name , i printString) asSymbol ifAbsent: [
-					valid := false.
-					nil] ]).
-			valid ifTrue: [ expandedVersions add: newAlternative ]
+				DASLVectorType baseType: arg elements: i]).
+			expandedVersions add: newAlternative
 		].
 	].
 	^ expandedVersions

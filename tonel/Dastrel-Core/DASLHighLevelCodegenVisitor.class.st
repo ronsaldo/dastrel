@@ -103,6 +103,7 @@ DASLHighLevelCodegenVisitor >> generateSemanticBlocks: translationUnit [
 DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 	self
 		generateUniformBlocks: translationUnit;
+		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;
 		generateCodeBlockPrototypes: translationUnit;
@@ -122,6 +123,16 @@ DASLHighLevelCodegenVisitor >> generateUniformBlock: block [
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateUniformBlocks: translationUnit [
 	translationUnit modules select: #isUniformBlock thenDo: [ :block | self generateUniformBlock: block ]
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateUniformGlobal: block [
+	self subclassResponsibility.
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateUniformGlobals: translationUnit [
+	translationUnit modules select: #isUniformGlobal thenDo: [ :block | self generateUniformGlobal: block ]
 ]
 
 { #category : #utilties }
@@ -261,7 +272,7 @@ DASLHighLevelCodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	globalRefValue := memberAccess globalReferenceValue.
 	globalRefValue ifNotNil: [ ^ globalRefValue codegenValue ].
 	
-	^ (memberAccess reference accept: self) , '.' , memberAccess identifier
+	^ (memberAccess reference accept: self) , '.' , memberAccess memberName
 ]
 
 { #category : #'code generation' }

@@ -30,6 +30,8 @@ DAIRCombineSamplerWithTexture >> sampler [
 { #category : #construction }
 DAIRCombineSamplerWithTexture >> sampler: sampler texture: texture [
 	self parameters: { sampler . texture }.
+	self assert: sampler type isSamplerType.
+	self assert: texture type isTextureType.
 	type := DASLSampledTextureType new texture: texture type.
 ]
 

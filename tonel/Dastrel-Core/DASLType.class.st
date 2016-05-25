@@ -147,9 +147,9 @@ DASLType class >> longType [
 { #category : #'built in types' }
 DASLType class >> matrixTypes [
 	^ {
-		DASLMatrixType name: #float2x2 baseType: FloatType rows: 2 columns: 2 alignment: 8.
-		DASLMatrixType name: #float3x3 baseType: FloatType rows: 3 columns: 3 alignment: 16.
-		DASLMatrixType name: #float4x4 baseType: FloatType rows: 4 columns: 4 alignment: 16.
+		DASLMatrixType baseType: FloatType rows: 2 columns: 2.
+		DASLMatrixType baseType: FloatType rows: 3 columns: 3.
+		DASLMatrixType baseType: FloatType rows: 4 columns: 4.
 	}
 ]
 
@@ -274,9 +274,13 @@ DASLType class >> ushortType [
 { #category : #'built in types' }
 DASLType class >> vectorTypes [
 	^ {
-		DASLVectorType name: #float2 baseType: FloatType elements: 2 alignment: 8.
-		DASLVectorType name: #float3 baseType: FloatType elements: 3 alignment: 16.
-		DASLVectorType name: #float4 baseType: FloatType elements: 4 alignment: 16.
+		DASLVectorType baseType: FloatType elements: 2.
+		DASLVectorType baseType: FloatType elements: 3.
+		DASLVectorType baseType: FloatType elements: 4.
+		
+		DASLVectorType baseType: DoubleType elements: 2.
+		DASLVectorType baseType: DoubleType elements: 3.
+		DASLVectorType baseType: DoubleType elements: 4.
 	}
 ]
 

@@ -3,10 +3,33 @@ Class {
 	#superclass : #DASLExpression,
 	#instVars : [
 		'operation',
-		'operand'
+		'operand',
+		'coercionType',
+		'type',
+		'builtInFunction'
 	],
 	#category : #'Dastrel-Core-AST'
 }
+
+{ #category : #accessing }
+DASLUnaryOperation >> builtInFunction [
+	^ builtInFunction
+]
+
+{ #category : #accessing }
+DASLUnaryOperation >> builtInFunction: anObject [
+	builtInFunction := anObject
+]
+
+{ #category : #accessing }
+DASLUnaryOperation >> coercionType [
+	^ coercionType
+]
+
+{ #category : #accessing }
+DASLUnaryOperation >> coercionType: anObject [
+	coercionType := anObject
+]
 
 { #category : #accessing }
 DASLUnaryOperation >> operand [
@@ -26,4 +49,14 @@ DASLUnaryOperation >> operation [
 { #category : #accessing }
 DASLUnaryOperation >> operation: anObject [
 	operation := anObject
+]
+
+{ #category : #accessing }
+DASLUnaryOperation >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLUnaryOperation >> type: anObject [
+	type := anObject
 ]

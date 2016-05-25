@@ -31,6 +31,9 @@ DASLGLSLCodegenVisitor class >> initialize [
 		float2x2 mat2
 		float3x3 mat3
 		float4x4 mat4
+		
+		texture2D texture2D
+		sampler sampler
 	).
 	
 	TypeDictionary := Dictionary new.
@@ -143,8 +146,7 @@ DASLGLSLCodegenVisitor >> generateUniformBlock: uniformBlock [
 	| prefix instanceName layoutString |
 	instanceName := uniformBlock name , '_dastrel_singleton_'.
 	prefix := instanceName , '.'.
-	layoutString := 'layout('.
-	layoutString := layoutString , 'std140) '.
+	layoutString := self generateUniformLayoutString: uniformBlock.
 	self
 		printLine: layoutString , 'uniform ' , uniformBlock name;
 		printLine: '{';
@@ -153,6 +155,50 @@ DASLGLSLCodegenVisitor >> generateUniformBlock: uniformBlock [
 		];
 		printLine: '} ' , instanceName , ';';
 		newline
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateUniformGlobal: uniformGlobal [
+	| prefix instanceName layoutString glslType |
+	instanceName := uniformGlobal name , '_dastrel_global_'.
+	glslType := self mapType: uniformGlobal type.
+	uniformGlobal codegenValue: instanceName.
+	prefix := instanceName , '.'.
+	layoutString := self generateUniformLayoutString: uniformGlobal.
+	self
+		printLine: layoutString , 'uniform ' , glslType, ' ', instanceName, ';'
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
+	| layoutProperties |
+	layoutProperties := OrderedCollection new.
+	uniform attributes keysAndValuesDo: [ :key :value |
+		(key value = #binding or: [ key value = #set ]) ifTrue: [
+			layoutProperties add: key value -> value value
+		]
+	].
+
+	uniform isUniformBlock ifTrue: [ 
+		layoutProperties add: #std140
+	].
+
+	layoutProperties ifEmpty: [ ^ '' ].
+
+	^ ByteString streamContents: [ :out |
+		out nextPutAll: 'layout ('.
+		layoutProperties doWithIndex: [ :prop :index |
+			index > 1 ifTrue: [ out nextPutAll: ', ' ].
+			prop isSymbol ifTrue: [
+				out nextPutAll: prop 
+			] ifFalse:[
+				out nextPutAll: prop key; nextPutAll: ' = '; nextPutAll: prop value asString 
+			]
+		].
+	
+		out nextPutAll: ') '
+	]
+	
 ]
 
 { #category : #'code generation' }

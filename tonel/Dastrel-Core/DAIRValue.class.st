@@ -25,6 +25,11 @@ DAIRValue >> isConstant [
 ]
 
 { #category : #testing }
+DAIRValue >> isConstantBuiltInFunction [
+	^ false
+]
+
+{ #category : #testing }
 DAIRValue >> isConstantValue [
 	^ false
 ]

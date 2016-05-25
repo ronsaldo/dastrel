@@ -2,7 +2,6 @@ Class {
 	#name : #DASLVectorType,
 	#superclass : #DASLType,
 	#instVars : [
-		'name',
 		'baseType',
 		'elements',
 		'size',
@@ -13,7 +12,9 @@ Class {
 
 { #category : #construction }
 DASLVectorType class >> baseType: aBaseType elements: numElements [
-	^ self baseType: aBaseType elements: numElements alignment: aBaseType alignment
+	| alignmentMultiplier |
+	alignmentMultiplier := numElements ~= 3 ifTrue: [ numElements ] ifFalse: [ 4 ].
+	^ self baseType: aBaseType elements: numElements alignment: aBaseType alignment * alignmentMultiplier
 ]
 
 { #category : #construction }
@@ -24,11 +25,6 @@ DASLVectorType class >> baseType: aBaseType elements: numElements alignment: anA
 		alignment: anAlignment;
 		size: (aBaseType size * numElements alignedTo: anAlignment);
 		yourself
-]
-
-{ #category : #construction }
-DASLVectorType class >> name: aName baseType: aBaseType elements: numElements alignment: anAlignment [
-	^ (self baseType: aBaseType elements: numElements alignment: anAlignment) name: aName; yourself
 ]
 
 { #category : #comparing }
@@ -87,21 +83,12 @@ DASLVectorType >> isVectorType [
 
 { #category : #accessing }
 DASLVectorType >> name [
-	^ name
-]
-
-{ #category : #accessing }
-DASLVectorType >> name: anObject [
-	name := anObject
+	^ self printString asSymbol
 ]
 
 { #category : #printing }
 DASLVectorType >> printOn: aStream [
-	name ifNotNil: [ 
-		aStream nextPutAll: name
-	] ifNil: [ 
-		aStream nextPutAll: 'Vector<' ; print: baseType; nextPut: $,; print: elements; nextPut: $,; print: alignment; nextPut: $>
-	]
+	aStream print: baseType; print: elements
 ]
 
 { #category : #accessing }

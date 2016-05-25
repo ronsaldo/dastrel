@@ -5,8 +5,36 @@ Class {
 		'currentFunction',
 		'samplerBuiltIns'
 	],
+	#classVars : [
+		'SwizzleComponentIndices'
+	],
 	#category : #'Dastrel-Core-Semantic'
 }
+
+{ #category : #'as yet unclassified' }
+DASLBlockSemanticVisitor class >> initialize [
+	"
+	self initialize
+	"
+	super initialize.
+	
+	SwizzleComponentIndices := Dictionary newFromPairs: #(
+		$x 0
+		$y 1
+		$z 2
+		$w 3
+		
+		$r 0
+		$g 1
+		$b 2
+		$a 3
+		
+		$s 0
+		$t 1
+		$p 2
+		$q 3
+	)
+]
 
 { #category : #'overload lookup' }
 DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes at: position [
@@ -136,7 +164,7 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
-	| referencedType member baseType samplerFunction |
+	| referencedType member baseType samplerFunction index |
 	memberAccess reference accept: self.
 	
 	referencedType := memberAccess reference type.
@@ -149,6 +177,7 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 			memberAccess memberIndex: member fieldIndex.
 			memberAccess type: member referenceType.
 			memberAccess globalReferenceValue: member.
+			memberAccess accessKind: #global.
 			^ self
 		].
 	
@@ -162,6 +191,29 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 			self error: 'failed to find sampler member named ' , memberAccess memberName at: memberAccess.
 		]. 
 		memberAccess type: samplerFunction referenceType.
+		memberAccess accessKind: #sampling.
+		^ self
+	].
+
+	baseType isVectorType ifTrue: [
+		memberAccess memberIndex: (memberAccess memberName collect: [:c |
+			index := SwizzleComponentIndices at: c ifAbsent: [
+				self error: 'invalid swizzle component ' , c asString at: memberAccess.
+			].
+			index >= baseType elements ifTrue: [ 
+				self error: 'swizzle component ' , c asString at , ' is out of bounds.' at: memberAccess.
+			].
+			index
+		] as: Array).
+		memberAccess accessKind: #swizzle.
+		memberAccess memberIndex size > 4 ifTrue: [ 
+			self error: 'invalid swizzle with more than for components.' at: memberAccess.
+		].
+		memberAccess memberIndex size > 1 ifTrue: [
+			memberAccess type: (DASLVectorType baseType: baseType baseType elements: memberAccess memberIndex size)
+		] ifFalse: [
+			memberAccess type: baseType baseType.
+		].
 		^ self
 	].
 
@@ -177,8 +229,14 @@ DASLBlockSemanticVisitor >> visitPostfixUnaryOperation: operation [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitPrefixUnaryOperation: operation [
+	| functionGroup matchingFunction |
 	operation operand accept: self.
-	"TODO: Check the types of the operands and compute the result types."
+	
+	functionGroup := self lookOperationFunctionGroup: (#pre , operation operation) asSymbol at: operation.
+	matchingFunction := self findIn: functionGroup bestMatchingType: { operation operand type} at: operation.
+	operation builtInFunction: matchingFunction.
+	operation coercionType: matchingFunction coercionType.
+	operation type: matchingFunction functionType returnType
 ]
 
 { #category : #visitor }

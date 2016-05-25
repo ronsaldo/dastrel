@@ -10,7 +10,8 @@ Class {
 		'visitedTranslationUnits'
 	],
 	#classVars : [
-		'BinaryOperationMap'
+		'BinaryOperationMap',
+		'UnaryOperationMap'
 	],
 	#category : #'Dastrel-Core-Codegen'
 }
@@ -40,6 +41,11 @@ DASLSSACodegenVisitor class >> initialize [
 		>  (igt ufgt)
 		== (ieq ufeq)
 		!= (ieq ufne)
+	).
+	
+	UnaryOperationMap := Dictionary newFromPairs: #(
+		#'pre-' (neg fneg)
+		#'pre~' (not invalid)
 	)
 ]
 
@@ -84,7 +90,7 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument arguments: arguments [
-	| functionType expectedArgumentTypes coercedArguments leftValue rightValue selfType selfBaseType |
+	| functionType expectedArgumentTypes coercedArguments leftValue rightValue selfType selfBaseType operand operationMapping operandType mappedOperation builtInFunctionRef |
 	functionType := builtInFunction functionType.
 	expectedArgumentTypes := functionType arguments.
 	coercedArguments := arguments collectWithIndex: [ :argument :index |
@@ -97,7 +103,7 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 		selfBaseType := selfType baseType.
 		selfBaseType isSamplerType ifTrue: [
 			self assert: arguments size >= 1.
-			^ self generateSampler: selfArgument operation: builtInFunction name argument: arguments.
+			^ self generateSampler: selfArgument operation: builtInFunction name argument: coercedArguments.
 		].
 	].
 
@@ -113,7 +119,23 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 		self halt.
 	].
 
-	self halt.
+	(arguments size = 1 and: [UnaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
+		"Give a special treatment to the multiplication"
+		operationMapping := UnaryOperationMap at: builtInFunction name.
+		operand := coercedArguments first.
+		
+		operandType := operand type.
+		
+		(operandType isFloatType or: [operandType isVectorType and: [operandType baseType isFloatType ] ]) ifTrue: [ 
+			mappedOperation := operationMapping second.
+		] ifFalse: [
+			mappedOperation := operationMapping first.
+		].
+		^ builder addOperation: mappedOperation operand: operand
+	].
+
+	builtInFunctionRef := DAIRConstantBuiltInFunction name: builtInFunction name functionType: builtInFunction functionType.
+	^ builder call: builtInFunctionRef arguments: coercedArguments
 ]
 
 { #category : #coercing }
@@ -434,7 +456,8 @@ DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
-	| globalRefValue baseReference |
+	| globalRefValue baseReference accessKind indices |
+	accessKind := memberAccess accessKind.
 	globalRefValue := memberAccess globalReferenceValue.
 	globalRefValue ifNotNil: [
 		globalRefValue codegenValue ifNotNil: [ 
@@ -442,8 +465,38 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	].
 	
 	baseReference := memberAccess reference accept: self.
+	
+	accessKind = #swizzle ifTrue: [
+		indices := memberAccess memberIndex.
+		memberAccess reference type isReferenceType ifTrue: [
+			baseReference := builder load: baseReference
+		].
+	
+		indices size > 1 ifTrue: [ 
+			^ builder shuffleVector: baseReference with: baseReference components: indices.
+		] ifFalse: [
+			^ builder extractVector: baseReference element: (builder constInt: indices first).
+		].
+	].
+
 	memberAccess type isFunctionGroupType ifTrue: [ ^ baseReference ].
 	^ builder getReference: baseReference element: (builder constInt: memberAccess memberIndex).
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitPostfixUnaryOperation: unaryOperation [
+	^ self generateBuiltInCall: unaryOperation builtInFunction self: nil arguments: {
+		unaryOperation operand accept: self
+	}
+
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitPrefixUnaryOperation: unaryOperation [
+	^ self generateBuiltInCall: unaryOperation builtInFunction self: nil arguments: {
+		unaryOperation operand accept: self
+	}
+
 ]
 
 { #category : #visitor }

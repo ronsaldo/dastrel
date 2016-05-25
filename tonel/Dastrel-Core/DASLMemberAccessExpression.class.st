@@ -6,7 +6,8 @@ Class {
 		'memberName',
 		'globalReferenceValue',
 		'type',
-		'memberIndex'
+		'memberIndex',
+		'accessKind'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -14,6 +15,16 @@ Class {
 { #category : #visitor }
 DASLMemberAccessExpression >> accept: aVisitor [
 	^ aVisitor visitMemberAccessExpression: self
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> accessKind [
+	^ accessKind
+]
+
+{ #category : #accessing }
+DASLMemberAccessExpression >> accessKind: anObject [
+	accessKind := anObject
 ]
 
 { #category : #accessing }

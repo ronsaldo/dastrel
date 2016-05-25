@@ -31,8 +31,23 @@ DAIRBuilder >> addInstruction: anInstruction name: theInstructionName [
 ]
 
 { #category : #adding }
+DAIRBuilder >> addOperation: operation left: left right: right [
+	^ self addOperation: operation left: left right: right name: function generateSymbol
+]
+
+{ #category : #adding }
 DAIRBuilder >> addOperation: operation left: left right: right name: name [
 	^ self addInstruction: (DAIRBinaryOperation operation: operation left: left right: right) name: name
+]
+
+{ #category : #adding }
+DAIRBuilder >> addOperation: operation operand: operand [
+	^ self addOperation: operation operand: operand name: function generateSymbol
+]
+
+{ #category : #adding }
+DAIRBuilder >> addOperation: operation operand: operand name: name [
+	^ self addInstruction: (DAIRUnaryOperation operation: operation operand: operand) name: name
 ]
 
 { #category : #instructions }
@@ -161,6 +176,16 @@ DAIRBuilder >> fmul: left with: right name: resultName [
 ]
 
 { #category : #instructions }
+DAIRBuilder >> fneg: operand [
+	^ self fneg: operand name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> fneg: operand name: resultName [
+	^ self addOperation: #fneg operand: operand name: resultName
+]
+
+{ #category : #instructions }
 DAIRBuilder >> frem: left with: right [
 	^ self frem: left with: right name: function generateSymbol
 ]
@@ -242,11 +267,6 @@ DAIRBuilder >> makeVector: vectorType arguments: arguments name: resultName [
 ]
 
 { #category : #instructions }
-DAIRBuilder >> makeVector: arguments name: resultName [
-	^ self addInstruction: (DAIRMakeVector parameters: arguments) name: resultName
-]
-
-{ #category : #instructions }
 DAIRBuilder >> mul: left with: right [
 	^ self mul: left with: right name: function generateSymbol
 ]
@@ -286,6 +306,16 @@ DAIRBuilder >> mulVector: left withMatrix: right name: resultName [
 	^ self addOperation: #mulVectorMatrix left: left right: right name: resultName
 ]
 
+{ #category : #instructions }
+DAIRBuilder >> neg: operand [
+	^ self neg: operand name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> neg: operand name: resultName [
+	^ self addOperation: #neg operand: operand name: resultName
+]
+
 { #category : #'instance creation' }
 DAIRBuilder >> newBasicBlock [
 	^ self newBasicBlock: function generateSymbol
@@ -297,6 +327,16 @@ DAIRBuilder >> newBasicBlock: aName [
 	block := DAIRBasicBlock new name: aName.
 	function addBasicBlock: block.
 	^ block.
+]
+
+{ #category : #instructions }
+DAIRBuilder >> not: operand [
+	^ self not operand name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> not: operand name: resultName [
+	^ self addOperation: #not operand: operand name: resultName
 ]
 
 { #category : #instructions }
@@ -337,6 +377,16 @@ DAIRBuilder >> sample: combinedSampler implicitLodAtCoord: texcoord [
 { #category : #instructions }
 DAIRBuilder >> sample: combinedSampler implicitLodAtCoord: texcoord name: resultName [
 	^ self addInstruction: (DAIRSampleImplicitLod sampledTexture: combinedSampler texcoord: texcoord) name: resultName
+]
+
+{ #category : #instructions }
+DAIRBuilder >> shuffleVector: firstVector with: secondVector components: components [
+	^ self shuffleVector: firstVector with: secondVector components: components name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> shuffleVector: firstVector with: secondVector components: components name: resultName [
+	^ self addInstruction: (DAIRShuffleVectors firstVector: firstVector secondVector: secondVector components: components) name: resultName
 ]
 
 { #category : #instructions }

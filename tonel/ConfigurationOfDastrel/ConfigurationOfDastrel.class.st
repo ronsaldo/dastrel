@@ -133,6 +133,37 @@ ConfigurationOfDastrel >> baseline01: spec [
 
 ]
 
+{ #category : #baselines }
+ConfigurationOfDastrel >> baseline02: spec [
+	<version: '0.2-baseline'>
+
+	spec for: #'common' do: [
+		spec blessing: #'baseline'.
+		spec repository: 'http://smalltalkhub.com/mc/ronsaldo/Dastrel/main/'.
+		spec 
+			project: 'NeoJSON' with: [
+				spec
+					className: #ConfigurationOfNeoJSON;
+					versionString: #'stable';
+					repository: 'http://mc.stfx.eu/Neo' ];
+			project: 'PetitParser' with: [
+				spec
+					className: #ConfigurationOfPetitParser;
+					versionString: #'stable';
+					loads: #('Core' );
+					repository: 'http://smalltalkhub.com/mc/Moose/PetitParser/main/' ].
+		spec 
+			package: 'Dastrel-Core' with: [
+				spec requires: #('PetitParser' 'NeoJSON' ). ];
+			package: 'Dastrel-IDE' with: [
+				spec requires: #('Dastrel-Core' ). ];
+			package: 'Dastrel-SpirV' with: [
+				spec requires: #('Dastrel-Core' ). ];
+			package: 'Dastrel-Tests' with: [
+				spec requires: #('Dastrel-Core' 'Dastrel-SpirV' ). ]. ].
+
+]
+
 { #category : #accessing }
 ConfigurationOfDastrel >> customProjectAttributes [
     "Edit to return a collection of any custom attributes e.g. for conditional loading: Array with: #'Condition1' with: #'Condition2.
@@ -145,7 +176,7 @@ ConfigurationOfDastrel >> customProjectAttributes [
 ConfigurationOfDastrel >> development: spec [
 	<symbolicVersion: #'development'>
 
-	spec for: #'common' version: '0.1-baseline'.
+	spec for: #'common' version: '0.2-baseline'.
 
 ]
 
@@ -165,7 +196,7 @@ ConfigurationOfDastrel >> project [
 ConfigurationOfDastrel >> stable: spec [
 	<symbolicVersion: #'stable'>
 
-	spec for: #'common' version: '0.1'.
+	spec for: #'common' version: '0.2'.
 
 ]
 
@@ -183,6 +214,26 @@ ConfigurationOfDastrel >> version01: spec [
 			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.29';
 			package: 'Dastrel-IDE' with: 'Dastrel-IDE-RonieSalgado.2';
 			package: 'Dastrel-SpirV' with: 'Dastrel-SpirV-RonieSalgado.9';
+			package: 'Dastrel-Tests' with: 'Dastrel-Tests-RonieSalgado.4'. ].
+
+]
+
+{ #category : #versions }
+ConfigurationOfDastrel >> version02: spec [
+	<version: '0.2' imports: #('0.2-baseline' )>
+
+	spec for: #'common' do: [
+		spec blessing: #'stable'.
+		spec description: 'version 0.2'.
+		spec author: 'RonieSalgado'.
+		spec timestamp: '5/25/2016 13:09'.
+		spec 
+			project: 'NeoJSON' with: '12';
+			project: 'PetitParser' with: '1.14'.
+		spec 
+			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.34';
+			package: 'Dastrel-IDE' with: 'Dastrel-IDE-RonieSalgado.2';
+			package: 'Dastrel-SpirV' with: 'Dastrel-SpirV-RonieSalgado.13';
 			package: 'Dastrel-Tests' with: 'Dastrel-Tests-RonieSalgado.4'. ].
 
 ]

@@ -5,6 +5,7 @@ Class {
 		'compiler'
 	],
 	#classVars : [
+		'StageSuffixMap',
 		'TargetList'
 	],
 	#category : #'Dastrel-Core-Compiler'
@@ -16,7 +17,7 @@ DASLBuildTool class >> compileShaders: shaderJson toDestination: destinationFold
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'class initialization' }
 DASLBuildTool class >> initialize [
 	"
 	self initialize
@@ -24,14 +25,23 @@ DASLBuildTool class >> initialize [
 	super initialize.
 	
 	TargetList := #(
-		(spirVTarget 'spir-v' spv)
-		"(glslTarget glsl glsl)"
+		(spirVTarget 'spir-v' spv false)
+		(glslTarget glsl glsl true)
+	).
+	
+	StageSuffixMap := Dictionary newFromPairs: #(
+		'vertex' 'vert'
+ 	   'tessellation-control' 'tesc'
+		'tessellation-evaluation' 'tese'
+    	'geometry' 'geom'
+    	'fragment' 'frag'
+    	'compute' 'comp'
 	)
 ]
 
 { #category : #'as yet unclassified' }
 DASLBuildTool >> buildShaderStages: stages sourceDirectory: sourceDirectory destinationDirectory: destinationDirectory [
-	| fullShaderSource targetSelector targetName targetExtension destinationName result stageImplementations destinationFullName |
+	| fullShaderSource targetSelector targetName targetExtension destinationName result stageImplementations destinationFullName addStageSuffix |
 	stages keysAndValuesDo: [ :stage :shaderSourceName |
 		fullShaderSource := sourceDirectory / shaderSourceName.
 		stageImplementations := Dictionary new.
@@ -39,10 +49,14 @@ DASLBuildTool >> buildShaderStages: stages sourceDirectory: sourceDirectory dest
 			targetSelector := target first.
 			targetName := target second asString.
 			targetExtension := target third asString.
+			addStageSuffix := target fourth.
 			
 			destinationName := shaderSourceName asFileReference withExtension: targetExtension.
 			destinationFullName := destinationDirectory resolve: destinationName.
-			stageImplementations at: targetName put: destinationName basename.
+			addStageSuffix ifTrue: [ 
+				destinationFullName := destinationFullName , (StageSuffixMap at: stage)
+			].
+			stageImplementations at: targetName put: destinationFullName basename.
 
 			compiler := DASLCompiler new.
 			compiler sourceFromFileNamed: fullShaderSource.
@@ -50,7 +64,10 @@ DASLBuildTool >> buildShaderStages: stages sourceDirectory: sourceDirectory dest
 			compiler compile.
 			result := compiler generatedCode.
 			result isString ifTrue: [
-				self halt.
+				destinationFullName writeStreamDo: [ :out |
+					out truncate.
+					out nextPutAll: result.
+				]
 			] ifFalse: [
 				result saveTo: destinationFullName
 			].

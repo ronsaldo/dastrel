@@ -17,6 +17,30 @@ DASLHighLevelCodegenVisitor >> decreaseTabCount [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateBuiltInCall: solvedFunction self: callSelf arguments: arguments [
+	^ self generateCallNamed: solvedFunction name self: callSelf arguments: arguments
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateCallNamed: functionName self: callSelf arguments: arguments [
+	| firstArg |
+	^ ByteString streamContents: [:out |
+		callSelf ifNotNil: [ 
+			out nextPutAll: callSelf;
+				nextPut: $..
+		].
+		out nextPutAll: functionName; 
+			nextPut: $(.
+		firstArg := true.
+		arguments do: [ :arg |
+			firstArg ifFalse: [ out nextPut: $,] ifTrue: [ firstArg := false ].
+			out nextPutAll: arg.
+		].
+		out nextPut: $)
+	]
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateCodeBlock: block [
 	self subclassResponsibility.
 ]
@@ -87,6 +111,11 @@ DASLHighLevelCodegenVisitor >> generateGraphBlocks: translationUnit [
 
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generatePrologue: translationUnit [
+]
+
+{ #category : #visitor }
+DASLHighLevelCodegenVisitor >> generateSamplingAccess: memberAccess [
+	self subclassResponsibility
 ]
 
 { #category : #'code generation' }
@@ -222,7 +251,18 @@ DASLHighLevelCodegenVisitor >> visitBinaryOperation: binaryOperation [
 
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitCallExpression: callExpression [
-	| firstArg |
+	| firstArg arguments callSelf |
+	callExpression solvedFunction ifNotNil: [
+		callExpression solvedFunction isBuiltInFunction ifTrue: [
+			arguments := callExpression arguments collect: [ :arg | arg accept: self ].
+			callSelf := nil.
+			callExpression solvedFunction isMember ifTrue: [
+				callSelf := callExpression reference accept: self. 
+			].
+			^ self generateBuiltInCall: callExpression solvedFunction self: callSelf arguments: arguments
+		]
+	].
+
 	^ ByteString streamContents: [:out |
 		out nextPutAll: (callExpression reference accept: self);
 			nextPut: $(.
@@ -268,11 +308,23 @@ DASLHighLevelCodegenVisitor >> visitLocalDeclaration: localDeclaration [
 
 { #category : #visitor }
 DASLHighLevelCodegenVisitor >> visitMemberAccessExpression: memberAccess [
-	| globalRefValue |
+	| globalRefValue accessKind |
 	globalRefValue := memberAccess globalReferenceValue.
 	globalRefValue ifNotNil: [ ^ globalRefValue codegenValue ].
 	
+	accessKind := memberAccess accessKind.
+	accessKind = #sampling ifTrue: [
+		^ self generateSamplingAccess: memberAccess.
+	].
+	
 	^ (memberAccess reference accept: self) , '.' , memberAccess memberName
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitPrefixUnaryOperation: prefixOperation [
+	| operand |
+	operand := prefixOperation operand accept: self.
+	^ '(' , prefixOperation operation , operand, ')'
 ]
 
 { #category : #'code generation' }

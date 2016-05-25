@@ -2,6 +2,8 @@ Class {
 	#name : #DASLGLSLCodegenVisitor,
 	#superclass : #DASLHighLevelCodegenVisitor,
 	#classVars : [
+		'SamplerTypeDictionary',
+		'SamplerTypeMapping',
 		'SpecialSemanticVariableMap',
 		'TypeDictionary',
 		'TypeMapping'
@@ -36,15 +38,44 @@ DASLGLSLCodegenVisitor class >> initialize [
 		sampler sampler
 	).
 	
+	SamplerTypeMapping := #(
+		texture2D sampler2D
+	).
+	
 	TypeDictionary := Dictionary new.
+	SamplerTypeDictionary := Dictionary new.
 	builtInTypes := DASLType builtInTypes.
 	TypeMapping pairsDo: [ :myName :mappedName |
 		TypeDictionary at: (builtInTypes at: myName) put: mappedName
 	].
 
+	SamplerTypeMapping pairsDo: [ :myName :mappedName |
+		SamplerTypeDictionary at: (builtInTypes at: myName) put: mappedName
+	].
+
 	SpecialSemanticVariableMap := Dictionary newFromPairs: #(
 		-1 gl_Position
 	)
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateBuiltInCall: solvedFunction self: callSelf arguments: arguments [
+	| samplerType |
+	callSelf ifNotNil: [ 
+		solvedFunction name = #sample ifTrue: [ 
+			^ ByteString streamContents: [ :out |
+				samplerType := self mapSamplerType: solvedFunction functionType arguments first.
+				out nextPutAll: 'texture('.
+				out nextPutAll: samplerType; nextPut: $(;
+					nextPutAll: callSelf; nextPutAll: ', '; nextPutAll: arguments first;
+					nextPut: $).
+				out nextPutAll: ', '; nextPutAll: arguments second; nextPutAll: ')'.
+			]
+		].
+	].
+
+	^ super generateBuiltInCall: solvedFunction self: callSelf arguments: arguments
+
 ]
 
 { #category : #'code generation' }
@@ -104,6 +135,11 @@ DASLGLSLCodegenVisitor >> generatePrologue [
 ]
 
 { #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateSamplingAccess: memberAccess [
+	^ memberAccess reference accept: self.
+]
+
+{ #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateSemanticBlock: semanticBlock [
 	| prefix |
 	prefix := semanticBlock name , '_m_'.
@@ -122,7 +158,7 @@ DASLGLSLCodegenVisitor >> generateSemanticVar: semanticVar prefix: prefix [
 
 	varString := ByteString streamContents: [ :out |
 		flow location >= 0 ifTrue: [ 
-			out nextPutAll: 'layout(location = ';
+			out nextPutAll: 'layout (location = ';
 				nextPutAll: flow location asString;
 				nextPutAll: ') '.
 		].
@@ -208,6 +244,11 @@ DASLGLSLCodegenVisitor >> generateUniformVar: uniformVariable prefix: prefix [
 	name := uniformVariable name.
 	self printLine: glslType , ' ' , name , ';'.
 	uniformVariable codegenValue: prefix , name
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> mapSamplerType: type [
+	^ SamplerTypeDictionary at: type
 ]
 
 { #category : #'code generation' }

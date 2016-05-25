@@ -627,7 +627,61 @@ DASLSSASpirVTranslator >> visitStructureType: structureType [
 	| types |
 	^ self valueTranslation: structureType do: [ :id |
 		types := structureType types collect: [:type | self translateValue: type ].
-		builder addTypeInstruction: (SpirVInstruction opcode: SpvOpTypeStruct result: id operands: types)
+		builder addTypeInstruction: (SpirVInstruction
+			opcode: SpvOpTypeStruct
+			result: id
+			operands: types
+		).
+		
+		structureType name ifNotNil: [ 
+			builder addDebugInstruction: (SpirVInstruction
+				opcode: SpvOpName
+				operands: { id } , structureType name asSpirVStringLiteral
+			).
+			
+			structureType names doWithIndex: [ :name :index |
+				builder addDebugInstruction: (SpirVInstruction
+					opcode: SpvOpMemberName
+					operands: { id . index - 1} , name asSpirVStringLiteral
+				).
+			].
+		].
+
+		structureType types doWithIndex: [ :type :index |
+			type isMatrixType ifTrue: [ 
+				builder addAnnotationInstruction: (SpirVInstruction
+					opcode: SpvOpMemberDecorate
+					operands: { id . index - 1 . SpvDecorationColMajor }
+				).
+				builder addAnnotationInstruction: (SpirVInstruction
+					opcode: SpvOpMemberDecorate
+					operands: { id . index - 1 . SpvDecorationMatrixStride . type columnType size }
+				)
+			].
+			
+		].
+		
+		structureType offsets doWithIndex: [ :offset :index |
+			builder addAnnotationInstruction: (SpirVInstruction
+				opcode: SpvOpMemberDecorate
+				operands: { id . index - 1 . SpvDecorationOffset . offset }
+			)
+		].
+	
+		structureType kind = DASLStructureType blockKind ifTrue: [ 
+			builder addAnnotationInstruction: (SpirVInstruction
+				opcode: SpvOpDecorate
+				operands: { id . SpvDecorationBlock }
+			)
+		].
+	
+		structureType kind = DASLStructureType bufferBlockKind ifTrue: [ 
+			builder addAnnotationInstruction: (SpirVInstruction
+				opcode: SpvOpDecorate
+				operands: { id . SpvDecorationBufferBlock }
+			)
+		].
+	
 	]
 ]
 

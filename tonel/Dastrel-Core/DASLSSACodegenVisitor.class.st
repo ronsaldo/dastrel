@@ -313,9 +313,10 @@ DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
-	| elementTypes blockType globalVar |
+	| elementTypes blockType globalVar fieldNames |
 	elementTypes := uniformBlock body collect: #type.
-	blockType := DASLStructureType types: elementTypes.
+	fieldNames := uniformBlock body collect: #name.
+	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
 	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
 	uniformBlock attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value

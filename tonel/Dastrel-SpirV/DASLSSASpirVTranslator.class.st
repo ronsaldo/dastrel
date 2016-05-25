@@ -11,7 +11,9 @@ Class {
 	],
 	#classVars : [
 		'BinaryOperationMap',
-		'StorageClassMap'
+		'BuiltInExtensionInstructionMap',
+		'StorageClassMap',
+		'UnaryOperationMap'
 	],
 	#pools : [
 		'SpirVConstants'
@@ -99,7 +101,24 @@ DASLSSASpirVTranslator class >> initialize [
 		mulVectorMatrix SpvOpVectorTimesMatrix
 	) pairsDo: [ :k :v |
 		BinaryOperationMap at: k put: (SpirVConstants bindingOf: v) value
-	]
+	].
+
+	UnaryOperationMap := Dictionary new.
+	#(
+		not SpvOpNot
+		neg SpvOpSNegate
+		fneg SpvOpFNegate
+	) pairsDo: [ :k :v |
+		UnaryOperationMap at: k put: (SpirVConstants bindingOf: v) value
+	].
+
+	BuiltInExtensionInstructionMap := Dictionary new.
+	#(
+		smoothstep (glsl450 GLSLstd450SmoothStep)
+	) pairsDo: [ :k :v |
+		BuiltInExtensionInstructionMap at: k put: { v first . (SpirVConstants bindingOf: v second) value }
+	].
+	
 ]
 
 { #category : #'as yet unclassified' }
@@ -200,17 +219,29 @@ DASLSSASpirVTranslator >> visitBinaryOperation: binaryOp [
 
 { #category : #visitor }
 DASLSSASpirVTranslator >> visitCall: callInstruction [
-	| resultType function arguments |
+	| resultType function arguments functionValue setInstructionPair extensionSet extensionInstruction |
 	^ self instructionTranslation: callInstruction do: [ :id |
+		functionValue := callInstruction functionValue.
 		resultType := self translateValue: callInstruction type.
-		function := self translateValue: callInstruction functionValue.
 		arguments := callInstruction arguments collect: [:arg | self translateValue: arg].
-		
-		builder addFunctionInstruction: (SpirVInstruction
-			opcode: SpvOpFunctionCall
-			type: resultType
-			result: id
-			operands: { function } , arguments)
+
+		functionValue isConstantBuiltInFunction ifTrue: [
+			setInstructionPair := BuiltInExtensionInstructionMap at: functionValue name.
+			extensionSet := builder perform: (setInstructionPair first , #ExtensionSet) asSymbol. 
+			extensionInstruction := setInstructionPair second.
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpExtInst
+				type: resultType
+				result: id
+				operands: { extensionSet . extensionInstruction } , arguments)
+		] ifFalse: [ 
+			function := self translateValue: functionValue.
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpFunctionCall
+				type: resultType
+				result: id
+				operands: { function } , arguments)
+		]
 	]
 ]
 
@@ -564,6 +595,22 @@ DASLSSASpirVTranslator >> visitSamplerType: samplerType [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitShuffleVectors: shuffleVectors [
+	| resultType firstVector secondVector |
+	^ self instructionTranslation: shuffleVectors do: [ :id |
+		firstVector := self translateValue: shuffleVectors firstVector.
+		secondVector := self translateValue: shuffleVectors secondVector.
+		resultType := self translateValue: shuffleVectors type.
+		builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpVectorShuffle
+				type: resultType
+				result: id
+				operands: { firstVector . secondVector } , shuffleVectors components
+		)
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitStore: storeInstruction [
 	| value variable |
 	^ self instructionTranslation: storeInstruction do: [ :id |
@@ -600,6 +647,22 @@ DASLSSASpirVTranslator >> visitTextureType: textureType [
 				textureType multisample asBit .
 				textureType sampled asBit .
 				"Unknown format" 0}
+		)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitUnaryOperation: unaryOp [
+	| opcode resultType operand |
+	^ self instructionTranslation: unaryOp do: [ :id |
+		opcode := UnaryOperationMap at: unaryOp operation.
+		resultType := self translateValue: unaryOp type.
+		operand := self translateValue: unaryOp operand.
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: opcode
+			type: resultType
+			result: id
+			operands: { operand }
 		)
 	]
 ]

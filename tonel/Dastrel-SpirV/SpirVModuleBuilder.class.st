@@ -140,6 +140,11 @@ SpirVModuleBuilder >> functionDo: aBlock [
 	] ensure: [ currentFunctionInstructions := oldScope. ]
 ]
 
+{ #category : #accessing }
+SpirVModuleBuilder >> glsl450ExtensionSet [
+	^ glsl450ExtensionId
+]
+
 { #category : #initialization }
 SpirVModuleBuilder >> initialize [
 	super initialize.

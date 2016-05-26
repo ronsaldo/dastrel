@@ -56,10 +56,7 @@ DASLType class >> boolType [
 
 { #category : #'class initialization' }
 DASLType class >> builtInTypes [
-	BuiltInTypes ifNil: [ 
-		BuiltInTypes := IdentityDictionary new.
-	(self primitiveTypes , self vectorTypes , self matrixTypes )do: [ :type | BuiltInTypes at: type name put: type ]
-	].
+	BuiltInTypes ifNil: [ self initialize. ].
 	^ BuiltInTypes
 ]
 

@@ -196,7 +196,7 @@ ConfigurationOfDastrel >> project [
 ConfigurationOfDastrel >> stable: spec [
 	<symbolicVersion: #'stable'>
 
-	spec for: #'common' version: '0.2'.
+	spec for: #'common' version: '0.3'.
 
 ]
 
@@ -234,6 +234,26 @@ ConfigurationOfDastrel >> version02: spec [
 			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.34';
 			package: 'Dastrel-IDE' with: 'Dastrel-IDE-RonieSalgado.2';
 			package: 'Dastrel-SpirV' with: 'Dastrel-SpirV-RonieSalgado.13';
+			package: 'Dastrel-Tests' with: 'Dastrel-Tests-RonieSalgado.4'. ].
+
+]
+
+{ #category : #versions }
+ConfigurationOfDastrel >> version03: spec [
+	<version: '0.3' imports: #('0.2-baseline' )>
+
+	spec for: #'common' do: [
+		spec blessing: #'stable'.
+		spec description: 'version 0.3'.
+		spec author: 'RonieSalgado'.
+		spec timestamp: '5/26/2016 14:02'.
+		spec 
+			project: 'NeoJSON' with: '12';
+			project: 'PetitParser' with: '1.14'.
+		spec 
+			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.36';
+			package: 'Dastrel-IDE' with: 'Dastrel-IDE-RonieSalgado.2';
+			package: 'Dastrel-SpirV' with: 'Dastrel-SpirV-RonieSalgado.14';
 			package: 'Dastrel-Tests' with: 'Dastrel-Tests-RonieSalgado.4'. ].
 
 ]

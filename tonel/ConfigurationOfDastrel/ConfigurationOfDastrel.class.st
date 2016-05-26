@@ -251,7 +251,7 @@ ConfigurationOfDastrel >> version03: spec [
 			project: 'NeoJSON' with: '12';
 			project: 'PetitParser' with: '1.14'.
 		spec 
-			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.36';
+			package: 'Dastrel-Core' with: 'Dastrel-Core-RonieSalgado.37';
 			package: 'Dastrel-IDE' with: 'Dastrel-IDE-RonieSalgado.2';
 			package: 'Dastrel-SpirV' with: 'Dastrel-SpirV-RonieSalgado.14';
 			package: 'Dastrel-Tests' with: 'Dastrel-Tests-RonieSalgado.4'. ].

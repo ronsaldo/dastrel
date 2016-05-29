@@ -777,6 +777,28 @@ DASLSSASpirVTranslator >> visitUnaryOperation: unaryOp [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitUnreachable: unreachableInstruction [
+	| returnType returnValueType returnValue |
+	^ self instructionTranslation: unreachableInstruction do: [ :id |
+		returnType := currentFunction functionType returnType.
+		returnType isVoidType ifTrue: [ 
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpReturn)
+		] ifFalse: [
+			returnValueType := self translateValue: returnType.
+			returnValue := builder newId.
+			builder addFunctionInstruction: (SpirVInstruction 
+				opcode: SpvOpUndef
+				type: returnValueType
+				result: returnValue).
+			builder addFunctionInstruction: (SpirVInstruction
+				opcode: SpvOpReturnValue
+				operands: {returnValue})
+		]
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitVectorType: vectorType [
 	| baseType |
 	^ self valueTranslation: vectorType do: [ :id |

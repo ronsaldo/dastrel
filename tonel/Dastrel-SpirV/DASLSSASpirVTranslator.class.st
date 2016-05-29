@@ -225,6 +225,46 @@ DASLSSASpirVTranslator >> visitBinaryOperation: binaryOp [
 ]
 
 { #category : #visitor }
+DASLSSASpirVTranslator >> visitBoolType: voidType [
+	^ self valueTranslation: voidType do: [ :id |
+		builder addTypeInstruction: (SpirVInstruction
+			opcode: SpvOpTypeBool
+			result: id
+		)
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitBranch: branchInstruction [
+	| condition trueBlock falseBlock mergeBlock continueBlock |
+	^ self instructionTranslation: branchInstruction do: [ :id |
+		condition := self translateValue: branchInstruction condition.
+		trueBlock := self basicBlockLabelId: branchInstruction trueBlock. 
+		falseBlock := self basicBlockLabelId: branchInstruction falseBlock. 
+		branchInstruction mergeBlock ifNotNil: [
+			mergeBlock := self basicBlockLabelId: branchInstruction mergeBlock.
+			branchInstruction continueBlock ifNotNil: [
+				continueBlock := self basicBlockLabelId: branchInstruction continueBlock.
+				builder addFunctionInstruction: (SpirVInstruction
+					opcode: SpvOpLoopMerge 
+					operands: { mergeBlock . continueBlock . SpvLoopControlNone }
+				)
+			] ifNil: [
+				builder addFunctionInstruction: (SpirVInstruction
+					opcode: SpvOpSelectionMerge 
+					operands: { mergeBlock . SpvSelectionControlNone }
+				)
+			]
+		].
+	
+		builder addFunctionInstruction: (SpirVInstruction
+			opcode: SpvOpBranchConditional
+			operands: { condition . trueBlock . falseBlock }
+		)
+	]
+]
+
+{ #category : #visitor }
 DASLSSASpirVTranslator >> visitCall: callInstruction [
 	| resultType function arguments functionValue setInstructionPair extensionSet extensionInstruction |
 	^ self instructionTranslation: callInstruction do: [ :id |

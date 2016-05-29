@@ -19,8 +19,18 @@ DAIRConstantBuiltInFunction class >> initialize [
 	"
 	super initialize.
 	ValidBuiltInFunctionNames := Set newFrom: #(
+		"Vector functions"
+		cross
+		dot
+		length
+		normalize
+		
+		"Math functions"
 		smoothstep
 		step
+		
+		"Matrix functions"
+		transpose
 	).
 ]
 

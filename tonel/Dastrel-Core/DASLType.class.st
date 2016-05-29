@@ -147,6 +147,10 @@ DASLType class >> matrixTypes [
 		DASLMatrixType baseType: FloatType rows: 2 columns: 2.
 		DASLMatrixType baseType: FloatType rows: 3 columns: 3.
 		DASLMatrixType baseType: FloatType rows: 4 columns: 4.
+		
+		DASLMatrixType baseType: DoubleType rows: 2 columns: 2.
+		DASLMatrixType baseType: DoubleType rows: 3 columns: 3.
+		DASLMatrixType baseType: DoubleType rows: 4 columns: 4.
 	}
 ]
 

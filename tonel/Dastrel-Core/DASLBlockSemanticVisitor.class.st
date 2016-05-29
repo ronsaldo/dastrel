@@ -63,7 +63,7 @@ DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes a
 		]
 	].
 	bestScoreSet size = 1 ifTrue: [ ^ bestScoreSet first ].
-	self error: 'Failed to find suitable function overload for "',  functionGroup ,'".' name at: position.
+	self error: 'Failed to find suitable function overload for "',  functionGroup name , '".' at: position.
 ]
 
 { #category : #initialization }

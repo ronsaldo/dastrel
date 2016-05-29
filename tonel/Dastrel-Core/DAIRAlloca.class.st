@@ -22,6 +22,13 @@ DAIRAlloca >> accept: aVisitor [
 ]
 
 { #category : #printing }
+DAIRAlloca >> fullPrintOn: aStream [
+	self printOn: aStream.
+	aStream nextPutAll: ' = alloca ';
+		print: type
+]
+
+{ #category : #printing }
 DAIRAlloca >> mnemonic [
 	^ 'alloca'
 ]

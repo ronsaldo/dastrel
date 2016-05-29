@@ -79,9 +79,13 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 
 { #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInFunctionPrototypes [
-	^ self builtInArithmeticFunctions , self builtInLogicalFunctions ,
-	self builtInMatrixMultiplicationFunctions ,
-	self builtInMathFunctions
+	^
+		self builtInArithmeticFunctions,
+		self builtInLogicalFunctions,
+		self builtInMatrixMultiplicationFunctions,
+		self builtInMathFunctions,
+		self builtInVectorFunctions,
+		self builtInMatrixFunctions
 ]
 
 { #category : #'builtin functions' }
@@ -126,6 +130,21 @@ DASLBuiltInFunctions class >> builtInMathFunctions [
 ]
 
 { #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInMatrixFunctions [
+	^ #(
+		(
+			(transpose) ()
+			(float3x3 float3x3 => float3x3)
+			(float4x4 float4x4 => float4x4)
+			
+			(double3x3 double3x3 => double3x3)
+			(double4x4 double4x4 => double4x4)
+		)
+	)
+
+]
+
+{ #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 	^ #(
 		(
@@ -157,6 +176,50 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 			(texture1D float => float4)
 			(texture2D float2 => float4)
 			(texture3D float3 => float4)
+		)
+	)
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInVectorFunctions [
+	^ #(
+		(
+			(dot) ()
+			(float2 float2 => float)
+			(float3 float3 => float)
+			(float4 float4 => float)
+			
+			(double2 double2 => double)
+			(double3 double3 => double)
+			(double4 double4 => double)
+		)
+
+		(
+			(cross) ()
+			(float3 float3 => float3)
+			(double3 double3 => double3)
+		)
+
+		(
+			(length) ()
+			(float2 float2 => float)
+			(float3 float3 => float)
+			(float4 float4 => float)
+			
+			(double2 double2 => double)
+			(double3 double3 => double)
+			(double4 double4 => double)
+		)
+		
+		(
+			(normalize) ()
+			(float2 => float2)
+			(float3 => float3)
+			(float4 => float4)
+			
+			(double2 => double2)
+			(double3 => double3)
+			(double4 => double4)
 		)
 	)
 ]

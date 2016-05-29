@@ -58,7 +58,7 @@ SpirVModule >> newId [
 
 { #category : #fileout }
 SpirVModule >> saveTo: aFileReference [
-	FileStream forceNewFileNamed: aFileReference fullName do: [ :out |
+	FileStream forceNewFileNamed: aFileReference asFileReference fullName do: [ :out |
 		out binary.
 		self writeOn: out
 	]

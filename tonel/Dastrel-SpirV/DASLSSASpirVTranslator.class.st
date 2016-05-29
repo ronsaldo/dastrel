@@ -114,7 +114,14 @@ DASLSSASpirVTranslator class >> initialize [
 
 	BuiltInExtensionInstructionMap := Dictionary new.
 	#(
+		cross (glsl450 GLSLstd450Cross)
+		dot (SpirV SpvOpDot)
+		length (glsl450 GLSLstd450Length)
+		normalize (glsl450 GLSLstd450Normalize)
+	
 		smoothstep (glsl450 GLSLstd450SmoothStep)
+		
+		transpose (SpirV SpvOpTranspose)
 	) pairsDo: [ :k :v |
 		BuiltInExtensionInstructionMap at: k put: { v first . (SpirVConstants bindingOf: v second) value }
 	].
@@ -227,13 +234,21 @@ DASLSSASpirVTranslator >> visitCall: callInstruction [
 
 		functionValue isConstantBuiltInFunction ifTrue: [
 			setInstructionPair := BuiltInExtensionInstructionMap at: functionValue name.
-			extensionSet := builder perform: (setInstructionPair first , #ExtensionSet) asSymbol. 
-			extensionInstruction := setInstructionPair second.
-			builder addFunctionInstruction: (SpirVInstruction
-				opcode: SpvOpExtInst
-				type: resultType
-				result: id
-				operands: { extensionSet . extensionInstruction } , arguments)
+			setInstructionPair first = #SpirV ifTrue: [ 
+				builder addFunctionInstruction: (SpirVInstruction
+					opcode: setInstructionPair second
+					type: resultType
+					result: id
+					operands: arguments)
+			] ifFalse: [ 
+				extensionSet := builder perform: (setInstructionPair first , #ExtensionSet) asSymbol. 
+				extensionInstruction := setInstructionPair second.
+				builder addFunctionInstruction: (SpirVInstruction
+					opcode: SpvOpExtInst
+					type: resultType
+					result: id
+					operands: { extensionSet . extensionInstruction } , arguments)
+			]
 		] ifFalse: [ 
 			function := self translateValue: functionValue.
 			builder addFunctionInstruction: (SpirVInstruction

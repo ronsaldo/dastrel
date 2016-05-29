@@ -24,6 +24,7 @@ DAIRFunction >> accept: aVisitor [
 { #category : #adding }
 DAIRFunction >> addBasicBlock: aBasicBlock [
 	basicBlocks add: aBasicBlock.
+	aBasicBlock index: basicBlocks size.
 	aBasicBlock function: self.
 ]
 
@@ -35,6 +36,11 @@ DAIRFunction >> arguments [
 { #category : #accessing }
 DAIRFunction >> basicBlocks [
 	^ basicBlocks
+]
+
+{ #category : #'control flow' }
+DAIRFunction >> computePostOrder [
+	self halt.
 ]
 
 { #category : #printing }

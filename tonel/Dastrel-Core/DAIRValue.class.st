@@ -14,9 +14,14 @@ DAIRValue >> addInstructionReference: anInstruction [
 	"By default, do nothing"
 ]
 
-{ #category : #adding }
+{ #category : #printing }
 DAIRValue >> fullPrintOn: aStream [
 	self printOn: aStream
+]
+
+{ #category : #printing }
+DAIRValue >> fullPrintString [
+	^ ByteString streamContents: [ :out | self fullPrintOn: out ]
 ]
 
 { #category : #testing }

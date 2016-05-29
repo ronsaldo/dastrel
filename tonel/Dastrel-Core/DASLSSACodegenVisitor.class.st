@@ -224,14 +224,14 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 		aFunctionNode body do: [ :statement |
 			builder isLastTerminator ifFalse: [ statement accept: self ]
 		].
-	
+
 		builder isLastTerminator ifFalse: [
-			currentFunction returnType isVoidType ifTrue: [
+			currentFunction functionType returnType isVoidType ifTrue: [
 				builder returnVoid
 			] ifFalse: [
 				self error: 'not all the control flow paths in ' , aFunctionNode name , ' return something.'
 			]
-		]
+		]	
 	].
 
 	allocaBuilder jump: contentBlock
@@ -488,6 +488,10 @@ DASLSSACodegenVisitor >> visitIfStatement: statement [
 	].
 	
 	builder currentBlock: mergeBlock.
+	mergeBlock predecessors ifEmpty: [
+		builder unreachable.
+		branchInstruction addUnreachableSuccessors.
+	]
 ]
 
 { #category : #visitor }

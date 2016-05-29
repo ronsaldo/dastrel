@@ -419,6 +419,16 @@ DAIRBuilder >> sub: left with: right name: resultName [
 	^ self addOperation: #sub left: left right: right name: resultName
 ]
 
+{ #category : #instructions }
+DAIRBuilder >> unreachable [
+	^ self unreachable: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> unreachable: resultName [
+	^ self addInstruction: DAIRUnreacheable new name: resultName
+]
+
 { #category : #'instance creation' }
 DAIRBuilder >> withBasicBlock: aBasicBlock do: aBlock [
 	| oldBlock |

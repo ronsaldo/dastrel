@@ -5,7 +5,8 @@ Class {
 		'trueBlock',
 		'falseBlock',
 		'mergeBlock',
-		'continueBlock'
+		'continueBlock',
+		'unreachableSuccessors'
 	],
 	#category : #'Dastrel-Core-SSA'
 }
@@ -18,6 +19,14 @@ DAIRBranch class >> condition: condition ifTrue: ifTrueBlock ifFalse: ifFalseBlo
 { #category : #visitor }
 DAIRBranch >> accept: aVisitor [
 	^ aVisitor visitBranch: self
+]
+
+{ #category : #accessing }
+DAIRBranch >> addUnreachableSuccessors [
+	mergeBlock predecessors ifEmpty: [
+		unreachableSuccessors := { mergeBlock }.
+		block computeSuccessors.
+	]
 ]
 
 { #category : #accessing }
@@ -59,6 +68,12 @@ DAIRBranch >> fullPrintOn: aStream [
 		space; nextPutAll: falseBlock name
 ]
 
+{ #category : #'as yet unclassified' }
+DAIRBranch >> initialize [
+	super initialize.
+	unreachableSuccessors := #()
+]
+
 { #category : #testing }
 DAIRBranch >> isBranch [
 	^ false
@@ -86,7 +101,7 @@ DAIRBranch >> mnemonic [
 
 { #category : #accessing }
 DAIRBranch >> successors [
-	^ { trueBlock . falseBlock }
+	^ { trueBlock . falseBlock } , unreachableSuccessors
 ]
 
 { #category : #accessing }

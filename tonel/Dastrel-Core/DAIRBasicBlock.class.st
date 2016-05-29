@@ -2,6 +2,7 @@ Class {
 	#name : #DAIRBasicBlock,
 	#superclass : #DASLObject,
 	#instVars : [
+		'index',
 		'name',
 		'function',
 		'instructions',
@@ -16,14 +17,20 @@ DAIRBasicBlock >> add: anInstruction [
 	instructions add: anInstruction.
 	anInstruction block: self.
 	anInstruction isTerminator ifTrue: [
-		successors := anInstruction successors.
-		successors do: [ :suc | suc addPredecessor: self]
+		self computeSuccessors
 	].
 ]
 
 { #category : #adding }
 DAIRBasicBlock >> addPredecessor: aBasicBlock [
 	predecessors add: aBasicBlock
+]
+
+{ #category : #adding }
+DAIRBasicBlock >> computeSuccessors [
+	successors := instructions last successors.
+	successors do: [ :suc | suc addPredecessor: self]
+
 ]
 
 { #category : #accessing }
@@ -34,6 +41,16 @@ DAIRBasicBlock >> function [
 { #category : #accessing }
 DAIRBasicBlock >> function: anObject [
 	function := anObject
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> index [
+	^ index
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> index: anObject [
+	index := anObject
 ]
 
 { #category : #initialization }

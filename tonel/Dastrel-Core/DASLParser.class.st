@@ -138,7 +138,7 @@ DASLParser >> function [
 { #category : #grammar }
 DASLParser >> functionArgumentDecl [
 	^ super functionArgumentDecl ==> [ :decl | DASLFunctionArgument new
-			position: (self positionFromToken: decl first);
+			position: decl first position;
 			type: decl third;
 			name: decl first value;
 			yourself ]

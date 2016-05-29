@@ -100,6 +100,15 @@ DASLBlockSemanticVisitor >> visitBinaryOperation: operation [
 ]
 
 { #category : #visitor }
+DASLBlockSemanticVisitor >> visitBlockStatement: block [
+	block scope: (DASLexicalScope new parentScope: currentScope).
+	self withScope: block scope do: [ 
+		block statements do: [ :statement | statement accept: self ]
+	]
+	
+]
+
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitCallExpression: expression [
 	| functionType functionGroup argumentTypes matchingFunction castType |
 	expression reference accept: self.
@@ -148,6 +157,17 @@ DASLBlockSemanticVisitor >> visitFunction: function [
 		function body do: [ :el | el accept: self. ]
 	].
 	currentFunction := nil
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitIfStatement: statement [
+	statement condition accept: self.
+	statement thenStatement accept: self.
+	statement elseStatement ifNotNil: [ statement elseStatement accept: self ].
+	
+	(self hasImplicitCoercion: statement condition type to: DASLType boolType) ifFalse: [
+		self error: 'if statement condition has to be a boolean expression.' at: statement.
+	]
 ]
 
 { #category : #visitor }

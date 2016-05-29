@@ -41,6 +41,15 @@ DASLParser >> blockAttributes [
 ]
 
 { #category : #grammar }
+DASLParser >> blockStatement [
+	^ super blockStatement ==> [ :statement |
+		DASLBlockStatement new
+			position: (self positionFromToken: statement first);
+			statements: statement second
+	]
+]
+
+{ #category : #grammar }
 DASLParser >> blockVariable [
 	^ super blockVariable ==> [:var | DASLFieldDefinition new
 			position: var second position;
@@ -129,7 +138,7 @@ DASLParser >> function [
 { #category : #grammar }
 DASLParser >> functionArgumentDecl [
 	^ super functionArgumentDecl ==> [ :decl | DASLFunctionArgument new
-			position: decl first position;
+			position: (self positionFromToken: decl first);
 			type: decl third;
 			name: decl first value;
 			yourself ]
@@ -158,6 +167,17 @@ DASLParser >> functionReturnTypes [
 { #category : #tokens }
 DASLParser >> identifier [
 	^ super identifier ==> [ :token | DASLIdentifier position: (self positionFromToken: token) token: token inputValue ]
+]
+
+{ #category : #grammar }
+DASLParser >> ifStatement [
+	^ super ifStatement ==> [ :statement |
+		DASLIfStatement new
+			position: (self positionFromToken: statement first);
+			condition: statement third;
+			thenStatement: statement fifth;
+			elseStatement: (statement sixth ifNotNil: [ statement sixth second ])
+	]
 ]
 
 { #category : #grammar }

@@ -93,7 +93,26 @@ Class {
 		'globalBlock',
 		'kwImport',
 		'import',
-		'uniformGlobal'
+		'uniformGlobal',
+		'ifStatement',
+		'switchStatement',
+		'whileStatement',
+		'doWhileStatement',
+		'forStatement',
+		'breakStatement',
+		'continueStatement',
+		'kwContinue',
+		'kwBreak',
+		'kwIf',
+		'kwElse',
+		'kwWhile',
+		'kwDo',
+		'kwFor',
+		'kwSwitch',
+		'switchCases',
+		'switchCase',
+		'kwCase',
+		'blockStatement'
 	],
 	#classVars : [
 		'Keywords'
@@ -117,7 +136,8 @@ DASLGrammar class >> initialize [
 		using discard return
 		let const
 		import
-		if for while switch break continue
+		case
+		if else for do while switch break continue
 	).
 ]
 
@@ -217,8 +237,18 @@ DASLGrammar >> blockAttributes [
 ]
 
 { #category : #grammar }
+DASLGrammar >> blockStatement [
+	^ leftCBracket , codeStatement star , rightCBracket
+]
+
+{ #category : #grammar }
 DASLGrammar >> blockVariable [
 	^ varFlowDirection optional , identifier , colon , type , semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> breakStatement [
+	^ kwBreak , semicolon
 ]
 
 { #category : #grammar }
@@ -243,7 +273,7 @@ DASLGrammar >> codeBody [
 
 { #category : #grammar }
 DASLGrammar >> codeStatement [
-	^ usingStatement / discardStatement / returnStatement / localVariable / inOutVariable / expressionStatement
+	^ usingStatement / localVariable / inOutVariable / discardStatement / returnStatement /  expressionStatement / ifStatement / switchStatement / whileStatement / doWhileStatement / forStatement / breakStatement / continueStatement / blockStatement
 ]
 
 { #category : #tokens }
@@ -262,8 +292,18 @@ DASLGrammar >> conditionalExpression [
 ]
 
 { #category : #grammar }
+DASLGrammar >> continueStatement [
+	^ kwContinue , semicolon
+]
+
+{ #category : #grammar }
 DASLGrammar >> discardStatement [
 	^ kwDiscard , semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> doWhileStatement [
+	^ kwDo , codeStatement , kwWhile, leftParent , expression , rightParent , semicolon
 ]
 
 { #category : #tokens }
@@ -307,6 +347,11 @@ DASLGrammar >> floatScientfic [
 ]
 
 { #category : #grammar }
+DASLGrammar >> forStatement [
+	^ kwFor , leftParent , codeStatement , expression , semicolon , expression, rightParent , codeStatement
+]
+
+{ #category : #grammar }
 DASLGrammar >> function [
 	^ functionPrototype , leftCBracket , codeBody  , rightCBracket
 ]
@@ -344,6 +389,11 @@ DASLGrammar >> identStart [
 { #category : #tokens }
 DASLGrammar >> identifier [
 	^ (identStart , (identStart / #digit asParser) star) token trim: ignorable.
+]
+
+{ #category : #grammar }
+DASLGrammar >> ifStatement [
+	^ kwIf , leftParent , expression , rightParent , codeStatement , (kwElse , codeStatement) optional
 ]
 
 { #category : #ignorables }
@@ -397,13 +447,43 @@ DASLGrammar >> kwAlignOf [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwBreak [
+	^ self keywordParser: 'break'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwCase [
+	^ self keywordParser: 'case'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwCodeBlock [
 	^ self keywordParser: 'code_block'
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwContinue [
+	^ self keywordParser: 'continue'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwDiscard [
 	^ self keywordParser: 'discard'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwDo [
+	^ self keywordParser: 'do'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwElse [
+	^ self keywordParser: 'else'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwFor [
+	^ self keywordParser: 'for'
 ]
 
 { #category : #keywords }
@@ -414,6 +494,11 @@ DASLGrammar >> kwFunction [
 { #category : #keywords }
 DASLGrammar >> kwGraphBlock [
 	^ self keywordParser: 'graph_block'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwIf [
+	^ self keywordParser: 'if'
 ]
 
 { #category : #keywords }
@@ -462,6 +547,11 @@ DASLGrammar >> kwSizeOf [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwSwitch [
+	^ self keywordParser: 'switch'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwUniform [
 	^ self keywordParser: 'uniform'
 ]
@@ -469,6 +559,11 @@ DASLGrammar >> kwUniform [
 { #category : #keywords }
 DASLGrammar >> kwUsing [
 	^ self keywordParser: 'using'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwWhile [
+	^ self keywordParser: 'while'
 ]
 
 { #category : #tokens }
@@ -607,6 +702,21 @@ DASLGrammar >> subscriptExpression [
 ]
 
 { #category : #grammar }
+DASLGrammar >> switchCase [
+	^ kwCase , expression, colon, codeStatement star
+]
+
+{ #category : #grammar }
+DASLGrammar >> switchCases [
+	^ switchCase star
+]
+
+{ #category : #grammar }
+DASLGrammar >> switchStatement [
+	^ kwSwitch , leftParent , expression , rightParent , leftCBracket , switchCases , rightCBracket
+]
+
+{ #category : #grammar }
 DASLGrammar >> termExpression [
 	^ nullaryExpression , accessExpression star
 ]
@@ -664,4 +774,9 @@ DASLGrammar >> varFlowLocation [
 { #category : #grammar }
 DASLGrammar >> varInitialValue [
 	^ equalAssign , expression
+]
+
+{ #category : #grammar }
+DASLGrammar >> whileStatement [
+	^ kwWhile , leftParent , expression , rightParent , codeStatement
 ]

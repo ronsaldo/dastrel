@@ -61,6 +61,16 @@ DAIRBuilder >> alloca: valueType name: variableName [
 ]
 
 { #category : #instructions }
+DAIRBuilder >> branch: condition ifTrue: ifTrueBlock ifFalse: ifFalseBlock [
+	^ self branch: condition ifTrue: ifTrueBlock ifFalse: ifFalseBlock name: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> branch: condition ifTrue: ifTrueBlock ifFalse: ifFalseBlock name: resultName [
+	^ self addInstruction: (DAIRBranch condition: condition ifTrue: ifTrueBlock ifFalse: ifFalseBlock) name: resultName
+]
+
+{ #category : #instructions }
 DAIRBuilder >> call: functionValue arguments: arguments [
 	^ self call: functionValue arguments: arguments name: function generateSymbol
 ]

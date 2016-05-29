@@ -121,9 +121,17 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 		].
 	
 		leftValue := coercedArguments first.
-		rightValue := coercedArguments right.
+		rightValue := coercedArguments second.
+		self assert: leftValue type = rightValue type.
+		operandType := leftValue type.
 		
-		self halt.
+		operationMapping := BinaryOperationMap at: builtInFunction name.
+		(operandType isFloatType or: [operandType isVectorType and: [operandType baseType isFloatType ] ]) ifTrue: [ 
+			mappedOperation := operationMapping second.
+		] ifFalse: [
+			mappedOperation := operationMapping first.
+		].
+		^ builder addOperation: mappedOperation left: leftValue right: rightValue
 	].
 
 	(arguments size = 1 and: [UnaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
@@ -395,6 +403,14 @@ DASLSSACodegenVisitor >> visitBinaryOperation: binaryOperation [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitBlockStatement: block [
+	block statements do: [ :statement |
+		statement accept: self.
+		builder isLastTerminator ifTrue: [ ^ self ] 
+	]
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitCallExpression: callExpression [
 	| function arguments functionRefType functionType expectedArgumentTypes coercedArguments callSelf |
 	function := callExpression solvedFunction ifNotNil: [
@@ -446,6 +462,32 @@ DASLSSACodegenVisitor >> visitIdentifier: identifier [
 		binding codegenValue isClosure ifTrue: [ ^ binding codegenValue value: builder ] ifFalse: [ ^ binding codegenValue ]
 		
 	].
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitIfStatement: statement [
+	| conditionValue thenBlock mergeBlock elseBlock branchInstruction |
+	conditionValue := self coerce: (statement condition accept: self) into: DASLType boolType.
+	thenBlock := builder newBasicBlock: 'ifThen'.
+	mergeBlock := builder newBasicBlock: 'ifMerge'.
+	elseBlock := mergeBlock.
+	statement elseStatement ifNotNil: [
+		elseBlock := builder newBasicBlock: 'ifElse'.
+	].
+
+	branchInstruction := builder branch: conditionValue ifTrue: thenBlock ifFalse: elseBlock.
+	branchInstruction mergeBlock: mergeBlock.
+	builder currentBlock: thenBlock.
+	statement thenStatement accept: self.
+	builder isLastTerminator ifFalse: [ builder jump: mergeBlock ].
+
+	statement elseStatement ifNotNil: [
+		builder currentBlock: elseBlock.
+		statement elseStatement accept: self.
+		builder isLastTerminator ifFalse: [ builder jump: mergeBlock ].
+	].
+	
+	builder currentBlock: mergeBlock.
 ]
 
 { #category : #visitor }

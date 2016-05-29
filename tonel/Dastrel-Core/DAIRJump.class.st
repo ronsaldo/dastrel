@@ -43,8 +43,13 @@ DAIRJump >> isTerminator [
 ]
 
 { #category : #printing }
+DAIRJump >> mnemonic [
+	^ #jump
+]
+
+{ #category : #printing }
 DAIRJump >> printOn: aStream [
-	aStream nextPutAll: 'jump '; nextPutAll:destination name
+	aStream nextPutAll: self mnemonic; nextPutAll:destination name
 ]
 
 { #category : #accessing }

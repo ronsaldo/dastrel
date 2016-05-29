@@ -27,6 +27,11 @@ DASLBuiltInFunctionPrototypeParser >> expandToVectorVersions: alternatives [
 			newAlternative := alternative copy.
 			newAlternative argumentTypes: (alternative argumentTypes collect: [:arg |
 				DASLVectorType baseType: arg elements: i]).
+			newAlternative coercionType ifNotNil: [
+				newAlternative coercionType: (DASLVectorType baseType: newAlternative coercionType elements: i)
+			].
+			newAlternative returnType: (DASLVectorType baseType: newAlternative returnType elements: i).
+		
 			expandedVersions add: newAlternative
 		].
 	].

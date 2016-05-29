@@ -39,13 +39,30 @@ DASLBlockSemanticVisitor class >> initialize [
 { #category : #'overload lookup' }
 DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes at: position [
 	"Find an exact match first, removing reference types"
+	| bestScore bestScoreSet score |
 	functionGroup alternatives do: [ :alternative |
 			(self compareAlmostExactTypes: alternative functionType arguments with: checkTypes) ifTrue: [
 			^ alternative
 		]
 	].
 
-	self halt.
+	"Find the best possible match"
+	bestScore := nil.
+	bestScoreSet := OrderedCollection new.
+	functionGroup alternatives do: [ :alternative |
+		score := self compareTypes: alternative functionType arguments with: checkTypes.
+		score >= 0 ifTrue: [ 
+			(bestScore isNil or: [ score < bestScore ]) ifTrue: [ 
+				bestScore := score.
+				bestScoreSet removeAll.
+			].
+	
+			score = bestScore ifTrue: [
+				bestScoreSet add: alternative.
+			]
+		]
+	].
+	bestScoreSet size = 1 ifTrue: [ ^ bestScoreSet first ].
 	self error: 'Failed to find suitable function overload for "',  functionGroup ,'".' name at: position.
 ]
 

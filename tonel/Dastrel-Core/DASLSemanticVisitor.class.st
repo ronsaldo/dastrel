@@ -36,8 +36,31 @@ DASLSemanticVisitor >> compareAlmostExactTypes: functionTypes with: valueRefType
 			(valueRefType isReferenceType and: [ valueRefType baseType = functionType]) ifFalse: [ ^ false ]
 		]
 	].
-
+	
 	^ true
+]
+
+{ #category : #types }
+DASLSemanticVisitor >> compareTypes: functionTypes with: valueRefTypes [
+	| functionType valueRefType differences |
+	functionTypes size ~= valueRefTypes size ifTrue: [ ^ -1 ].
+	
+	differences := 0.
+	1 to: functionTypes size do: [ :i |
+		functionType := functionTypes at: i.
+		valueRefType := valueRefTypes at: i.
+		functionType ~= valueRefType ifTrue: [
+			(valueRefType isReferenceType and: [ valueRefType baseType = functionType]) ifFalse: [
+				 (self hasImplicitCoercion: valueRefType to: functionType) ifTrue: [
+					differences := differences + 1.
+				] ifFalse: [
+					^ -1
+				]
+			]
+		]
+	].
+
+	^ differences
 ]
 
 { #category : #accessing }
@@ -72,6 +95,9 @@ DASLSemanticVisitor >> hasImplicitCoercion: rawType to: rawCoercionType [
 	"De reference the variable"
 	type isReferenceType ifTrue: [ type := type baseType ].
 	type = coercionType ifTrue: [ ^ true ].
+	
+	"Convert scalars into vectors automatically."
+	(rawCoercionType isVectorType and: [ type isVectorType not ]) ifTrue: [ ^ self hasImplicitCoercion: type to: rawCoercionType baseType ].
 	
 	^ false
 ]

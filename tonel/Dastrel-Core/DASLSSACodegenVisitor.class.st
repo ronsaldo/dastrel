@@ -51,12 +51,19 @@ DASLSSACodegenVisitor class >> initialize [
 
 { #category : #coercing }
 DASLSSACodegenVisitor >> coerce: value into: targetType [
-	| valueType |
+	| valueType coercedScalar |
 	self flag: 'TODO: Implement this properly.'.
 	valueType := value type.
 	valueType = targetType ifTrue: [ ^ value ].
 	targetType isReferenceType ifTrue: [ self error: 'invalid implicit conversion between reference types.' ].
 	valueType isReferenceType ifTrue: [ ^ self coerce: (builder load: value) into: targetType ].
+	
+	"Scalar to vector"
+	(targetType isVectorType and: [valueType isVectorType not]) ifTrue: [
+		coercedScalar := self coerce: value into: targetType baseType.
+		^ builder makeVector: targetType arguments: ((1 to: targetType elements) collect: [:i | coercedScalar]) 
+	].
+
 	self halt.
 ]
 

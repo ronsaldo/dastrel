@@ -250,6 +250,14 @@ DASLHighLevelCodegenVisitor >> visitBinaryOperation: binaryOperation [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitBlockStatement: blockStatement [
+	self 
+		printLine: '{';
+		withIndentation: [ blockStatement statements do: [ :statement | statement accept: self ]];
+		printLine: '}'
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitCallExpression: callExpression [
 	| firstArg arguments callSelf |
 	callExpression solvedFunction ifNotNil: [
@@ -290,6 +298,16 @@ DASLHighLevelCodegenVisitor >> visitIdentifier: identifier [
 	binding := identifier binding.
 	binding isType ifTrue: [ ^ self mapType: binding ].
 	^ binding codegenValue
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitIfStatement: ifStatement [
+	self printLine: 'if ( ' , (ifStatement condition accept: self), ' )'.
+	ifStatement thenStatement accept: self.
+	ifStatement elseStatement ifNotNil: [
+		self printLine: 'else'.
+		ifStatement elseStatement accept: self.
+	]
 ]
 
 { #category : #'code generation' }

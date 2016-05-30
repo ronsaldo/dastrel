@@ -350,6 +350,16 @@ DAIRBuilder >> not: operand name: resultName [
 ]
 
 { #category : #instructions }
+DAIRBuilder >> phi [
+	^ self phi: function generateSymbol
+]
+
+{ #category : #instructions }
+DAIRBuilder >> phi: resultName [
+	^ self addInstruction: DAIRPhi new name: resultName
+]
+
+{ #category : #instructions }
 DAIRBuilder >> rem: left with: right [
 	^ self rem: left with: right name: function generateSymbol
 ]

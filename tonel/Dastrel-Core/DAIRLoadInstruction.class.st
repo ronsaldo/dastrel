@@ -17,6 +17,11 @@ DAIRLoadInstruction >> accept: aVisitor [
 	^ aVisitor visitLoad: self
 ]
 
+{ #category : #testing }
+DAIRLoadInstruction >> isLoad [
+	^ true
+]
+
 { #category : #printing }
 DAIRLoadInstruction >> mnemonic [
 	^ 'load'

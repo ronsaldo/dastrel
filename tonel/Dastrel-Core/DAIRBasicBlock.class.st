@@ -3,11 +3,15 @@ Class {
 	#superclass : #DASLObject,
 	#instVars : [
 		'index',
+		'postOrderIndex',
+		'preOrderIndex',
 		'name',
 		'function',
 		'instructions',
 		'predecessors',
-		'successors'
+		'successors',
+		'immediateDominator',
+		'dominanceFrontier'
 	],
 	#category : #'Dastrel-Core-SSA'
 }
@@ -34,6 +38,27 @@ DAIRBasicBlock >> computeSuccessors [
 ]
 
 { #category : #accessing }
+DAIRBasicBlock >> dominanceFrontier [
+	^ dominanceFrontier
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> dominanceFrontier: anObject [
+	dominanceFrontier := anObject
+]
+
+{ #category : #printing }
+DAIRBasicBlock >> fullPrintOn: aStream [
+	aStream print: self; nextPut: $:.
+	aStream space.
+	self printArray: predecessors on: aStream.
+	aStream space.
+	self printArray: successors on: aStream.
+	aStream cr.
+	instructions do: [ :ins | aStream tab. ins fullPrintOn: aStream. aStream cr ]
+]
+
+{ #category : #accessing }
 DAIRBasicBlock >> function [
 	^ function
 ]
@@ -41,6 +66,16 @@ DAIRBasicBlock >> function [
 { #category : #accessing }
 DAIRBasicBlock >> function: anObject [
 	function := anObject
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> immediateDominator [
+	^ immediateDominator
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> immediateDominator: anObject [
+	immediateDominator := anObject
 ]
 
 { #category : #accessing }
@@ -102,6 +137,26 @@ DAIRBasicBlock >> numberOfInstructions [
 ]
 
 { #category : #accessing }
+DAIRBasicBlock >> postOrderIndex [
+	^ postOrderIndex
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> postOrderIndex: anObject [
+	postOrderIndex := anObject
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> preOrderIndex [
+	^ preOrderIndex
+]
+
+{ #category : #accessing }
+DAIRBasicBlock >> preOrderIndex: anObject [
+	preOrderIndex := anObject
+]
+
+{ #category : #accessing }
 DAIRBasicBlock >> predecessors [
 	^ predecessors
 ]
@@ -112,9 +167,23 @@ DAIRBasicBlock >> predecessors: anObject [
 ]
 
 { #category : #printing }
+DAIRBasicBlock >> printArray: anArray on: aStream [
+	aStream nextPut: $[; space.
+	anArray do: [ :el |
+		 aStream print: el; space].
+	aStream nextPut: $].
+]
+
+{ #category : #printing }
 DAIRBasicBlock >> printOn: aStream [
-	aStream nextPutAll: name; nextPut: $:; cr.
-	instructions do: [ :ins | aStream tab. ins fullPrintOn: aStream. aStream cr ]
+	aStream nextPutAll: name; nextPut: $@; print: index
+]
+
+{ #category : #adding }
+DAIRBasicBlock >> remove: anInstruction [ 
+	instructions remove: anInstruction.
+	anInstruction block: nil.
+
 ]
 
 { #category : #accessing }

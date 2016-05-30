@@ -111,7 +111,7 @@ DASLAstVisitor >> visitImportStatement: usingStatement [
 
 { #category : #visitor }
 DASLAstVisitor >> visitInteger: integer [
-	self subclassResponsibility
+	^ DAIRConstant type: integer type value: integer value
 ]
 
 { #category : #visitor }

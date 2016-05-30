@@ -14,6 +14,11 @@ DAIRStoreInstruction >> accept: aVisitor [
 	^ aVisitor visitStore: self
 ]
 
+{ #category : #testing }
+DAIRStoreInstruction >> isStore [
+	^ true
+]
+
 { #category : #printing }
 DAIRStoreInstruction >> mnemonic [
 	^ 'store'

@@ -50,6 +50,11 @@ DAIRInstruction >> instructionReferences [
 ]
 
 { #category : #testing }
+DAIRInstruction >> isAlloca [
+	^ false
+]
+
+{ #category : #testing }
 DAIRInstruction >> isBranch [
 	^ false
 ]
@@ -61,6 +66,16 @@ DAIRInstruction >> isInstruction [
 
 { #category : #testing }
 DAIRInstruction >> isJump [
+	^ false
+]
+
+{ #category : #testing }
+DAIRInstruction >> isLoad [
+	^ false
+]
+
+{ #category : #testing }
+DAIRInstruction >> isStore [
 	^ false
 ]
 
@@ -103,6 +118,11 @@ DAIRInstruction >> parameters: anArrayOfParameter [
 { #category : #printing }
 DAIRInstruction >> printOn: aStream [
 	aStream nextPut: $%; nextPutAll: name
+]
+
+{ #category : #modifying }
+DAIRInstruction >> removeFromBlock [
+	block remove: self.
 ]
 
 { #category : #accessing }

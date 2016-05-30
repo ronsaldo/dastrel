@@ -28,6 +28,11 @@ DAIRAlloca >> fullPrintOn: aStream [
 		print: type
 ]
 
+{ #category : #testing }
+DAIRAlloca >> isAlloca [
+	^ true
+]
+
 { #category : #printing }
 DAIRAlloca >> mnemonic [
 	^ 'alloca'

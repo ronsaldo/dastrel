@@ -220,6 +220,12 @@ DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
 	].
 
 	layoutProperties ifEmpty: [ ^ '' ].
+	layoutProperties sort: [ :a :b |
+		| sa sb |
+		sa := a isSymbol ifTrue: [a] ifFalse: [ a key ].
+		sb := b isSymbol ifTrue: [b] ifFalse: [ b key ].
+		sa < sb
+	].
 
 	^ ByteString streamContents: [ :out |
 		out nextPutAll: 'layout ('.

@@ -76,7 +76,7 @@ DASLSSASpirVTranslator class >> initialize [
 		ugt SpvOpUGreaterThan
 		uge SpvOpUGreaterThanEqual
 
-		fadd 		SpvOpFdd
+		fadd 		SpvOpFAdd
 		fsub 		SpvOpFSub
 		fmul 		SpvOpFMul
 		fdiv 		SpvOpFDiv
@@ -417,6 +417,11 @@ DASLSSASpirVTranslator >> visitFunction: function [
 				opcode: SpvOpEntryPoint
 				operands: { SpvExecutionModelFragment . id . } , function name asSpirVStringLiteral , interfaceList
 			).
+			
+			builder addExecutionModeInstruction: (SpirVInstruction
+				opcode: SpvOpExecutionMode
+				operands: {id . SpvExecutionModeOriginUpperLeft}
+			)
 		].
 		function propertyAt: #geometry ifPresent: [ :dummy |
 			self halt.

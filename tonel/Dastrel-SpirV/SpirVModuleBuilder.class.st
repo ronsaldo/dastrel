@@ -3,18 +3,16 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'module',
-		'typeInstructions',
 		'functionInstructions',
 		'prologueInstructions',
 		'debugInstructions',
 		'annotationInstructions',
-		'constantsInstructions',
-		'globalsInstructions',
 		'currentFunctionInstructions',
 		'glsl450ExtensionId',
 		'capabilityInstructions',
 		'executionModeInstructions',
-		'entryPointInstructions'
+		'entryPointInstructions',
+		'constantGlobalAndTypeInstructions'
 	],
 	#pools : [
 		'SpirVConstants'
@@ -46,7 +44,7 @@ SpirVModuleBuilder >> addCapability: capability [
 { #category : #adding }
 SpirVModuleBuilder >> addConstantInstruction: anInstruction [
 	self assert: anInstruction opcode isNotNil.
-	constantsInstructions add: anInstruction.
+	constantGlobalAndTypeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
@@ -81,7 +79,7 @@ SpirVModuleBuilder >> addFunctionInstruction: anInstruction [
 { #category : #adding }
 SpirVModuleBuilder >> addGlobalInstruction: anInstruction [
 	self assert: anInstruction opcode isNotNil.
-	globalsInstructions add: anInstruction.
+	constantGlobalAndTypeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
@@ -95,7 +93,7 @@ SpirVModuleBuilder >> addPrologueInstruction: anInstruction [
 { #category : #adding }
 SpirVModuleBuilder >> addTypeInstruction: anInstruction [
 	self assert: anInstruction opcode isNotNil.
-	typeInstructions add: anInstruction.
+	constantGlobalAndTypeInstructions add: anInstruction.
 	^ anInstruction resultId
 ]
 
@@ -122,9 +120,7 @@ SpirVModuleBuilder >> finish [
 	module addInstructions: executionModeInstructions.
 	module addInstructions: debugInstructions.
 	module addInstructions: annotationInstructions.
-	module addInstructions: typeInstructions.
-	module addInstructions: constantsInstructions.
-	module addInstructions: globalsInstructions.
+	module addInstructions: constantGlobalAndTypeInstructions.
 	module addInstructions: functionInstructions.
 	^ module
 ]
@@ -155,9 +151,7 @@ SpirVModuleBuilder >> initialize [
 	executionModeInstructions := OrderedCollection new.
 	debugInstructions := OrderedCollection new.
 	annotationInstructions := OrderedCollection new.
-	typeInstructions := OrderedCollection new.
-	constantsInstructions := OrderedCollection new.
-	globalsInstructions := OrderedCollection new.
+	constantGlobalAndTypeInstructions := OrderedCollection new.
 	functionInstructions := OrderedCollection new.
 	self createDefaultPrologue.
 ]

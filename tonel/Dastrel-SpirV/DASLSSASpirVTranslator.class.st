@@ -12,6 +12,7 @@ Class {
 	#classVars : [
 		'BinaryOperationMap',
 		'BuiltInExtensionInstructionMap',
+		'EntryPointTypes',
 		'StorageClassMap',
 		'UnaryOperationMap'
 	],
@@ -29,6 +30,15 @@ DASLSSASpirVTranslator class >> initialize [
 	super initialize.
 	
 	(Smalltalk at: #SpirVConstants) initialize.
+	
+	EntryPointTypes := #(
+		vertex
+		fragment
+		compute
+		geometry
+		tcontrol
+		teval
+	).
 	
 	StorageClassMap := IdentityDictionary newFromPairs: #(
 		uniformConstant 0
@@ -121,6 +131,16 @@ DASLSSASpirVTranslator class >> initialize [
 	
 		smoothstep (glsl450 GLSLstd450SmoothStep)
 		
+		smin (glsl450 GLSLstd450SMin)
+		umin (glsl450 GLSLstd450UMin)
+		fmin (glsl450 GLSLstd450FMin)
+
+		smax (glsl450 GLSLstd450SMax)
+		umax (glsl450 GLSLstd450UMax)
+		fmax (glsl450 GLSLstd450FMax)
+		
+		fmix (glsl450 GLSLstd450FMix)
+		
 		transpose (SpirV SpvOpTranspose)
 	) pairsDo: [ :k :v |
 		BuiltInExtensionInstructionMap at: k put: { v first . (SpirVConstants bindingOf: v second) value }
@@ -164,6 +184,13 @@ DASLSSASpirVTranslator >> instructionTranslation: aValue do: aBlock [
 ]
 
 { #category : #'as yet unclassified' }
+DASLSSASpirVTranslator >> isEntryPointFunction: aGlobalValue [
+	aGlobalValue isFunction ifFalse: [ ^ false ].
+	EntryPointTypes do: [ :point | (aGlobalValue hasProperty: point) ifTrue: [ ^ true ] ].
+	^ false.
+]
+
+{ #category : #'as yet unclassified' }
 DASLSSASpirVTranslator >> translateBasicBlock: basicBlock [
 	| labelId |
 	labelId := self basicBlockLabelId: basicBlock.
@@ -175,7 +202,7 @@ DASLSSASpirVTranslator >> translateBasicBlock: basicBlock [
 DASLSSASpirVTranslator >> translateSSAModule: ssaModule [
 	^ SpirVModuleBuilder build: [ :builderArg |
 		builder := builderArg.
-		ssaModule globalValues valuesDo: [ :globalValue | self translateValue: globalValue ]
+		ssaModule globalValues valuesDo: [ :globalValue | (self isEntryPointFunction: globalValue) ifTrue: [ self translateValue: globalValue ] ]
 	]
 ]
 
@@ -204,6 +231,33 @@ DASLSSASpirVTranslator >> visitAlloca: allocaInstruction [
 			type: resultType
 			result: id
 			operands: { SpvStorageClassFunction })
+	]
+]
+
+{ #category : #visitor }
+DASLSSASpirVTranslator >> visitArrayType: arrayType [
+	| baseType length |
+	^ self valueTranslation: arrayType do: [ :id |
+		baseType := self translateValue: arrayType baseType.
+		arrayType isBounded ifTrue: [
+			length := self translateValue: (DAIRConstant int: arrayType elements).
+			builder addTypeInstruction: (SpirVInstruction
+				opcode: SpvOpTypeArray
+				result: id
+				operands: {baseType . length}
+			).
+		] ifFalse: [ 
+			builder addTypeInstruction: (SpirVInstruction
+				opcode: SpvOpTypeRuntimeArray
+				result: id
+				operands: {baseType}
+			).
+		].
+
+		builder addAnnotationInstruction: (SpirVInstruction
+			opcode: SpvOpDecorate 
+			operands: {id . SpvDecorationArrayStride . arrayType baseType size }
+		)
 	]
 ]
 
@@ -471,7 +525,7 @@ DASLSSASpirVTranslator >> visitGetElementReference: getElementRef [
 		index := self translateValue: getElementRef index.
 		resultType := self translateValue: getElementRef type.
 		builder addFunctionInstruction: (SpirVInstruction
-			opcode: SpvOpInBoundsAccessChain
+			opcode: (getElementRef index isConstant ifTrue: [ SpvOpInBoundsAccessChain  ] ifFalse: [ SpvOpAccessChain ]) 
 			type: resultType
 			result: id
 			operands: { pointer . index })

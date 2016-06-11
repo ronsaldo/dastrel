@@ -2,6 +2,7 @@ Class {
 	#name : #DASLBuiltInFunction,
 	#superclass : #DASLModule,
 	#instVars : [
+		'canonicalName',
 		'functionType',
 		'coercionType',
 		'operation',
@@ -24,6 +25,16 @@ DASLBuiltInFunction >> builtInOptions [
 { #category : #accessing }
 DASLBuiltInFunction >> builtInOptions: anObject [
 	builtInOptions := anObject
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> canonicalName [
+	^ canonicalName
+]
+
+{ #category : #accessing }
+DASLBuiltInFunction >> canonicalName: anObject [
+	canonicalName := anObject
 ]
 
 { #category : #accessing }

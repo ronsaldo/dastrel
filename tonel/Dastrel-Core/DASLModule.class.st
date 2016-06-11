@@ -17,8 +17,8 @@ DASLModule >> attributes [
 ]
 
 { #category : #accessing }
-DASLModule >> attributes: anObject [
-	attributes := anObject
+DASLModule >> attributes: aDictionary [
+	attributes := aDictionary ifNotNil: [ aDictionary ] ifNil: [ Dictionary new ]
 ]
 
 { #category : #accessing }
@@ -33,6 +33,11 @@ DASLModule >> inputs: anObject [
 
 { #category : #testing }
 DASLModule >> isBuiltInFunction [
+	^ false
+]
+
+{ #category : #testing }
+DASLModule >> isCallableBlock [
 	^ false
 ]
 

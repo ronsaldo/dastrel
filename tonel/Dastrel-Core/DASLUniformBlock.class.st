@@ -1,6 +1,6 @@
 Class {
 	#name : #DASLUniformBlock,
-	#superclass : #DASLStructureBlock,
+	#superclass : #DASLStructureLikeBlock,
 	#instVars : [
 		'codegenValue'
 	],

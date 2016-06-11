@@ -306,6 +306,11 @@ DASLType >> alignment [
 ]
 
 { #category : #testing }
+DASLType >> isArrayType [
+	^ false
+]
+
+{ #category : #testing }
 DASLType >> isAutoType [
 	^ false
 ]

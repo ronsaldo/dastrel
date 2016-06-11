@@ -6,7 +6,8 @@ Class {
 		'gensymCount',
 		'tabCount',
 		'currentFunction',
-		'visitedTranslationUnits'
+		'visitedTranslationUnits',
+		'inlineStatement'
 	],
 	#category : #'Dastrel-Core-Codegen'
 }
@@ -129,8 +130,19 @@ DASLHighLevelCodegenVisitor >> generateSemanticBlocks: translationUnit [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateStructure: block [
+	self subclassResponsibility.
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateStructures: translationUnit [
+	translationUnit modules select: #isStructureBlock thenDo: [ :block | self generateStructure: block ]
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 	self
+		generateStructures: translationUnit;
 		generateUniformBlocks: translationUnit;
 		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
@@ -181,7 +193,7 @@ DASLHighLevelCodegenVisitor >> initialize [
 	gensymCount := 0.
 	tabCount := 0.
 	visitedTranslationUnits := Set new.
-	
+	inlineStatement := false.
 ]
 
 { #category : #'code generation' }
@@ -191,6 +203,7 @@ DASLHighLevelCodegenVisitor >> mapType: aType [
 
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> newline [
+	inlineStatement ifTrue: [ ^ self ].
 	outputStream lf
 ]
 
@@ -209,6 +222,7 @@ DASLHighLevelCodegenVisitor >> prepareCodeGeneration: translationUnit [
 
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> printLine: line [
+	inlineStatement ifTrue: [ ^ self printString line ].
 	self printTabs;
 		printString: line;
 		newline
@@ -221,12 +235,19 @@ DASLHighLevelCodegenVisitor >> printString: string [
 
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> printTabs [
+	inlineStatement ifTrue: [ ^ self ].
 	1 to: tabCount do: [ :v | outputStream nextPutAll: '    ' ].
 ]
 
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> printType: aType [
 	self printString: (self mapType: aType)
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> typeSubscriptsFor: type [
+	type isArrayType ifFalse: [ ^ '' ].
+	^ (self typeSubscriptsFor: type baseType) , '[', (type isBounded ifTrue: [ type elements printString ] ifFalse: [ '' ]), ']'
 ]
 
 { #category : #visitor }
@@ -258,6 +279,62 @@ DASLHighLevelCodegenVisitor >> visitBlockStatement: blockStatement [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitBreakStatement: statement [
+	self printLine: 'break;'
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitCallBlockStatement: statement [
+	| block arguments variablesToDeclare resultExpression resultValue argumentExpression argumentValue first |
+	block := statement blockReference type block.
+	
+	variablesToDeclare := OrderedCollection new.
+	arguments := OrderedCollection new.
+	block outputs ifNotNil: [
+		block outputs keysAndValuesDo: [ :outputName :outputDecl |
+			resultExpression := statement results at: outputName ifAbsent: [ nil. ].
+			resultExpression ifNotNil: [
+				resultValue := resultExpression accept: self
+			] ifNil: [
+				resultValue := self gensym
+				variablesToDeclare add: { resultValue . self mapType: outputDecl type baseType }
+			].
+			arguments add: resultValue
+		].
+	].
+
+	block inputs ifNotNil: [
+		block inputs keysAndValuesDo: [ :inputName :inputDecl |
+			argumentExpression := statement arguments at: inputName ifAbsent: [ nil. ].
+			argumentExpression ifNotNil:[
+				argumentValue := argumentExpression accept: self
+			] ifNil: [
+				self halt.
+			].
+		
+			arguments add: argumentValue.
+		]
+	].
+
+	variablesToDeclare do: [ :var |
+		self printLine: var second , ' ' , var first, ';'
+	].
+
+	self
+		printTabs;
+		printString: block name;
+		printString: '('.
+	first := true.
+	arguments do: [ :arg |
+		first ifFalse: [ self printString: ', ' ].
+		first := false.
+		self printString: arg
+	].
+	self printLine: ');'.
+
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitCallExpression: callExpression [
 	| firstArg arguments callSelf |
 	callExpression solvedFunction ifNotNil: [
@@ -283,6 +360,16 @@ DASLHighLevelCodegenVisitor >> visitCallExpression: callExpression [
 	]
 ]
 
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitContinueStatement: statement [
+	self printLine: 'continue;'
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitDiscardStatement: statement [
+	self printLine: 'discard;'
+]
+
 { #category : #visitor }
 DASLHighLevelCodegenVisitor >> visitExpressionStatement: expressionStatement [
 	self
@@ -290,6 +377,30 @@ DASLHighLevelCodegenVisitor >> visitExpressionStatement: expressionStatement [
 		printString: (expressionStatement expression accept: self);
 		printString: ';';
 		newline
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitForStatement: statement [
+	self
+		printTabs;
+		printString: 'for ( '.
+	self withInlineStatement: [
+		statement initStatement accept: self.
+		self printString: ' '.
+	].
+
+	statement condition ifNotNil: [
+		self
+			printString: (statement condition accept: self);
+			printString: '; '
+	].
+	statement increment ifNotNil: [
+		self
+			printString: (statement increment accept: self)
+	].
+	self printLine: ')'.
+	statement body accept: self.
+
 ]
 
 { #category : #'code generation' }
@@ -312,10 +423,13 @@ DASLHighLevelCodegenVisitor >> visitIfStatement: ifStatement [
 
 { #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> visitLocalDeclaration: localDeclaration [
+	localDeclaration flow ifNotNil: [ ^ self ].
+	
 	self printTabs;
 		printType: localDeclaration type;
 		printString: ' ';
-		printString: localDeclaration name.
+		printString: localDeclaration name;
+		printString: (self typeSubscriptsFor: localDeclaration type).
 	localDeclaration codegenValue: localDeclaration name.
 	localDeclaration initialValue ifNotNil: [
 		self printString: ' = ';
@@ -368,6 +482,14 @@ DASLHighLevelCodegenVisitor >> visitReturnStatement: returnStatement [
 ]
 
 { #category : #visitor }
+DASLHighLevelCodegenVisitor >> visitSubscriptExpression: subscriptAccess [
+	| refValue indexValue |
+	refValue := subscriptAccess reference accept: self.
+	indexValue := subscriptAccess index accept: self.
+	^ refValue , '[' , indexValue , ']'
+]
+
+{ #category : #visitor }
 DASLHighLevelCodegenVisitor >> visitTranslationUnit: translationUnit [
 	(visitedTranslationUnits includes: translationUnit) ifTrue: [ ^ self ].
 	visitedTranslationUnits add: translationUnit.
@@ -382,8 +504,22 @@ DASLHighLevelCodegenVisitor >> visitTranslationUnit: translationUnit [
 DASLHighLevelCodegenVisitor >> visitUsingStatement: usingStatement [
 ]
 
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> visitWhileStatement: statement [
+	self printLine: 'while ( ' , (statement condition accept: self), ' )'.
+	statement body accept: self.
+]
+
 { #category : #'code printing' }
 DASLHighLevelCodegenVisitor >> withIndentation: aBlock [
 	self increaseTabCount.
 	aBlock ensure: [ self decreaseTabCount ]
+]
+
+{ #category : #'code printing' }
+DASLHighLevelCodegenVisitor >> withInlineStatement: aBlock [
+	| oldInlineStatement |
+	oldInlineStatement := inlineStatement.
+	inlineStatement := true.
+	aBlock ensure: [ inlineStatement := oldInlineStatement ]
 ]

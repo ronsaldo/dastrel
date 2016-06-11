@@ -1,6 +1,6 @@
 Class {
 	#name : #DASLSemanticBlock,
-	#superclass : #DASLStructureBlock,
+	#superclass : #DASLStructureLikeBlock,
 	#instVars : [
 		'direction'
 	],

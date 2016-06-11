@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLExpression,
 	#instVars : [
 		'reference',
-		'index'
+		'index',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -40,4 +41,14 @@ DASLSubscriptExpression >> reference [
 { #category : #accessing }
 DASLSubscriptExpression >> reference: anObject [
 	reference := anObject
+]
+
+{ #category : #accessing }
+DASLSubscriptExpression >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLSubscriptExpression >> type: aType [
+	type := aType
 ]

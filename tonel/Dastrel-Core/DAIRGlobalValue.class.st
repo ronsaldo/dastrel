@@ -8,6 +8,11 @@ Class {
 	#category : #'Dastrel-Core-SSA'
 }
 
+{ #category : #properties }
+DAIRGlobalValue >> hasProperty: aSymbol [
+	^ properties includesKey: aSymbol
+]
+
 { #category : #initialization }
 DAIRGlobalValue >> initialize [
 	super initialize.

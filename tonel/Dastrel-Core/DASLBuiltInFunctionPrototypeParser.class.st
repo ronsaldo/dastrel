@@ -122,11 +122,12 @@ DASLBuiltInFunctionPrototypeParser >> parsePrototype: prototypeData [
 	| names alternatives |
 	names := prototypeData first.
 	names isArray ifFalse: [ names := { names } ].
+	names := names collect: [ :name | name isArray ifTrue: [ name ] ifFalse: [ { name . name } ] ].
 	
 	currentOptions := IdentitySet newFrom: prototypeData second.
 	alternatives := prototypeData allButFirst: 2.
 	
-	currentGroups := names collect: [ :name | self findOrCreateFunctionGroup: name ].
+	currentGroups := names collect: [ :name | self findOrCreateFunctionGroup: name. ].
 	alternatives do: [ :alternative | self parseAlternative: alternative ].
 ]
 
@@ -134,12 +135,12 @@ DASLBuiltInFunctionPrototypeParser >> parsePrototype: prototypeData [
 DASLBuiltInFunctionPrototypeParser >> parsePrototypes: prototypesData [
 	| group |
 	prototypesData do: [ :prototype | self parsePrototype: prototype ].
-	rawPrototypes keysAndValuesDo: [ :name :alternatives |
-		group := DASLFunctionGroup new name:
-			name;
-			addAllAlternatives: (alternatives collect: [:alt | alt asBuiltInFunction name: name; yourself]);
-			yourself.
-		prototypes at: name put: group
+	rawPrototypes keysAndValuesDo: [ :names :alternatives |
+		group := prototypes at: names first ifAbsent: [DASLFunctionGroup new
+			name: names first
+		].
+		group addAllAlternatives: (alternatives collect: [:alt | alt asBuiltInFunction name: names first; canonicalName: names second; yourself]).
+		prototypes at: names first put: group
 	].
 	^ prototypes
 ]

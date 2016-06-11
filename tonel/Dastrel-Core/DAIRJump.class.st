@@ -2,7 +2,10 @@ Class {
 	#name : #DAIRJump,
 	#superclass : #DAIRInstruction,
 	#instVars : [
-		'destination'
+		'destination',
+		'mergeBlock',
+		'continueBlock',
+		'unreachableSuccessors'
 	],
 	#category : #'Dastrel-Core-SSA'
 }
@@ -15,6 +18,33 @@ DAIRJump class >> destination: aBasicBlock [
 { #category : #visitor }
 DAIRJump >> accept: aVisitor [
 	^ aVisitor visitJump: self
+]
+
+{ #category : #'as yet unclassified' }
+DAIRJump >> addUnreachableSuccessors [
+	| changed |
+	changed := false.
+	mergeBlock predecessors ifEmpty: [
+		unreachableSuccessors := { mergeBlock }.
+		changed := true.
+	].
+
+	continueBlock predecessors ifEmpty: [
+		unreachableSuccessors := { mergeBlock }.
+		changed := true.
+	].
+
+	changed ifTrue: [ block computeSuccessors. ]
+]
+
+{ #category : #accessing }
+DAIRJump >> continueBlock [
+	^ continueBlock
+]
+
+{ #category : #accessing }
+DAIRJump >> continueBlock: anObject [
+	continueBlock := anObject
 ]
 
 { #category : #accessing }
@@ -32,6 +62,12 @@ DAIRJump >> fullPrintOn: aStream [
 	aStream nextPutAll: 'jump '; nextPutAll:destination name
 ]
 
+{ #category : #'as yet unclassified' }
+DAIRJump >> initialize [
+	super initialize.
+	unreachableSuccessors := #()
+]
+
 { #category : #testing }
 DAIRJump >> isJump [
 	^ true
@@ -40,6 +76,16 @@ DAIRJump >> isJump [
 { #category : #testing }
 DAIRJump >> isTerminator [
 	^ true
+]
+
+{ #category : #accessing }
+DAIRJump >> mergeBlock [
+	^ mergeBlock
+]
+
+{ #category : #accessing }
+DAIRJump >> mergeBlock: anObject [
+	mergeBlock := anObject
 ]
 
 { #category : #printing }
@@ -54,7 +100,7 @@ DAIRJump >> printOn: aStream [
 
 { #category : #accessing }
 DAIRJump >> successors [
-	^ { destination }
+	^ { destination } , unreachableSuccessors
 ]
 
 { #category : #accessing }

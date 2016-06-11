@@ -62,6 +62,13 @@ DASLModuleSemanticVisitor >> visitSemanticBlock: semanticBlock [
 ]
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitStructureBlock: structureBlock [
+	currentScope at: structureBlock name put: structureBlock ifPresent: [
+		self error: 'uniform block overrides a previously defined symbol' at: structureBlock
+	].
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitTranslationUnit: translationUnit [
 	| builtInScope packageScope |
 	currentDirectory := translationUnit fullPath asFileReference parent.

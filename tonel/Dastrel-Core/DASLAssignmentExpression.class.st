@@ -5,7 +5,9 @@ Class {
 		'operation',
 		'reference',
 		'value',
-		'type'
+		'type',
+		'coercionType',
+		'builtInFunction'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -13,6 +15,26 @@ Class {
 { #category : #visitor }
 DASLAssignmentExpression >> accept: aVisitor [
 	^ aVisitor visitAssignment: self
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> builtInFunction [
+	^ builtInFunction
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> builtInFunction: anObject [
+	builtInFunction := anObject
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> coercionType [
+	^ coercionType
+]
+
+{ #category : #accessing }
+DASLAssignmentExpression >> coercionType: anObject [
+	coercionType := anObject
 ]
 
 { #category : #accessing }

@@ -29,6 +29,16 @@ DAIRConstantBuiltInFunction class >> initialize [
 		smoothstep
 		step
 		
+		umin
+		smin
+		fmin
+		
+		umax
+		smax
+		fmax
+		
+		fmix
+		
 		"Matrix functions"
 		transpose
 	).

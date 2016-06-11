@@ -78,6 +78,29 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 ]
 
 { #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInCommon [
+	^ #(
+		(
+			((min umin) (max umax)) (expandToVector)
+			(uint uint => uint)
+			(ulong ulong => ulong)
+		)
+		
+		(
+			((min smin) (max smax)) (expandToVector)
+			(int int => int)
+			(long long => long)
+		)
+		
+		(
+			((min fmin) (max fmax)) (expandToVector)
+			(float float => float)
+			(double double => double)
+		)
+	)
+]
+
+{ #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 	^
 		self builtInArithmeticFunctions,
@@ -85,7 +108,8 @@ DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 		self builtInMatrixMultiplicationFunctions,
 		self builtInMathFunctions,
 		self builtInVectorFunctions,
-		self builtInMatrixFunctions
+		self builtInMatrixFunctions,
+		self builtInCommon
 ]
 
 { #category : #'builtin functions' }
@@ -111,7 +135,7 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 
 { #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInMathFunctions [
-	^ #(
+	^ #(	
 		(
 			(smoothstep) (expandToVector)
 			(float float float => float)
@@ -125,6 +149,12 @@ DASLBuiltInFunctions class >> builtInMathFunctions [
 			(double double double2 => double2)
 			(double double double3 => double3)
 			(double double double4 => double4)
+		)
+		
+		(
+			((mix fmix)) (expandToVector)
+			(float float float => float)
+			(double double double => double)
 		)
 	)
 ]

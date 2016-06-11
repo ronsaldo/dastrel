@@ -1,35 +1,44 @@
 Class {
 	#name : #DASLStructureBlock,
-	#superclass : #DASLModule,
+	#superclass : #DASLStructureLikeBlock,
 	#instVars : [
-		'interfaceList',
-		'body'
+		'codegenValue',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
 
-{ #category : #accessing }
-DASLStructureBlock >> body [
-	^ body
+{ #category : #visitor }
+DASLStructureBlock >> accept: aVisitor [
+	^ aVisitor visitStructureBlock: self
 ]
 
 { #category : #accessing }
-DASLStructureBlock >> body: anArray [
-	body := anArray.
-	body doWithIndex: [ :field :index | field fieldIndex: index - 1]
+DASLStructureBlock >> codegenValue [
+	^ codegenValue
 ]
 
 { #category : #accessing }
-DASLStructureBlock >> interfaceList [
-	^ interfaceList
+DASLStructureBlock >> codegenValue: anObject [
+	codegenValue := anObject
 ]
 
-{ #category : #accessing }
-DASLStructureBlock >> interfaceList: anObject [
-	interfaceList := anObject ifNil: [ #() ].
+{ #category : #'as yet unclassified' }
+DASLStructureBlock >> isStructureBlock [
+	^ true
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 DASLStructureBlock >> referenceType [
-	^ DASLBlockType new block: self.
+	^ DASLTypeWrapper new wrapped: (DASLBlockType new block: self).
+]
+
+{ #category : #accessing }
+DASLStructureBlock >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLStructureBlock >> type: anObject [
+	type := anObject
 ]

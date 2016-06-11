@@ -3,7 +3,8 @@ Class {
 	#superclass : #DASLSemanticVisitor,
 	#instVars : [
 		'currentFunction',
-		'samplerBuiltIns'
+		'samplerBuiltIns',
+		'loopLevel'
 	],
 	#classVars : [
 		'SwizzleComponentIndices'
@@ -70,18 +71,29 @@ DASLBlockSemanticVisitor >> findIn: functionGroup bestMatchingType: checkTypes a
 DASLBlockSemanticVisitor >> initialize [
 	super initialize.
 	samplerBuiltIns := DASLBuiltInFunctions builtInSamplerFunctions.
-
+	loopLevel := 0.
 ]
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitAssignment: assignment [
-	| referenceType |
+	| referenceType valueType operationSymbol functionGroup matchingFunction |
 	assignment reference accept: self.
 	assignment value accept: self.
 
 	referenceType := assignment reference type.
 	referenceType isReferenceType ifFalse: [ self error: 'a variable reference is required to perform the assignment.' at: assignment ].
-	
+		
+	assignment operation = #= ifTrue: [
+		valueType := assignment value type
+	] ifFalse: [
+		operationSymbol := assignment operation allButLast asSymbol.
+		functionGroup := self lookOperationFunctionGroup: operationSymbol at: assignment.
+		matchingFunction := self findIn: functionGroup bestMatchingType: { assignment reference type. assignment value type} at: assignment.
+		assignment coercionType: (valueType := matchingFunction coercionType).
+		assignment builtInFunction: matchingFunction.
+	].
+
+	self checkImplicitCoercion: valueType to: referenceType baseType on: assignment.
 	assignment type: referenceType.
 	
 ]
@@ -106,6 +118,36 @@ DASLBlockSemanticVisitor >> visitBlockStatement: block [
 		block statements do: [ :statement | statement accept: self ]
 	]
 	
+]
+
+{ #category : #'as yet unclassified' }
+DASLBlockSemanticVisitor >> visitBreakStatement: statement [
+	loopLevel = 0 ifTrue: [
+		self error: 'Continue is not being used in a loop.' at: statement
+	]
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitCallBlockStatement: callBlockStatement [
+	| block |
+	callBlockStatement blockReference accept: self.
+	(callBlockStatement blockReference type isBlockType and: [callBlockStatement blockReference type block isCallableBlock ]) ifFalse: [
+		self error: 'Expected code_block or graph_block for calling.' at: callBlockStatement blockReference
+	].
+
+	block := callBlockStatement blockReference type block.
+	callBlockStatement arguments keysAndValuesDo: [ :name :argument |
+		block inputs at: name ifAbsent: [ self error: 'Unknown block argument.' at: argument ].
+		argument accept: self.
+		self checkImplicitCoercion: argument type to: (block inputs at: name) type on: argument
+	].
+
+	callBlockStatement results keysAndValuesDo: [ :name :variable |
+		block outputs at: name ifAbsent: [ self error: 'Unknown block result.' at: variable ].
+		variable accept: self.
+		self checkImplicitCoercion: variable type to: (block outputs at: name) type on: variable
+	].
+
 ]
 
 { #category : #visitor }
@@ -145,9 +187,50 @@ DASLBlockSemanticVisitor >> visitCodeBlock: codeBlock [
 	]
 ]
 
+{ #category : #'as yet unclassified' }
+DASLBlockSemanticVisitor >> visitContinueStatement: statement [
+	loopLevel = 0 ifTrue: [
+		self error: 'Continue is not being used in a loop.' at: statement
+	]
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitDoWhileStatement: statement [
+	statement condition accept: self.
+	self withLoop: [ 
+		statement body accept: self.
+	].
+	
+	(self hasImplicitCoercion: statement condition type to: DASLType boolType) ifFalse: [
+		self error: 'Do while statement condition has to be a boolean expression.' at: statement.
+	]
+]
+
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitExpressionStatement: expressionStatement [
 	expressionStatement expression accept: self
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitForStatement: statement [
+	statement scope: (DASLexicalScope new parentScope: currentScope).
+	self withScope: statement scope do: [ 
+		statement initStatement accept: self.
+		statement condition ifNotNil: [
+			statement condition accept: self.
+			(self hasImplicitCoercion: statement condition type to: DASLType boolType) ifFalse: [
+				self error: 'For statement condition has to be a boolean expression.' at: statement.
+			]
+		].
+		statement increment ifNotNil: [
+			statement increment accept: self
+		].
+	
+		self withLoop: [ 
+			statement body accept: self.
+		].
+	]
+
 ]
 
 { #category : #visitor }
@@ -166,7 +249,7 @@ DASLBlockSemanticVisitor >> visitIfStatement: statement [
 	statement elseStatement ifNotNil: [ statement elseStatement accept: self ].
 	
 	(self hasImplicitCoercion: statement condition type to: DASLType boolType) ifFalse: [
-		self error: 'if statement condition has to be a boolean expression.' at: statement.
+		self error: 'If statement condition has to be a boolean expression.' at: statement.
 	]
 ]
 
@@ -181,6 +264,8 @@ DASLBlockSemanticVisitor >> visitInterface: interface [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
+	declaration flow ifNotNil: [ ^ self ].
+	
 	declaration initialValue ifNotNil: [ 
 		declaration initialValue accept: self.
 	].
@@ -188,9 +273,7 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 	self resolveTypeOf: declaration inferWith: declaration initialValue.
 	
 	declaration initialValue ifNotNil: [
-		(self hasImplicitCoercion: declaration initialValue type to: declaration type) ifFalse: [ 
-			self error: 'cannot convert implicitly value of type "', declaration initialValue type printString, '" into type "' , declaration type printString , '".'at: declaration.
-		]
+		self checkImplicitCoercion: declaration initialValue type to: declaration type on: declaration
 	].
 	
 	currentScope at: declaration name put: declaration ifPresent: [ 
@@ -210,7 +293,7 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 		block := referencedType block.
 		block isGlobalConnectionBlock ifTrue: [
 			member := block scope lookSymbol: memberAccess memberName.
-			member ifNil: [ self error: 'failed to find member "' ,  memberAccess memberName , '" in block "' , block name, '".' at:  memberAccess ].
+			member ifNil: [ self error: 'Failed to find member "' ,  memberAccess memberName , '" in block "' , block name, '".' at:  memberAccess ].
 			memberAccess memberIndex: member fieldIndex.
 			memberAccess type: member referenceType.
 			memberAccess globalReferenceValue: member.
@@ -218,14 +301,14 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 			^ self
 		].
 	
-		self error: 'cannot access member of non global connection block.' at: memberAccess.
+		self error: 'Cannot access member of non global connection block.' at: memberAccess.
 	].
 
 	baseType := referencedType.
 	referencedType isReferenceType ifTrue: [ baseType := referencedType baseType ].
 	baseType isSamplerType ifTrue: [
 		samplerFunction := samplerBuiltIns at: memberAccess memberName ifAbsent: [ 
-			self error: 'failed to find sampler member named ' , memberAccess memberName at: memberAccess.
+			self error: 'Failed to find sampler member named ' , memberAccess memberName at: memberAccess.
 		]. 
 		memberAccess type: samplerFunction referenceType.
 		memberAccess accessKind: #sampling.
@@ -235,16 +318,16 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 	baseType isVectorType ifTrue: [
 		memberAccess memberIndex: (memberAccess memberName collect: [:c |
 			index := SwizzleComponentIndices at: c ifAbsent: [
-				self error: 'invalid swizzle component ' , c asString at: memberAccess.
+				self error: 'Invalid swizzle component ' , c asString at: memberAccess.
 			].
 			index >= baseType elements ifTrue: [ 
-				self error: 'swizzle component ' , c asString at , ' is out of bounds.' at: memberAccess.
+				self error: 'Swizzle component ' , c asString at , ' is out of bounds.' at: memberAccess.
 			].
 			index
 		] as: Array).
 		memberAccess accessKind: #swizzle.
 		memberAccess memberIndex size > 4 ifTrue: [ 
-			self error: 'invalid swizzle with more than for components.' at: memberAccess.
+			self error: 'Invalid swizzle with more than for components.' at: memberAccess.
 		].
 		memberAccess memberIndex size > 1 ifTrue: [
 			memberAccess type: (DASLVectorType baseType: baseType baseType elements: memberAccess memberIndex size)
@@ -254,6 +337,16 @@ DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 		^ self
 	].
 
+	baseType isStructureType ifTrue: [
+		self assert: referencedType isReferenceType.
+		memberAccess memberIndex: (baseType names indexOf: memberAccess memberName ifAbsent: [
+			self error: 'Failed to find member "' ,  memberAccess memberName , '" in structure "' , baseType name, '".' at:  memberAccess
+		]) - 1.
+		memberAccess accessKind: #structure.
+		memberAccess type: (DASLReferenceType baseType: (baseType types at: memberAccess memberIndex + 1) storage: referencedType storage).
+		^ self
+	].
+ 
 	self halt.
 	"TODO: Check the referenced type. Ensure the member exist."
 ]
@@ -285,14 +378,35 @@ DASLBlockSemanticVisitor >> visitReturnStatement: returnStatement [
 	
 	expectedReturnType := currentFunction functionType returnType.
 	returnType := self arrayOfTypesToTuple: (returnStatement value collect: #type).
-	(self hasImplicitCoercion: returnType to: expectedReturnType) ifFalse: [ 
-		self error: 'cannot return value of type "',  returnType printString ,'" in a function whose returning type is "', expectedReturnType printString , '".' at: returnStatement.
-	]
-
+	self checkImplicitCoercion: returnType to: expectedReturnType on: returnStatement value.
 ]
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitSemanticBlock: interface [
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitStructureBlock: interface [
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitSubscriptExpression: subscriptAccess [
+	| referencedType baseType elementType |
+	subscriptAccess reference accept: self.
+	subscriptAccess index accept: self.
+	
+	referencedType := subscriptAccess reference type.
+	referencedType isReferenceType ifFalse: [ self error: 'Expected a reference.' at: subscriptAccess ].
+	baseType := referencedType baseType.
+	baseType isArrayType ifFalse: [ self error: 'Expected an array.' at: subscriptAccess ].
+
+	(self hasImplicitCoercion: subscriptAccess index type to: DASLType intType) ifFalse: [ self error: 'Expected an integer index.' at: subscriptAccess index].
+	(baseType isBounded and: [ subscriptAccess index isConstantExpression and: [ subscriptAccess index evaluateConstant >= baseType elements ] ]) ifTrue: [
+		self error: 'Array access is outside of bounds.' at: subscriptAccess index
+	]. 
+
+	elementType := baseType baseType.
+	subscriptAccess type: (DASLReferenceType baseType: elementType storage: referencedType storage).
 ]
 
 { #category : #visitor }
@@ -326,4 +440,25 @@ DASLBlockSemanticVisitor >> visitUsingStatement: usingStatement [
 	useScope ifNil: [ self error: 'cannot be used.' at: usingStatement ].
 	
 	currentScope addUseScope: useScope.
+]
+
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitWhileStatement: statement [
+	statement condition accept: self.
+	self withLoop: [ 
+		statement body accept: self.
+	].
+	
+	(self hasImplicitCoercion: statement condition type to: DASLType boolType) ifFalse: [
+		self error: 'While statement condition has to be a boolean expression.' at: statement.
+	]
+]
+
+{ #category : #'as yet unclassified' }
+DASLBlockSemanticVisitor >> withLoop: aBlock [
+	| oldLoopLevel |
+	oldLoopLevel := loopLevel.
+	loopLevel := loopLevel + 1.
+	aBlock ensure: [ loopLevel := oldLoopLevel ]
+
 ]

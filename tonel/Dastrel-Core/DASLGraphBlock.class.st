@@ -23,8 +23,18 @@ DASLGraphBlock >> codegenValue: anObject [
 ]
 
 { #category : #testing }
+DASLGraphBlock >> isCallableBlock [
+	^ true
+]
+
+{ #category : #testing }
 DASLGraphBlock >> isGraphBlock [
 	^ true
+]
+
+{ #category : #accessing }
+DASLGraphBlock >> referenceType [
+	^ DASLBlockType new block: self.
 ]
 
 { #category : #accessing }

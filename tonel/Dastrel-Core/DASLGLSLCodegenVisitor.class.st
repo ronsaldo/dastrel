@@ -1,6 +1,9 @@
 Class {
 	#name : #DASLGLSLCodegenVisitor,
 	#superclass : #DASLHighLevelCodegenVisitor,
+	#instVars : [
+		'typeDictionary'
+	],
 	#classVars : [
 		'SamplerTypeDictionary',
 		'SamplerTypeMapping',
@@ -170,11 +173,35 @@ DASLGLSLCodegenVisitor >> generateSemanticVar: semanticVar prefix: prefix [
 		out nextPutAll: flow direction; space;
 			 nextPutAll: glslType; space;
 			 nextPutAll: semanticVar codegenValue;
+			 nextPutAll: (self typeSubscriptsFor: semanticVar type);
 			 nextPut: $;.
 	].
 
 	self printLine: varString.
 	
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateStructure: structure [
+	| structureType |
+	structureType := structure type.
+	typeDictionary at: structureType ifPresent: [ ^ self ].
+	self
+		printLine: 'struct ' , structure name;
+		printLine: '{';
+		withIndentation: [
+			structure body do: [ :var | self generateStructureField: var].
+		];
+		printLine: '};';
+		newline.
+	typeDictionary at: structureType put: structure name.
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateStructureField: var [
+	| glslType |
+	glslType := self mapType: var type.
+	self printLine: glslType , ' ' , var name , (self typeSubscriptsFor: var type) , ';'
 ]
 
 { #category : #'code generation' }
@@ -248,8 +275,14 @@ DASLGLSLCodegenVisitor >> generateUniformVar: uniformVariable prefix: prefix [
 	| glslType name |
 	glslType := self mapType: uniformVariable type.
 	name := uniformVariable name.
-	self printLine: glslType , ' ' , name , ';'.
+	self printLine: glslType , ' ' , name , (self typeSubscriptsFor: uniformVariable type) , ';'.
 	uniformVariable codegenValue: prefix , name
+]
+
+{ #category : #'as yet unclassified' }
+DASLGLSLCodegenVisitor >> initialize [
+	super initialize.
+	typeDictionary := Dictionary new.
 ]
 
 { #category : #'code generation' }
@@ -259,15 +292,49 @@ DASLGLSLCodegenVisitor >> mapSamplerType: type [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> mapType: type [
+	type isArrayType ifTrue: [
+		^ self mapType: type baseType
+	].
+	typeDictionary at: type ifPresent: [ :mappedType | ^ mappedType ].
 	^ TypeDictionary at: type
 ]
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> printCodeBlockPrototype: codeBlock [
+	| first |
 	self printTabs;
 		printString: 'void ';
 		printString: codeBlock name;
-		printString: '()'
+		printString: '('.
+	first := true.
+
+	codeBlock outputs ifNotNil: [ 
+		codeBlock outputs keysAndValuesDo: [ :name :decl |
+			first ifFalse: [ self printString: ', ' ].
+			first := false.
+			self
+				printString: 'out '; 
+				printString: (self mapType: decl type baseType);
+				printString: ' ';
+				printString: decl name.
+			decl codegenValue: decl name.
+		].
+	].
+
+	codeBlock inputs ifNotNil: [ 
+		codeBlock inputs keysAndValuesDo: [ :name :decl |
+			first ifFalse: [ self printString: ', ' ].
+			first := false.
+			self
+				printString: 'in '; 
+				printString: (self mapType: decl type);
+				printString: ' ';
+				printString: decl name.
+			decl codegenValue: decl name.
+		].
+	].
+
+	self printString: ')'.
 ]
 
 { #category : #visitor }

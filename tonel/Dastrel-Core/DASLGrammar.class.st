@@ -112,7 +112,15 @@ Class {
 		'switchCases',
 		'switchCase',
 		'kwCase',
-		'blockStatement'
+		'blockStatement',
+		'struct',
+		'kwStruct',
+		'structBody',
+		'callBlockStatement',
+		'keywordList',
+		'keywordElement',
+		'leftArrow',
+		'typeArraySubscript'
 	],
 	#classVars : [
 		'Keywords'
@@ -130,7 +138,7 @@ DASLGrammar class >> initialize [
 	Keywords := #(
 		in out inout
 		uniform
-		interface semantic implements
+		interface semantic implements struct
 		sizeof alignof
 		function code_block graph_block
 		using discard return
@@ -257,6 +265,11 @@ DASLGrammar >> callArguments [
 ]
 
 { #category : #grammar }
+DASLGrammar >> callBlockStatement [
+	^ (keywordList , leftArrow) optional , expression , keywordList, semicolon
+]
+
+{ #category : #grammar }
 DASLGrammar >> callExpression [
 	^ leftParent , callArguments , rightParent
 ]
@@ -273,7 +286,7 @@ DASLGrammar >> codeBody [
 
 { #category : #grammar }
 DASLGrammar >> codeStatement [
-	^ usingStatement / localVariable / inOutVariable / discardStatement / returnStatement /  expressionStatement / ifStatement / switchStatement / whileStatement / doWhileStatement / forStatement / breakStatement / continueStatement / blockStatement
+	^ usingStatement / localVariable / inOutVariable / discardStatement / returnStatement / ifStatement / switchStatement / whileStatement / doWhileStatement / forStatement / breakStatement / continueStatement / blockStatement / callBlockStatement / expressionStatement
 ]
 
 { #category : #tokens }
@@ -348,7 +361,7 @@ DASLGrammar >> floatScientfic [
 
 { #category : #grammar }
 DASLGrammar >> forStatement [
-	^ kwFor , leftParent , codeStatement , expression , semicolon , expression, rightParent , codeStatement
+	^ kwFor , leftParent , codeStatement , expression optional, semicolon , expression optional, rightParent , codeStatement
 ]
 
 { #category : #grammar }
@@ -378,7 +391,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / interface / uniformGlobal / uniform / semantic / codeBlock / function
+	^ import / interface / uniformGlobal / struct / uniform / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -431,9 +444,19 @@ DASLGrammar >> interfaceImplementations [
 	^ kwImplements , identifier , (comma , identifier) star
 ]
 
+{ #category : #grammar }
+DASLGrammar >> keywordElement [
+	^ identifier , colon , expression
+]
+
 { #category : #tokens }
 DASLGrammar >> keywordEnd [
 	^ (identStart / #digit asParser ) not
+]
+
+{ #category : #grammar }
+DASLGrammar >> keywordList [
+	^ keywordElement plus
 ]
 
 { #category : #keywords }
@@ -547,6 +570,11 @@ DASLGrammar >> kwSizeOf [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwStruct [
+	^ self keywordParser: 'struct'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwSwitch [
 	^ self keywordParser: 'switch'
 ]
@@ -564,6 +592,11 @@ DASLGrammar >> kwUsing [
 { #category : #keywords }
 DASLGrammar >> kwWhile [
 	^ self keywordParser: 'while'
+]
+
+{ #category : #grammar }
+DASLGrammar >> leftArrow [
+	^ '<==' asParser token trim: ignorable
 ]
 
 { #category : #tokens }
@@ -697,6 +730,16 @@ DASLGrammar >> start [
 ]
 
 { #category : #grammar }
+DASLGrammar >> struct [
+	^ kwStruct , blockAttributes optional , identifier , interfaceImplementations optional, leftCBracket, structBody , rightCBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> structBody [
+	^ blockVariable star
+]
+
+{ #category : #grammar }
 DASLGrammar >> subscriptExpression [
 	^ leftBracket , expression , rightBracket
 ]
@@ -723,7 +766,12 @@ DASLGrammar >> termExpression [
 
 { #category : #grammar }
 DASLGrammar >> type [
-	^ identifier
+	^ identifier , memberExpression star , typeArraySubscript star
+]
+
+{ #category : #grammar }
+DASLGrammar >> typeArraySubscript [
+	^ leftBracket , integer optional , rightBracket
 ]
 
 { #category : #grammar }
@@ -748,7 +796,7 @@ DASLGrammar >> uniformGlobal [
 
 { #category : #grammar }
 DASLGrammar >> usingAliasStatement [
-	^ kwUsing , identifier , assignmentOperator , expression , semicolon
+	^ kwUsing , identifier , equalAssign , expression , semicolon
 ]
 
 { #category : #grammar }

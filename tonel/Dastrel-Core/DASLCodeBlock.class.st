@@ -45,6 +45,11 @@ DASLCodeBlock >> interfaceList: anObject [
 ]
 
 { #category : #testing }
+DASLCodeBlock >> isCallableBlock [
+	^ true
+]
+
+{ #category : #testing }
 DASLCodeBlock >> isCodeBlock [
 	^ true
 ]
@@ -58,6 +63,11 @@ DASLCodeBlock >> printOn: aStream [
 	aStream space.
 	self printList: body on: aStream.
 	aStream nextPut: $).
+]
+
+{ #category : #accessing }
+DASLCodeBlock >> referenceType [
+	^ DASLBlockType new block: self.
 ]
 
 { #category : #accessing }

@@ -25,6 +25,13 @@ DASLSemanticVisitor >> arrayOfTypesToTuple: arrayOfTypes [
 ]
 
 { #category : #types }
+DASLSemanticVisitor >> checkImplicitCoercion: rawType to: rawCoercionType on: node [
+	(self hasImplicitCoercion: rawType to: rawCoercionType) ifFalse: [ 
+		self error: 'Cannot convert implicitly value of type "', rawCoercionType printString, '" into type "' , rawType printString , '".' at: node.
+	]
+]
+
+{ #category : #types }
 DASLSemanticVisitor >> compareAlmostExactTypes: functionTypes with: valueRefTypes [
 	| functionType valueRefType |
 	functionTypes size ~= valueRefTypes size ifTrue: [ ^ false ].
@@ -89,6 +96,10 @@ DASLSemanticVisitor >> hasImplicitCoercion: rawType to: rawCoercionType [
 	| type coercionType |
 	rawType = rawCoercionType ifTrue: [ ^ true ].
 	
+	(rawCoercionType isReferenceType and: [ rawType isReferenceType and: [rawType baseType = rawCoercionType baseType ]]) ifTrue: [
+		^ self hasStorageCoercion: rawType storage to: rawCoercionType storage
+	].
+	
 	type := rawType.
 	coercionType := rawCoercionType.
 
@@ -103,11 +114,25 @@ DASLSemanticVisitor >> hasImplicitCoercion: rawType to: rawCoercionType [
 ]
 
 { #category : #types }
+DASLSemanticVisitor >> hasStorageCoercion: sourceStorage to: destStorage [
+	sourceStorage = destStorage ifTrue: [ ^ true ].
+	(sourceStorage = #output and: [ destStorage = #function ]) ifTrue: [ ^ true ].
+	self halt.
+]
+
+{ #category : #types }
 DASLSemanticVisitor >> lookOperationFunctionGroup: operation at: position [
 	| functionGroup |
 	functionGroup := currentScope lookSymbolRecursively: operation.
 	functionGroup ifNil: [ self error: 'Unsupported operation yet: ' , operation at: position].
 	^ functionGroup
+]
+
+{ #category : #resolving }
+DASLSemanticVisitor >> resolveStructureBlockType: structureBlock on: typeExpression [
+	structureBlock type ifNil: [ self error: 'Failed to complete structure type.' at: typeExpression ].
+	structureBlock type isSymbol ifTrue: [ self error: 'Circular structure types are not supported.' at: typeExpression].
+	^ structureBlock type
 ]
 
 { #category : #resolving }
@@ -133,6 +158,10 @@ DASLSemanticVisitor >> resolveType: typeExpression inferWith: inferenceExpressio
 	].
 
 	wrappedType := typeExpression type wrapped.
+	(wrappedType isBlockType and: [ wrappedType block isStructureBlock ]) ifTrue: [
+		wrappedType := self resolveStructureBlockType: wrappedType block on: typeExpression.
+	].
+
 	wrappedType isAutoType ifTrue: [
 		inferenceExpression ifNil: [ self error: 'cannot infer type without an expression' at: typeExpression ].
 		wrappedType := self adjustTypeForInference: inferenceExpression type.
@@ -176,6 +205,18 @@ DASLSemanticVisitor >> visitLiteralType: stringLiteral [
 
 { #category : #visitor }
 DASLSemanticVisitor >> visitString: stringLiteral [
+]
+
+{ #category : #visitor }
+DASLSemanticVisitor >> visitStructureBlock: structureBlock [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
+DASLSemanticVisitor >> visitTypeSubscriptExpression: expression [
+	| baseType |
+	baseType := self resolveType: expression reference inferWith: nil.
+	expression type: (DASLTypeWrapper new wrapped: (DASLArrayType baseType: baseType elements: expression bounds)).
 ]
 
 { #category : #scope }

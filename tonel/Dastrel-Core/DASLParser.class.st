@@ -60,8 +60,26 @@ DASLParser >> blockVariable [
 ]
 
 { #category : #grammar }
+DASLParser >> breakStatement [
+	^ super breakStatement ==> [ :tokens | DASLBreakStatement new
+			position: (self positionFromToken: tokens first);
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> callArguments [
 	^ super callArguments ==> [ :args | { args first } , (args second collect: #second) ]
+]
+
+{ #category : #grammar }
+DASLParser >> callBlockStatement [
+	^ super callBlockStatement ==> [ :statement | DASLCallBlockStatement new
+			position: statement second position;
+			results: (statement first ifNotNil: [ statement first first ] ifNil: [ Dictionary new ]);
+			arguments: statement third;
+			blockReference: statement second;
+			yourself
+	]
 ]
 
 { #category : #grammar }
@@ -96,6 +114,13 @@ DASLParser >> conditionalExpression [
 ]
 
 { #category : #grammar }
+DASLParser >> continueStatement [
+	^ super continueStatement ==> [ :tokens | DASLContinueStatement new
+			position: (self positionFromToken: tokens first);
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> discardStatement [
 	^ super discardStatement ==> [ :tokens | DASLDiscardStatement new
 			position: (self positionFromToken: tokens first);
@@ -123,6 +148,18 @@ DASLParser >> fileName: anObject [
 { #category : #tokens }
 DASLParser >> float [
 	^ super float ==> [ :token | DASLFloat position: (self positionFromToken: token) token: token inputValue ]
+]
+
+{ #category : #grammar }
+DASLParser >> forStatement [
+	^ super forStatement ==> [ :statement |
+		DASLForStatement new
+			position: (self positionFromToken: statement first);
+			initStatement: statement third;
+			condition: statement fourth;
+			increment: statement sixth;
+			body: statement eighth
+ 	]
 ]
 
 { #category : #grammar }
@@ -226,6 +263,16 @@ DASLParser >> interfaceImplementations [
 ]
 
 { #category : #grammar }
+DASLParser >> keywordElement [
+	^ super keywordElement ==> [ :element | element first value -> element third ]
+]
+
+{ #category : #grammar }
+DASLParser >> keywordList [
+	^ super keywordList ==> [ :elements | Dictionary newFrom: elements ]
+]
+
+{ #category : #grammar }
 DASLParser >> localVariable [
 	^ super localVariable ==> [ :local | DASLLocalDeclStatement new
 			position: (self positionFromToken: local first);
@@ -259,6 +306,11 @@ DASLParser >> optionalType [
 	^ super optionalType ==> [ :typeExpr |
 		typeExpr ifNil: [ DASLLiteralType type: DASLType autoType ] ifNotNil: [ typeExpr second ]
 	]
+]
+
+{ #category : #grammar }
+DASLParser >> parentExpression [
+	^ super parentExpression ==> [ :expr | expr second ]
 ]
 
 { #category : #utility }
@@ -308,8 +360,19 @@ DASLParser >> start [
 ]
 
 { #category : #grammar }
+DASLParser >> struct [
+	^ super struct ==> [ :block | DASLStructureBlock new
+			position: (self positionFromToken: block first);
+			attributes: block second;
+			name: block third value;
+			interfaceList: block fourth;
+			body: block sixth;
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> subscriptExpression [
-	^ super memberExpression ==> [ :expr | DASLSubscriptExpression new
+	^ super subscriptExpression ==> [ :expr | DASLSubscriptExpression new
 			position: (self positionFromToken: expr first);
 			index: expr second;
 			yourself ]
@@ -323,6 +386,35 @@ DASLParser >> termExpression [
 			access reference: currentLeft.
 			currentLeft := access. ].
 		currentLeft ]
+]
+
+{ #category : #grammar }
+DASLParser >> type [
+	| typeNode |
+	^ super type ==> [ :typeExpr |
+		typeNode := typeExpr first.
+		typeExpr second do: [ :memberAccess |
+			memberAccess reference: typeNode.
+			typeNode := memberAccess
+		].
+	
+		typeExpr third do: [ :arraySubscript |
+			arraySubscript reference: typeNode.
+			typeNode := arraySubscript
+		].
+	
+		typeNode.
+	]
+]
+
+{ #category : #grammar }
+DASLParser >> typeArraySubscript [
+	^ super typeArraySubscript ==> [ :expr |
+		DASLTypeSubscriptExpression new
+			position: (self positionFromToken: expr first);
+			bounds: expr second value;
+			yourself
+	]
 ]
 
 { #category : #grammar }

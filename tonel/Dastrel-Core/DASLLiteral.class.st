@@ -29,12 +29,22 @@ DASLLiteral class >> position: aPosition token: aString [
 	^ self new position: aPosition; parse: aString; yourself
 ]
 
+{ #category : #testing }
+DASLLiteral >> evaluateConstant [
+	^ self value
+]
+
 { #category : #parsing }
 DASLLiteral >> findTypeForSuffix: aSuffix defaultType: defaultType [
 	| typeName |
 	aSuffix ifEmpty: [ ^ defaultType ].
 	typeName := LiteralSuffixTable at: aSuffix ifAbsent: [ self error: 'invalid literal suffix.' at: self ].
 	^ DASLType builtInTypes at: typeName
+]
+
+{ #category : #testing }
+DASLLiteral >> isConstantExpression [
+	^ true
 ]
 
 { #category : #parsing }

@@ -64,6 +64,11 @@ DASLAstNode >> isSemanticBlock [
 ]
 
 { #category : #testing }
+DASLAstNode >> isStructureBlock [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isType [
 	^ false
 ]

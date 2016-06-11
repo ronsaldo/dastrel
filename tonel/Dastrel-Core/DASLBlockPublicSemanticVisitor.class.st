@@ -5,6 +5,38 @@ Class {
 }
 
 { #category : #visitor }
+DASLBlockPublicSemanticVisitor >> declareBlockInputArgument: declaration [
+	| blockNode |
+	blockNode := currentScope node.
+	blockNode inputs ifNil: [ blockNode inputs: OrderedDictionary new ].
+	blockNode inputs at: declaration name ifPresent: [
+		self error: 'Declaring repeated input variable ' , declaration at: declaration
+	].
+
+	blockNode inputs at: declaration name put: declaration
+]
+
+{ #category : #visitor }
+DASLBlockPublicSemanticVisitor >> declareBlockOutputArgument: declaration [
+	| blockNode |
+	blockNode := currentScope node.
+	blockNode outputs ifNil: [ blockNode outputs: OrderedDictionary new ].
+	blockNode outputs at: declaration name ifPresent: [
+		self error: 'Declaring repeated output variable ' , declaration at: declaration
+	].
+
+	declaration type: (DASLReferenceType baseType: declaration type storage: DASLType functionStorage).
+	blockNode outputs at: declaration name put: declaration
+]
+
+{ #category : #resolving }
+DASLBlockPublicSemanticVisitor >> resolveStructureBlockType: structureBlock on: typeExpression [
+	structureBlock type ifNil: [ structureBlock accept: self ].
+	^ super resolveStructureBlockType: structureBlock on: typeExpression
+
+]
+
+{ #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitCodeBlock: codeBlock [
 	codeBlock interfaceList do: [ :iface | iface accept: self ].
 	
@@ -78,6 +110,25 @@ DASLBlockPublicSemanticVisitor >> visitInterface: interface [
 { #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitLocalDeclaration: declaration [
 	"TODO: Support in/out for code blocks"
+	declaration flow ifNil: [ ^ self ].
+	
+	declaration initialValue ifNotNil: [ 
+		declaration initialValue accept: self.
+	].
+
+	self resolveTypeOf: declaration inferWith: declaration initialValue.
+	
+	declaration initialValue ifNotNil: [
+		self checkImplicitCoercion: declaration initialValue type to: declaration type on: declaration initialValue.
+	].
+	
+	currentScope at: declaration name put: declaration ifPresent: [ 
+		self error: 'local variable overrides an existing variable in the same lexical scope.' at: declaration.
+	].
+
+	declaration flow direction = #in ifTrue: [ ^ self declareBlockInputArgument: declaration ].
+	declaration flow direction = #out ifTrue: [ ^ self declareBlockOutputArgument: declaration ].
+	self halt.
 ]
 
 { #category : #visitor }
@@ -99,6 +150,23 @@ DASLBlockPublicSemanticVisitor >> visitSemanticBlock: semanticBlock [
 		]
 	].
 
+]
+
+{ #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitStructureBlock: structureBlock [
+	| fieldTypes fieldNames |
+	structureBlock type ifNotNil: [ ^ self ].
+	structureBlock type: #solving.
+	structureBlock interfaceList do: [ :iface | iface accept: self ].
+	
+	structureBlock scope: (DASLModuleScope new parentScope: currentScope; node: structureBlock).
+	fieldTypes := structureBlock body collect: [ :field |
+		field accept: self.
+		field type
+	].
+
+	fieldNames := structureBlock body collect: #name.
+	structureBlock type: (DASLStructureType name: structureBlock name types: fieldTypes kind: DASLStructureType genericKind names: fieldNames)
 ]
 
 { #category : #visitor }

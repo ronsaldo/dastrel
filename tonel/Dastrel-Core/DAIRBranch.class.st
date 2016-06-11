@@ -23,10 +23,19 @@ DAIRBranch >> accept: aVisitor [
 
 { #category : #accessing }
 DAIRBranch >> addUnreachableSuccessors [
+	| changed |
+	changed := false.
 	mergeBlock predecessors ifEmpty: [
 		unreachableSuccessors := { mergeBlock }.
-		block computeSuccessors.
-	]
+		changed := true.
+	].
+
+	continueBlock predecessors ifEmpty: [
+		unreachableSuccessors := { mergeBlock }.
+		changed := true.
+	].
+
+	changed ifTrue: [ block computeSuccessors. ]
 ]
 
 { #category : #accessing }

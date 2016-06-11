@@ -30,6 +30,11 @@ DASLAstVisitor >> visitBuiltInFunction: builtInFunction [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitCallBlockStatement: callExpression [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitCallExpression: callExpression [
 	self subclassResponsibility
 ]

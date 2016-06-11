@@ -7,7 +7,9 @@ Class {
 		'builder',
 		'entryBlock',
 		'allocaBuilder',
-		'visitedTranslationUnits'
+		'visitedTranslationUnits',
+		'breakBlock',
+		'continueBlock'
 	],
 	#classVars : [
 		'BinaryOperationMap',
@@ -149,7 +151,7 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 		^ builder addOperation: mappedOperation operand: operand
 	].
 
-	builtInFunctionRef := DAIRConstantBuiltInFunction name: builtInFunction name functionType: builtInFunction functionType.
+	builtInFunctionRef := DAIRConstantBuiltInFunction name: builtInFunction canonicalName functionType: builtInFunction functionType.
 	^ builder call: builtInFunctionRef arguments: coercedArguments
 ]
 
@@ -189,9 +191,29 @@ DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 	"TODO: Generate the proper function type."
-	| functionType |
-	functionType := DASLFunctionType arguments: #() returnType: DASLType voidType.
-	aCodeBlock codegenValue: (DAIRFunction name: aCodeBlock name functionType: functionType).
+	| functionType argumentDecls function argDecl |
+	argumentDecls := OrderedCollection new.
+	aCodeBlock outputs ifNotNil: [
+		aCodeBlock outputs keysAndValuesDo: [ :name :decl |
+			argumentDecls add: decl.
+		]
+	].
+
+	aCodeBlock inputs ifNotNil: [
+		aCodeBlock inputs keysAndValuesDo: [ :name :decl |
+			argumentDecls add: decl.
+		]
+	].
+
+	functionType := DASLFunctionType arguments: (argumentDecls collect: #type) returnType: DASLType voidType.
+	function := DAIRFunction name: aCodeBlock name functionType: functionType.
+	function arguments doWithIndex: [ :arg :index |
+		argDecl := argumentDecls at: index.
+		argDecl codegenValue: arg.
+		arg name: argDecl name
+	].
+
+	aCodeBlock codegenValue: function.
 	ssaModule add: aCodeBlock codegenValue.
 ]
 
@@ -389,6 +411,10 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 	value := assignment value accept: self.
 	variable := assignment reference accept: self.
 	self assert: variable type isReferenceType.
+	assignment builtInFunction ifNotNil: [
+		value := self generateBuiltInCall: assignment builtInFunction self: nil arguments: { variable . value } 
+	].
+
 	coercedValued := self coerce: value into: variable type baseType.
 	builder store: coercedValued in: variable.
 ]
@@ -408,6 +434,55 @@ DASLSSACodegenVisitor >> visitBlockStatement: block [
 		statement accept: self.
 		builder isLastTerminator ifTrue: [ ^ self ] 
 	]
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitBreakStatement: statement [
+	self assert: breakBlock isNotNil.
+	builder jump: breakBlock
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitCallBlockStatement: statement [
+	| block arguments resultValue resultExpression outputsToStore tempVar argumentExpression argumentValue |
+	block := statement blockReference type block.
+	
+	arguments := OrderedCollection new.
+	outputsToStore := OrderedCollection new.
+	
+	block outputs ifNotNil: [
+		block outputs keysAndValuesDo: [ :outputName :outputDecl |
+			resultExpression := statement results at: outputName ifAbsent: [ nil. ].
+			resultValue := resultExpression ifNotNil: [ resultExpression accept: self ] ifNil: [ allocaBuilder alloca: outputDecl type baseType ].
+			resultValue type ~= outputDecl type ifTrue: [
+				tempVar := allocaBuilder alloca: outputDecl type baseType.
+				arguments add: tempVar.
+				outputsToStore add: {tempVar . resultValue} 
+			] ifFalse: [
+				arguments add: tempVar
+			]
+		]
+	].
+
+	block inputs ifNotNil: [
+		block inputs keysAndValuesDo: [ :inputName :inputDecl |
+			argumentExpression := statement arguments at: inputName ifAbsent: [ nil. ].
+			argumentExpression ifNotNil:[
+				argumentValue := self coerce: (argumentExpression accept: self) into: inputDecl type
+			] ifNil: [
+				self halt.
+			].
+		
+			arguments add: argumentValue.
+		]
+	].
+
+	builder call: block codegenValue arguments: arguments asArray.
+	
+	outputsToStore do: [ :output |
+		builder store: (builder load: output first) in: output second. 
+	].
+
 ]
 
 { #category : #visitor }
@@ -445,6 +520,12 @@ DASLSSACodegenVisitor >> visitCallExpression: callExpression [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitContinueStatement: statement [
+	self assert: continueBlock isNotNil.
+	builder jump: continueBlock
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitExpressionStatement: expressionStatement [
 	expressionStatement expression accept: self
 ]
@@ -452,6 +533,65 @@ DASLSSACodegenVisitor >> visitExpressionStatement: expressionStatement [
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitFloat: literal [
 	^ DAIRConstantValue type: literal type value: literal value
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitForStatement: statement [
+	"Loop pre-header"
+	| loopHeader condition loopBody loopMerge loopContinue branchInstruction |
+	statement initStatement accept: self.
+	builder isLastTerminator ifTrue: [ ^ self ]. "Dead code"
+	
+	"Loop header"
+	loopHeader := builder newBasicBlock: 'forCondition'.
+	loopBody := builder newBasicBlock: 'forBody'.
+	loopMerge := builder newBasicBlock: 'forMerge'.
+	loopContinue := loopHeader.
+	
+	statement increment ifNotNil: [	
+		loopContinue := builder newBasicBlock: 'forContinue'.
+	].
+	
+	builder
+		jump: loopHeader;
+		currentBlock: loopHeader.
+		
+	"Emit the condition."
+	statement condition ifNotNil: [
+		condition := self coerce: (statement condition accept: self) into: DASLType boolType.
+		branchInstruction := builder branch: condition ifTrue: loopBody ifFalse: loopMerge.
+	] ifNil: [
+		branchInstruction := builder jump: loopBody
+	].
+
+	branchInstruction
+		mergeBlock: loopMerge;
+		continueBlock: loopContinue.
+			
+	self withBreak: loopMerge continue: loopContinue do: [
+		"Emit the loop body".
+		builder currentBlock: loopBody.
+		statement body accept: self.
+		builder isLastTerminator ifFalse: [ builder jump: loopContinue ]
+	].
+	
+	statement increment ifNotNil: [
+		builder currentBlock: loopContinue.
+		loopContinue predecessors ifNotEmpty: [ 
+			statement increment accept: self.
+			builder jump: loopHeader
+		] ifEmpty: [
+			builder unreachable.
+			branchInstruction addUnreachableSuccessors
+		]
+	].
+	
+	builder currentBlock: loopMerge.
+	loopMerge predecessors ifEmpty: [
+		builder unreachable.
+		branchInstruction addUnreachableSuccessors
+	].
+
 ]
 
 { #category : #visitor }
@@ -497,6 +637,7 @@ DASLSSACodegenVisitor >> visitIfStatement: statement [
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 	| valueType variable initialValue coercedInitialValue |
+	localDeclaration flow ifNotNil: [ ^ self ].
 	valueType := localDeclaration type.
 	variable := allocaBuilder alloca: valueType name: localDeclaration name.
 	localDeclaration codegenValue: variable.
@@ -522,7 +663,7 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	
 	accessKind = #swizzle ifTrue: [
 		indices := memberAccess memberIndex.
-		memberAccess reference type isReferenceType ifTrue: [
+		baseReference type isReferenceType ifTrue: [
 			baseReference := builder load: baseReference
 		].
 	
@@ -572,6 +713,14 @@ DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitSubscriptExpression: subscriptAccess [
+	| reference index |
+	reference := subscriptAccess reference accept: self.
+	index := self coerce: (subscriptAccess index accept: self) into: DASLType intType.
+	^ builder getReference: reference element: index
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 	(visitedTranslationUnits includes: translationUnit) ifTrue: [ ^ self ].
 	visitedTranslationUnits add: translationUnit.
@@ -594,4 +743,17 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitUsingStatement: anUsingStatement [
 	"Nothing to do, for now"
+]
+
+{ #category : #'as yet unclassified' }
+DASLSSACodegenVisitor >> withBreak: newBreakBlock continue: newContinueBlock do: aBlock [
+	| oldBreak oldContinue |
+	oldBreak := breakBlock.
+	oldContinue := continueBlock.
+	breakBlock := newBreakBlock.
+	continueBlock := newContinueBlock.
+	aBlock ensure: [
+		breakBlock := oldBreak.
+		continueBlock := oldContinue.
+	]
 ]

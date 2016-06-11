@@ -74,8 +74,8 @@ DASLLocalDeclStatement >> printOn: aStream [
 ]
 
 { #category : #accessing }
-DASLLocalDeclStatement >> referenceType [
-	^ DASLReferenceType baseType: self type storage: DASLType functionStorage
+DASLLocalDeclStatement >> referenceType [ 
+	^ type isReferenceType ifTrue: [ type ] ifFalse: [ DASLReferenceType baseType: type storage: DASLType functionStorage ]
 ]
 
 { #category : #accessing }

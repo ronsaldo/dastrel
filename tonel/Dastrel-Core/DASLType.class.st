@@ -305,6 +305,11 @@ DASLType >> alignment [
 	self subclassResponsibility
 ]
 
+{ #category : #converting }
+DASLType >> asSlovimType [
+	self subclassResponsibility
+]
+
 { #category : #testing }
 DASLType >> isArrayType [
 	^ false
@@ -377,6 +382,11 @@ DASLType >> isSampledTextureType [
 
 { #category : #testing }
 DASLType >> isSamplerType [
+	^ false
+]
+
+{ #category : #testing }
+DASLType >> isSlovimType [
 	^ false
 ]
 

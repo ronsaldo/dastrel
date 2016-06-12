@@ -9,7 +9,8 @@ Class {
 		'allocaBuilder',
 		'visitedTranslationUnits',
 		'breakBlock',
-		'continueBlock'
+		'continueBlock',
+		'currentFunctionType'
 	],
 	#classVars : [
 		'BinaryOperationMap',
@@ -55,6 +56,8 @@ DASLSSACodegenVisitor class >> initialize [
 DASLSSACodegenVisitor >> coerce: value into: targetType [
 	| valueType coercedScalar |
 	self flag: 'TODO: Implement this properly.'.
+	targetType isSlovimType ifFalse: [ ^ self coerce: value into: targetType asSlovimType].
+	
 	valueType := value type.
 	valueType = targetType ifTrue: [ ^ value ].
 	targetType isReferenceType ifTrue: [ self error: 'invalid implicit conversion between reference types.' ].
@@ -76,7 +79,7 @@ DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 	expandedArguments := OrderedCollection new.
 	arguments do: [ :arg | self extractImplicitVectorElements: arg typeElement: baseType into: expandedArguments].
 	self assert: expandedArguments size = type elements.
-	^ builder makeVector: type arguments: expandedArguments asArray
+	^ builder makeVector: type asSlovimType arguments: expandedArguments asArray
 ]
 
 { #category : #coercing }
@@ -151,7 +154,7 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 		^ builder addOperation: mappedOperation operand: operand
 	].
 
-	builtInFunctionRef := DAIRConstantBuiltInFunction name: builtInFunction canonicalName functionType: builtInFunction functionType.
+	builtInFunctionRef := SLVMConstantBuiltInFunction name: builtInFunction canonicalName functionType: builtInFunction functionType asSlovimType.
 	^ builder call: builtInFunctionRef arguments: coercedArguments
 ]
 
@@ -165,14 +168,15 @@ DASLSSACodegenVisitor >> generateCastOrConstructionOf: type arguments: argumentV
 DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 	| contentBlock |
 	currentFunction := aCodeBlock codegenValue.
+	currentFunctionType := aCodeBlock functionType.
 	aCodeBlock attributes keysAndValuesDo: [ :key :value |
 		currentFunction propertyAt: key value asSymbol put: value value
 	].
 
-	builder := DAIRBuilder on: currentFunction.
+	builder := SLVMBuilder on: currentFunction.
 
 	entryBlock := builder newBasicBlock: #entry.
-	allocaBuilder := DAIRBuilder on: currentFunction.
+	allocaBuilder := SLVMBuilder on: currentFunction.
 	allocaBuilder currentBlock: entryBlock.
 
 	contentBlock := builder newBasicBlock: #content.
@@ -206,7 +210,8 @@ DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 	].
 
 	functionType := DASLFunctionType arguments: (argumentDecls collect: #type) returnType: DASLType voidType.
-	function := DAIRFunction name: aCodeBlock name functionType: functionType.
+	aCodeBlock functionType: functionType.
+	function := SLVMFunction name: aCodeBlock name functionType: functionType asSlovimType.
 	function arguments doWithIndex: [ :arg :index |
 		argDecl := argumentDecls at: index.
 		argDecl codegenValue: arg.
@@ -231,14 +236,15 @@ DASLSSACodegenVisitor >> generateCodeBlocks: translationUnit [
 DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 	| contentBlock argumentValues |
 	currentFunction := ssaModule globalNamed: aFunctionNode mangledName.
-	builder := DAIRBuilder on: currentFunction.
+	currentFunctionType := aFunctionNode prototype functionType.
+	builder := SLVMBuilder on: currentFunction.
 	argumentValues := currentFunction arguments.
 	aFunctionNode prototype arguments doWithIndex: [ :protoArg :index |
 		protoArg codegenValue: (argumentValues at: index)
 	].
 
 	entryBlock := builder newBasicBlock: #entry.
-	allocaBuilder := DAIRBuilder on: currentFunction.
+	allocaBuilder := SLVMBuilder on: currentFunction.
 	allocaBuilder currentBlock: entryBlock.
 
 	contentBlock := builder newBasicBlock: #content.
@@ -263,7 +269,7 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	| functionType function |
 	functionType := aFunctionNode functionType.
-	function := DAIRFunction name: aFunctionNode mangledName functionType: functionType.
+	function := SLVMFunction name: aFunctionNode mangledName functionType: functionType asSlovimType.
 	aFunctionNode codegenValue: function.
 	ssaModule add: function.
 ]
@@ -342,7 +348,7 @@ DASLSSACodegenVisitor >> generateSemanticBlocks: translationUnit [
 DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 	| fullName globalVar |
 	fullName := namePrefix , aVariable name.
-	globalVar := DAIRGlobalVariable name: fullName valueType: aVariable type storage: aVariable storage.
+	globalVar := SLVMGlobalVariable name: fullName valueType: aVariable type asSlovimType storage: aVariable storage.
 	aVariable codegenValue: globalVar.
 	globalVar propertyAt: #location put: aVariable flow location.
 	ssaModule add: globalVar.
@@ -354,7 +360,7 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	elementTypes := uniformBlock body collect: #type.
 	fieldNames := uniformBlock body collect: #name.
 	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
-	globalVar := DAIRGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
+	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
 	uniformBlock attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value
 	].
@@ -364,7 +370,7 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	
 	uniformBlock body do: [ :var |
 		var codegenValue: [:currentBuilder |
-			currentBuilder getReference: globalVar element: (DAIRConstantValue int: var fieldIndex)
+			currentBuilder getReference: globalVar element: (SLVMConstantValue int: var fieldIndex)
 		]
 	].
 
@@ -378,7 +384,7 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
 	| globalVar |
-	globalVar := DAIRGlobalVariable name: uniformGlobal name valueType: uniformGlobal type storage: DASLType uniformConstantStorage.
+	globalVar := SLVMGlobalVariable name: uniformGlobal name valueType: uniformGlobal type storage: DASLType uniformConstantStorage.
 	uniformGlobal codegenValue: globalVar.
 	uniformGlobal attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value
@@ -401,7 +407,7 @@ DASLSSACodegenVisitor >> initialize [
 
 { #category : #compilation }
 DASLSSACodegenVisitor >> passOn: ast [
-	ssaModule := DAIRModule new.
+	ssaModule := SLVMModule new.
 	^ ast accept: self.
 ]
 
@@ -532,7 +538,7 @@ DASLSSACodegenVisitor >> visitExpressionStatement: expressionStatement [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitFloat: literal [
-	^ DAIRConstantValue type: literal type value: literal value
+	^ SLVMConstantValue type: literal type asSlovimType value: literal value
 ]
 
 { #category : #visitor }
@@ -639,7 +645,7 @@ DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 	| valueType variable initialValue coercedInitialValue |
 	localDeclaration flow ifNotNil: [ ^ self ].
 	valueType := localDeclaration type.
-	variable := allocaBuilder alloca: valueType name: localDeclaration name.
+	variable := allocaBuilder alloca: valueType asSlovimType name: localDeclaration name.
 	localDeclaration codegenValue: variable.
 	localDeclaration initialValue ifNotNil: [ 
 		initialValue := localDeclaration initialValue accept: self.
@@ -697,7 +703,7 @@ DASLSSACodegenVisitor >> visitPrefixUnaryOperation: unaryOperation [
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
 	| returnType returnTypes returnValues |
-	returnType := currentFunction functionType returnType.
+	returnType := currentFunctionType returnType.
 	returnTypes := returnType isTupleType ifTrue: [ returnType types ] ifFalse: [ { returnType } ].
 	returnValues := returnStatement value collect: [:value | value accept: self].
 	

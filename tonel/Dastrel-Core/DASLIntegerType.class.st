@@ -22,6 +22,11 @@ DASLIntegerType >> accept: aVisitor [
 	^ aVisitor visitIntegerType: self
 ]
 
+{ #category : #converting }
+DASLIntegerType >> asSlovimType [
+	^ SLVMIntegerType name: name size: size alignment: alignment
+]
+
 { #category : #comparing }
 DASLIntegerType >> hash [
 	^ super hash bitXor: signed hash

@@ -14,6 +14,11 @@ DASLVoidType >> accept: aVisitor [
 	^ aVisitor visitVoidType: self
 ]
 
+{ #category : #'as yet unclassified' }
+DASLVoidType >> asSlovimType [
+	^ SLVMType voidType
+]
+
 { #category : #comparing }
 DASLVoidType >> hash [
 	^ self class hash

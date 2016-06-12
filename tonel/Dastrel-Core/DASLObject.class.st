@@ -10,11 +10,6 @@ DASLObject >> error: errorMessage at: position [
 ]
 
 { #category : #'as yet unclassified' }
-DASLObject >> isSSAValue [
-	^ false
-]
-
-{ #category : #'as yet unclassified' }
 DASLObject >> isType [
 	^ false
 ]

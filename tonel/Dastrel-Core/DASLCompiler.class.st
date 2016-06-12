@@ -128,6 +128,11 @@ DASLCompiler >> sourceFromFileNamed: aFileName [
 ]
 
 { #category : #'public access' }
+DASLCompiler >> spirVTarget [
+	codeGenerator := DASLSpirVCodegenVisitor new.
+]
+
+{ #category : #'public access' }
 DASLCompiler >> ssaTarget [
 	codeGenerator := DASLSSACodegenVisitor new.
 ]

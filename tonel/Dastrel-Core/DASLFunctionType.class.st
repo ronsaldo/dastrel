@@ -33,6 +33,11 @@ DASLFunctionType >> arguments: anObject [
 	arguments := anObject
 ]
 
+{ #category : #converting }
+DASLFunctionType >> asSlovimType [
+	^ SLVMFunctionType arguments: (arguments collect: #asSlovimType) returnType: returnType asSlovimType
+]
+
 { #category : #comparing }
 DASLFunctionType >> hash [
 	^ (self class hash bitXor: arguments hash) bitXor: returnType hash

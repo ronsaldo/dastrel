@@ -28,6 +28,11 @@ DASLArrayType >> alignment [
 	^ baseType alignment
 ]
 
+{ #category : #converting }
+DASLArrayType >> asSlovimType [
+	^ SLVMArrayType baseType: baseType asSlovimType elements: elements
+]
+
 { #category : #accessing }
 DASLArrayType >> baseType [
 	^ baseType

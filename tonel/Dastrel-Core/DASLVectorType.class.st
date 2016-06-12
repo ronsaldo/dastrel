@@ -51,6 +51,11 @@ DASLVectorType >> alignment: anObject [
 	alignment := anObject
 ]
 
+{ #category : #converting }
+DASLVectorType >> asSlovimType [
+	^ SLVMVectorType baseType: baseType asSlovimType elements: elements alignment: alignment
+]
+
 { #category : #accessing }
 DASLVectorType >> baseType [
 	^ baseType

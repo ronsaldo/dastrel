@@ -9,6 +9,11 @@ DASLBoolType >> accept: aVisitor [
 	^ aVisitor visitBoolType: self
 ]
 
+{ #category : #converting }
+DASLBoolType >> asSlovimType [
+	^ SLVMType boolType
+]
+
 { #category : #initialization }
 DASLBoolType >> initialize [
 	super initialize.

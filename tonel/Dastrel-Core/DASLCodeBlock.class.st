@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'interfaceList',
 		'body',
-		'codegenValue'
+		'codegenValue',
+		'functionType'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -32,6 +33,16 @@ DASLCodeBlock >> codegenValue [
 { #category : #accessing }
 DASLCodeBlock >> codegenValue: anObject [
 	codegenValue := anObject
+]
+
+{ #category : #accessing }
+DASLCodeBlock >> functionType [
+	^ functionType
+]
+
+{ #category : #accessing }
+DASLCodeBlock >> functionType: anObject [
+	functionType := anObject
 ]
 
 { #category : #accessing }

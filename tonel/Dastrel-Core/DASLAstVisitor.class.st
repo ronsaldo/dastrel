@@ -116,7 +116,7 @@ DASLAstVisitor >> visitImportStatement: usingStatement [
 
 { #category : #visitor }
 DASLAstVisitor >> visitInteger: integer [
-	^ DAIRConstant type: integer type value: integer value
+	^ SLVMConstant type: integer type asSlovimType value: integer value
 ]
 
 { #category : #visitor }

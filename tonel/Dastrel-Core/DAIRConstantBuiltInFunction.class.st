@@ -24,15 +24,30 @@ DAIRConstantBuiltInFunction class >> initialize [
 		dot
 		length
 		normalize
+		reflect
+		refract
 		
 		"Math functions"
 		smoothstep
 		step
 		
+		"Common functions"
 		umin
 		smin
 		fmin
 		
+		pow atan2
+		
+		asin sin asinh sinh
+		acos cos acosh cosh
+		atan tan atanh
+		exp exp2 log log2
+		sqrt inverseSqrt
+		floor ceil trunc round roundEven fract
+		degrees radians 
+		fabs
+		fsign
+			
 		umax
 		smax
 		fmax

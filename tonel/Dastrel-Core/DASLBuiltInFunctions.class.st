@@ -28,7 +28,7 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 		)
 		
 		(
-			(+ * %) (ignoreOrder expandToVector operation)
+			(+ * / %) (ignoreOrder expandToVector operation)
 			(smallInt smallInt => int)
 			(smallUInt smallUInt => uint)
 			(long long => long)
@@ -137,24 +137,35 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 DASLBuiltInFunctions class >> builtInMathFunctions [
 	^ #(	
 		(
-			(smoothstep) (expandToVector)
+			(smoothstep step) (expandToVector)
 			(float float float => float)
 			(double double double => double)
 		)
-		(
-			(smoothstep) ()
-			(float float float2 => float2)
-			(float float float3 => float3)
-			(float float float4 => float4)
-			(double double double2 => double2)
-			(double double double3 => double3)
-			(double double double4 => double4)
-		)
-		
+
 		(
 			((mix fmix)) (expandToVector)
 			(float float float => float)
 			(double double double => double)
+		)
+		
+		(
+			(pow atan2) (expandToVector)
+			(float float => float)
+			(double double => double)
+		)
+		
+		(
+			(asin sin asinh sinh
+			acos cos acosh cosh
+			atan tan atanh
+			exp exp2 log log2
+			sqrt inverseSqrt
+			floor ceil trunc round roundEven fract
+			degrees radians 
+			fabs
+			(sign fsign)) (expandToVector)
+			(float => float)
+			(double => double)
 		)
 	)
 ]
@@ -232,13 +243,13 @@ DASLBuiltInFunctions class >> builtInVectorFunctions [
 
 		(
 			(length) ()
-			(float2 float2 => float)
-			(float3 float3 => float)
-			(float4 float4 => float)
+			(float2 => float)
+			(float3 => float)
+			(float4 => float)
 			
-			(double2 double2 => double)
-			(double3 double3 => double)
-			(double4 double4 => double)
+			(double2 => double)
+			(double3 => double)
+			(double4 => double)
 		)
 		
 		(
@@ -250,6 +261,23 @@ DASLBuiltInFunctions class >> builtInVectorFunctions [
 			(double2 => double2)
 			(double3 => double3)
 			(double4 => double4)
+		)
+		
+		(
+			(reflect) (expandToVector)
+			(float float => float)
+			(double double => double)
+		)
+
+		(
+			(refract) ()
+			(float2 float2 float => float2)
+			(float3 float3 float => float3)
+			(float4 float4 float => float4)
+			
+			(double2 double2 double => double2)
+			(double3 double3 double => double3)
+			(double4 double4 double => double4)
 		)
 	)
 ]

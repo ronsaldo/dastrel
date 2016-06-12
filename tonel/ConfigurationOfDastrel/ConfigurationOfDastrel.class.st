@@ -164,6 +164,42 @@ ConfigurationOfDastrel >> baseline02: spec [
 
 ]
 
+{ #category : #baselines }
+ConfigurationOfDastrel >> baseline03: spec [
+	<version: '0.3-baseline'>
+
+	spec for: #'common' do: [
+		spec blessing: #'baseline'.
+		spec repository: 'http://smalltalkhub.com/mc/ronsaldo/Dastrel/main/'.
+		spec 
+			project: 'NeoJSON' with: [
+				spec
+					className: #ConfigurationOfNeoJSON;
+					versionString: #'stable';
+					repository: 'http://mc.stfx.eu/Neo' ];
+			project: 'PetitParser' with: [
+				spec
+					className: #ConfigurationOfPetitParser;
+					versionString: #'stable';
+					loads: #('Core' );
+					repository: 'http://smalltalkhub.com/mc/Moose/PetitParser/main/' ];
+			project: 'Slovim' with: [
+				spec
+					className: #ConfigurationOfSlovim;
+					versionString: #'bleedingEdge';
+					repository: 'http://smalltalkhub.com/mc/ronsaldo/Slovim/main/' ].
+		spec 
+			package: 'Dastrel-BuildTool' with: [
+				spec requires: #('NeoJSON' ). ];
+			package: 'Dastrel-Core' with: [
+				spec requires: #('PetitParser' 'Slovim' ). ];
+			package: 'Dastrel-IDE' with: [
+				spec requires: #('Dastrel-Core' ). ];
+			package: 'Dastrel-Tests' with: [
+				spec requires: #('Dastrel-Core' 'Dastrel-BuildTool' ). ]. ].
+
+]
+
 { #category : #accessing }
 ConfigurationOfDastrel >> customProjectAttributes [
     "Edit to return a collection of any custom attributes e.g. for conditional loading: Array with: #'Condition1' with: #'Condition2.
@@ -176,7 +212,7 @@ ConfigurationOfDastrel >> customProjectAttributes [
 ConfigurationOfDastrel >> development: spec [
 	<symbolicVersion: #'development'>
 
-	spec for: #'common' version: '0.2-baseline'.
+	spec for: #'common' version: '0.3-baseline'.
 
 ]
 

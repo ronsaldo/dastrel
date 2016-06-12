@@ -27,6 +27,7 @@ DASLSSASpirVTranslator class >> initialize [
 	"
 	self initialize
 	"
+	| value |
 	super initialize.
 	
 	(Smalltalk at: #SpirVConstants) initialize.
@@ -128,9 +129,49 @@ DASLSSASpirVTranslator class >> initialize [
 		dot (SpirV SpvOpDot)
 		length (glsl450 GLSLstd450Length)
 		normalize (glsl450 GLSLstd450Normalize)
+		reflect (glsl450 GLSLstd450Reflect)
+		refract (glsl450 GLSLstd450Refract)
 	
 		smoothstep (glsl450 GLSLstd450SmoothStep)
+		step (glsl450 GLSLstd450Step)
 		
+		pow (glsl450 GLSLstd450Pow) 
+		atan2 (glsl450 GLSLstd450Atan2) 
+		
+		asin (glsl450 GLSLstd450Asin) 
+		sin (glsl450 GLSLstd450Sin)
+		asinh (glsl450 GLSLstd450Asinh)
+		sinh (glsl450 GLSLstd450Sinh)
+		
+		acos (glsl450 GLSLstd450Acos) 
+		cos (glsl450 GLSLstd450Cos)
+		acosh (glsl450 GLSLstd450Acosh)
+		cosh (glsl450 GLSLstd450Cosh)
+		
+		atan (glsl450 GLSLstd450Atan)
+		tan (glsl450 GLSLstd450Tan)
+		atanh (glsl450 GLSLstd450Atanh)
+		
+		exp (glsl450 GLSLstd450Exp)
+		exp2 (glsl450 GLSLstd450Exp2)
+		log (glsl450 GLSLstd450Log)
+		log2 (glsl450 GLSLstd450Log2)
+		
+		sqrt (glsl450 GLSLstd450Sqrt)
+		inverseSqrt (glsl450 GLSLstd450InverseSqrt)
+		floor (glsl450 GLSLstd450Floor)
+		ceil (glsl450 GLSLstd450Ceil)
+		trunc (glsl450 GLSLstd450Trunc)
+		round (glsl450 GLSLstd450Round)
+		roundEven (glsl450 GLSLstd450RoundEven)
+		fract (glsl450 GLSLstd450Fract)
+		
+		degrees (glsl450 GLSLstd450Degrees)
+		radians (glsl450 GLSLstd450Radians)
+		fabs (glsl450 GLSLstd450FAbs)
+		
+		fsign (glsl450 GLSLstd450FSign)
+			
 		smin (glsl450 GLSLstd450SMin)
 		umin (glsl450 GLSLstd450UMin)
 		fmin (glsl450 GLSLstd450FMin)
@@ -143,7 +184,9 @@ DASLSSASpirVTranslator class >> initialize [
 		
 		transpose (SpirV SpvOpTranspose)
 	) pairsDo: [ :k :v |
-		BuiltInExtensionInstructionMap at: k put: { v first . (SpirVConstants bindingOf: v second) value }
+		value := (SpirVConstants bindingOf: v second) value.
+		self assert: value isNotNil.
+		BuiltInExtensionInstructionMap at: k put: { v first . value }
 	].
 	
 ]

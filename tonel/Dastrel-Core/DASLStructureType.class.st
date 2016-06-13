@@ -48,6 +48,11 @@ DASLStructureType >> alignment [
 	^ alignment
 ]
 
+{ #category : #converting }
+DASLStructureType >> asSlovimType [
+	^ SLVMStructureType name: name types: (types collect: #asSlovimType) kind: kind names: names
+]
+
 { #category : #private }
 DASLStructureType >> computeLayout [
 	| currentOffset offset |

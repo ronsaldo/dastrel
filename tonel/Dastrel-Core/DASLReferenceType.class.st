@@ -43,6 +43,11 @@ DASLReferenceType >> accept: aVisitor [
 	^ aVisitor visitReferenceType: self
 ]
 
+{ #category : #converting }
+DASLReferenceType >> asSlovimType [
+	^ SLVMReferenceType baseType: baseType asSlovimType storage: storage
+]
+
 { #category : #accessing }
 DASLReferenceType >> baseType [
 	^ baseType

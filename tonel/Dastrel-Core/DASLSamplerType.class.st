@@ -14,6 +14,11 @@ DASLSamplerType >> accept: aVisitor [
 	^ aVisitor visitSamplerType: self
 ]
 
+{ #category : #converting }
+DASLSamplerType >> asSlovimType [
+	^ SLVMType samplerType
+]
+
 { #category : #comparing }
 DASLSamplerType >> hash [
 	^ self class hash

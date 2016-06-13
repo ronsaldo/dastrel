@@ -89,7 +89,7 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 	vectorOrScalarTypeNoRef isReferenceType ifTrue: [ vectorOrScalarTypeNoRef := vectorOrScalarTypeNoRef baseType ].
 	vectorOrScalarTypeNoRef isVectorType ifTrue: [
 		loadedVector := self coerce: vectorOrScalar into: vectorOrScalarTypeNoRef.
-		self assert: vectorOrScalarTypeNoRef baseType = typeElement.
+		self assert: vectorOrScalarTypeNoRef baseType asSlovimType = typeElement asSlovimType.
 		1 to: vectorOrScalarTypeNoRef elements do: [ :i |
 			expandedArguments add: (builder extractVector: loadedVector element: (builder constInt: i-1))
 		].
@@ -360,7 +360,7 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	elementTypes := uniformBlock body collect: #type.
 	fieldNames := uniformBlock body collect: #name.
 	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
-	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType storage: DASLType uniformStorage.
+	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType asSlovimType storage: DASLType uniformStorage.
 	uniformBlock attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value
 	].
@@ -384,7 +384,7 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
 	| globalVar |
-	globalVar := SLVMGlobalVariable name: uniformGlobal name valueType: uniformGlobal type storage: DASLType uniformConstantStorage.
+	globalVar := SLVMGlobalVariable name: uniformGlobal name valueType: uniformGlobal type asSlovimType storage: DASLType uniformConstantStorage.
 	uniformGlobal codegenValue: globalVar.
 	uniformGlobal attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value
@@ -461,7 +461,7 @@ DASLSSACodegenVisitor >> visitCallBlockStatement: statement [
 			resultExpression := statement results at: outputName ifAbsent: [ nil. ].
 			resultValue := resultExpression ifNotNil: [ resultExpression accept: self ] ifNil: [ allocaBuilder alloca: outputDecl type baseType ].
 			resultValue type ~= outputDecl type ifTrue: [
-				tempVar := allocaBuilder alloca: outputDecl type baseType.
+				tempVar := allocaBuilder alloca: outputDecl type baseType asSlovimType.
 				arguments add: tempVar.
 				outputsToStore add: {tempVar . resultValue} 
 			] ifFalse: [

@@ -8,6 +8,15 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+DASVGraphNodeTest >> testCenter [
+	| node |
+	node := DASVGraphNode new.
+	self assert: node center equals: node position + (node extent / 2).
+	node center: 6@6.
+	self assert: node center equals: 6@6.
+]
+
+{ #category : #'as yet unclassified' }
 DASVGraphNodeTest >> testNew [
 	| node |
 	node := DASVGraphNode new.

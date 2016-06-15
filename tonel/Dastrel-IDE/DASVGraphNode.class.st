@@ -2,17 +2,25 @@ Class {
 	#name : #DASVGraphNode,
 	#superclass : #DASVVisualElement,
 	#instVars : [
+		'name',
 		'inputs',
 		'outputs',
 		'title',
-		'bounds'
+		'position',
+		'size',
+		'extent'
 	],
 	#category : #'Dastrel-IDE'
 }
 
 { #category : #initialize }
-DASVGraphNode class >> defaultBounds [
-	^ 0@0 extent: 64@64
+DASVGraphNode class >> defaultExtent [
+	^ 180@150
+]
+
+{ #category : #initialize }
+DASVGraphNode class >> defaultPosition [
+	^ 0@0
 ]
 
 { #category : #accessing }
@@ -27,48 +35,86 @@ DASVGraphNode >> backgroundColor [
 
 { #category : #drawing }
 DASVGraphNode >> borderColor [
-	^ Color black
+	^ selected ifTrue: [ Color lightGray ] ifFalse: [ hasMouseOver ifTrue: [ Color gray ] ifFalse: [ Color black ] ]
 ]
 
 { #category : #accessing }
 DASVGraphNode >> bounds [
-	^ bounds
+	^ position extent: extent
 ]
 
 { #category : #accessing }
-DASVGraphNode >> bounds: anObject [
-	bounds := anObject
+DASVGraphNode >> bounds: aRectangle [
+	position := aRectangle topLeft.
+	extent := aRectangle extent.
+]
+
+{ #category : #accessing }
+DASVGraphNode >> center [
+	^ position + (extent / 2)
+]
+
+{ #category : #accessing }
+DASVGraphNode >> center: newCenter [
+	position := position + newCenter - self center
+]
+
+{ #category : #drawing }
+DASVGraphNode >> drawFrameOn: canvas [
+	| shape |
+	shape := self createShapeOn: canvas rectangleShape: self localRectangle radius: 5.
+	
+	canvas
+		setPaint: self backgroundColor;
+		setShape: shape;
+		draw;
+		setStrokePaint: self borderColor;
+		draw.
 ]
 
 { #category : #drawing }
 DASVGraphNode >> drawOn: canvas [
-	| shape |
 	canvas pathTransform restoreAfter: [
-		shape := self createShapeOn: canvas rectangleShape: self localRectangle radius: 5.
-	
 		canvas
 			pathTransform translateX: self position x Y: self position y.
+		
+		self
+			drawFrameOn: canvas;
+			drawTitleBarOn: canvas.
+		
+	]
+]
+
+{ #category : #drawing }
+DASVGraphNode >> drawTitleBarOn: canvas [
+	canvas pathTransform restoreAfter: [
+		canvas pathTransform translateX: 5 Y: self font getPreciseAscent.
 		canvas
-			setPaint: self backgroundColor;
-			setShape: shape;
-			draw;
-			setStrokePaint: self borderColor;
-			draw.
+			setFont: self font;
+			setPaint: Color black;
+			drawString: name
 	]
 ]
 
 { #category : #accessing }
 DASVGraphNode >> extent [
-	^ bounds extent
+	^ extent
+]
+
+{ #category : #accessing }
+DASVGraphNode >> extent: aPoint [
+	extent := aPoint
 ]
 
 { #category : #initialization }
 DASVGraphNode >> initialize [
 	super initialize.
+	name := 'Untitled node'.
 	inputs := OrderedCollection new.
 	outputs := OrderedCollection new.
 	title := self class defaultTitle.
-	bounds := self class defaultBounds.
+	position := self class defaultPosition.
+	extent := self class defaultExtent.
 ]
 
 { #category : #accessing }
@@ -84,6 +130,16 @@ DASVGraphNode >> inputs: anObject [
 { #category : #accessing }
 DASVGraphNode >> localRectangle [
 	^ 0@0 extent: self extent
+]
+
+{ #category : #accessing }
+DASVGraphNode >> name [
+	^ name
+]
+
+{ #category : #accessing }
+DASVGraphNode >> name: anObject [
+	name := anObject
 ]
 
 { #category : #accessing }
@@ -108,7 +164,12 @@ DASVGraphNode >> outputs: anObject [
 
 { #category : #accessing }
 DASVGraphNode >> position [
-	^ bounds origin
+	^ position
+]
+
+{ #category : #accessing }
+DASVGraphNode >> position: aPoint [
+	position := aPoint
 ]
 
 { #category : #accessing }
@@ -119,4 +180,9 @@ DASVGraphNode >> title [
 { #category : #accessing }
 DASVGraphNode >> title: anObject [
 	title := anObject
+]
+
+{ #category : #drawing }
+DASVGraphNode >> titleBarHeight [
+	^ self font getPreciseAscent + 5
 ]

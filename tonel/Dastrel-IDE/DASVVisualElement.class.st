@@ -1,8 +1,23 @@
 Class {
 	#name : #DASVVisualElement,
 	#superclass : #Object,
+	#instVars : [
+		'hasMouseOver',
+		'selected'
+	],
+	#classVars : [
+		'ElementFont'
+	],
 	#category : #'Dastrel-IDE'
 }
+
+{ #category : #'class initialization' }
+DASVVisualElement class >> initialize [
+	"
+	super initialize
+	"
+	ElementFont := LogicalFont familyName: 'Arial' pointSize: 20
+]
 
 { #category : #'athens shapes' }
 DASVVisualElement >> createShapeOn: aCanvas rectangle: aRectangle [
@@ -30,4 +45,35 @@ DASVVisualElement >> createShapeOn: aCanvas rectangleShape: aRectangle radius: r
 			lineTo: 0@radius;
 			cwArcTo: radius @ 0 angle: Float halfPi.
 	]
+]
+
+{ #category : #accessing }
+DASVVisualElement >> font [
+	^ ElementFont
+]
+
+{ #category : #accessing }
+DASVVisualElement >> hasMouseOver [
+	^ hasMouseOver
+]
+
+{ #category : #accessing }
+DASVVisualElement >> hasMouseOver: anObject [
+	hasMouseOver := anObject
+]
+
+{ #category : #initialization }
+DASVVisualElement >> initialize [
+	super initialize.
+	selected := false.
+]
+
+{ #category : #accessing }
+DASVVisualElement >> selected [
+	^ selected
+]
+
+{ #category : #accessing }
+DASVVisualElement >> selected: anObject [
+	selected := anObject
 ]

@@ -183,7 +183,7 @@ DASLParser >> functionArgumentDecl [
 
 { #category : #grammar }
 DASLParser >> functionArgumentsDecl [
-	^ super functionArgumentsDecl ==> [ :decls | {decls first } , decls second ]
+	^ super functionArgumentsDecl ==> [ :decls | {decls first } , (decls second collect: #second)]
 ]
 
 { #category : #grammar }

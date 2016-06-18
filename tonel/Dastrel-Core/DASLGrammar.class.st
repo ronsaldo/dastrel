@@ -219,10 +219,10 @@ DASLGrammar >> binaryExpression [
 			g left: ('<<' asParser token trim: ignorable) do: binOpDo.
 			g left: ('>>' asParser token trim: ignorable) do: binOpDo. ];
 		group: [ :g |
-			g left: ($< asParser token trim: ignorable) do: binOpDo.
-			g left: ($> asParser token trim: ignorable) do: binOpDo.
 			g left: ('<=' asParser token trim: ignorable) do: binOpDo.
-			g left: ('>=' asParser token trim: ignorable) do: binOpDo. ];
+			g left: ('>=' asParser token trim: ignorable) do: binOpDo.
+			g left: ($< asParser token trim: ignorable) do: binOpDo.
+			g left: ($> asParser token trim: ignorable) do: binOpDo. ];
 		group: [ :g |
 			g left: ('==' asParser token trim: ignorable) do: binOpDo.
 			g left: ('!=' asParser token trim: ignorable) do: binOpDo. ];

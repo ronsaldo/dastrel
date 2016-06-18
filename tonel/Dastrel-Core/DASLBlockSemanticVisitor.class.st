@@ -378,7 +378,7 @@ DASLBlockSemanticVisitor >> visitReturnStatement: returnStatement [
 	
 	expectedReturnType := currentFunction functionType returnType.
 	returnType := self arrayOfTypesToTuple: (returnStatement value collect: #type).
-	self checkImplicitCoercion: returnType to: expectedReturnType on: returnStatement value.
+	self checkImplicitCoercion: returnType to: expectedReturnType on: returnStatement.
 ]
 
 { #category : #visitor }

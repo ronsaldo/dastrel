@@ -11,6 +11,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+DASLBuildProject class >> fromFileNamed: fileName [
+	^ self new loadFromFileNamed: fileName
+]
+
+{ #category : #'as yet unclassified' }
 DASLBuildProject class >> loadFromFileNamed: fileName [
 	^ self new loadFromFileNamed: fileName
 ]

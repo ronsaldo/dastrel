@@ -484,3 +484,13 @@ DASLParser >> varFlowLocation [
 DASLParser >> varInitialValue [
 	^ super varInitialValue ==> [ :initialValue |  initialValue second ]
 ]
+
+{ #category : #grammar }
+DASLParser >> whileStatement [
+	^ super whileStatement ==> [ :statement |
+		DASLWhileStatement new
+			position: (self positionFromToken: statement first);
+			condition: statement third;
+			body: statement fifth
+	]
+]

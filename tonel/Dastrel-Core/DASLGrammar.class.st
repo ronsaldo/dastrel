@@ -205,8 +205,6 @@ DASLGrammar >> binaryExpression [
 			g prefix: ($- asParser token trim: ignorable) do: prefixOpDo.
 			g prefix: ($! asParser token trim: ignorable) do: prefixOpDo.
 			g prefix: ($~ asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($* asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($& asParser token trim: ignorable) do: prefixOpDo.
 			g prefix: kwSizeOf do: prefixOpDo.
 			g prefix: kwAlignOf do: prefixOpDo.
 			];

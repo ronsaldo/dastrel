@@ -322,6 +322,58 @@ DASLSSACodegenVisitor >> generateGraphBlocks: translationUnit [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> generateLogicalAnd: operation [
+	| conditionValue resultBlock logicalContinueBlock branchInstruction phiNode leftBlock rightBlock |
+	resultBlock := builder newBasicBlock: 'logicalAndResult'.
+	logicalContinueBlock := builder newBasicBlock: 'logicalAndContinue'.
+
+	"Test the first operand"
+	conditionValue := self coerce: (operation left accept: self) into: DASLType boolType.
+	leftBlock := builder currentBlock.
+	branchInstruction := builder branch: conditionValue ifTrue: logicalContinueBlock ifFalse: resultBlock.
+	branchInstruction mergeBlock: resultBlock.
+	
+	"Test the second operand"
+	builder currentBlock: logicalContinueBlock.
+	conditionValue := self coerce: (operation right accept: self) into: DASLType boolType.
+	rightBlock := builder currentBlock.
+	builder jump: resultBlock.
+	
+	"Merge the results"
+	builder currentBlock: resultBlock.
+	phiNode := builder phi: 'landResult'.
+	phiNode addValue: (SLVMConstantValue bool: false) from: leftBlock.
+	phiNode addValue: conditionValue from: rightBlock.
+	^ phiNode
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateLogicalOr: operation [
+	| conditionValue resultBlock logicalContinueBlock branchInstruction phiNode leftBlock rightBlock |
+	resultBlock := builder newBasicBlock: 'logicalOrResult'.
+	logicalContinueBlock := builder newBasicBlock: 'logicalOrContinue'.
+
+	"Test the first operand"
+	conditionValue := self coerce: (operation left accept: self) into: DASLType boolType.
+	leftBlock := builder currentBlock.
+	branchInstruction := builder branch: conditionValue ifTrue: resultBlock ifFalse: logicalContinueBlock.
+	branchInstruction mergeBlock: resultBlock.
+	
+	"Test the second operand"
+	builder currentBlock: logicalContinueBlock.
+	conditionValue := self coerce: (operation right accept: self) into: DASLType boolType.
+	rightBlock := builder currentBlock.
+	builder jump: resultBlock.
+	
+	"Merge the results"
+	builder currentBlock: resultBlock.
+	phiNode := builder phi: 'landResult'.
+	phiNode addValue: (SLVMConstantValue bool: true) from: leftBlock.
+	phiNode addValue: conditionValue from: rightBlock.
+	^ phiNode
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> generateMultiplication: leftValue with: rightValue [
 	| leftType rightType |
 	leftType := leftValue type.
@@ -383,11 +435,13 @@ DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
-	| elementTypes blockType globalVar fieldNames storage |
+	| elementTypes blockType globalVar fieldNames storage isPushConstant |
 	elementTypes := uniformBlock body collect: #type.
 	fieldNames := uniformBlock body collect: #name.
 	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
-	storage := (uniformBlock attributes includesKey: #push_constant) ifTrue: [ DASLType pushConstantStorage ] ifFalse: [ DASLType uniformStorage ].
+
+	isPushConstant := uniformBlock attributes keys detect: [:key | key value == #push_constant] ifFound: [ true] ifNone: [ false ].
+	storage := isPushConstant ifTrue: [ DASLType pushConstantStorage ] ifFalse: [ DASLType uniformStorage ].
 	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType asSlovimType storage: storage.
 	
 	uniformBlock attributes keysAndValuesDo: [ :key :value |
@@ -456,6 +510,9 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitBinaryOperation: binaryOperation [
+	binaryOperation operation = #'&&' ifTrue: [ ^ self generateLogicalAnd: binaryOperation ].
+	binaryOperation operation = #'||' ifTrue: [ ^ self generateLogicalOr: binaryOperation ].
+
 	^ self generateBuiltInCall: binaryOperation builtInFunction self: nil arguments: {
 		binaryOperation left accept: self.
 		binaryOperation right accept: self.
@@ -779,6 +836,37 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitUsingStatement: anUsingStatement [
 	"Nothing to do, for now"
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitWhileStatement: statement [
+	| conditionValue  loopHeader loopBody loopMerge branchInstruction |
+	loopHeader := builder newBasicBlock: 'whileCondition'.
+	loopBody := builder newBasicBlock: 'whileBody'.
+	loopMerge := builder newBasicBlock: 'whileMerge'.
+	
+	builder
+		jump: loopHeader;
+		currentBlock: loopHeader.
+		
+	conditionValue := self coerce: (statement condition accept: self) into: DASLType boolType.
+	branchInstruction := builder branch: conditionValue ifTrue: loopBody ifFalse: loopMerge.
+	branchInstruction
+		mergeBlock: loopMerge;
+		continueBlock: loopHeader.
+		
+	self withBreak: loopMerge continue: loopHeader do: [
+		"Emit the loop body".
+		builder currentBlock: loopBody.
+		statement body accept: self.
+		builder isLastTerminator ifFalse: [ builder jump: loopHeader ]
+	].
+
+	builder currentBlock: loopMerge.
+	loopMerge predecessors ifEmpty: [
+		builder unreachable.
+		branchInstruction addUnreachableSuccessors
+	].
 ]
 
 { #category : #'as yet unclassified' }

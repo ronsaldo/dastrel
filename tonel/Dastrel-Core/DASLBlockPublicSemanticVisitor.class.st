@@ -37,6 +37,20 @@ DASLBlockPublicSemanticVisitor >> resolveStructureBlockType: structureBlock on: 
 ]
 
 { #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitBufferBlock: bufferBlock [
+	bufferBlock interfaceList do: [ :iface | iface accept: self ].
+	
+	bufferBlock scope: (DASLModuleScope new parentScope: currentScope; node: bufferBlock).
+	self withScope: bufferBlock scope do: [
+		bufferBlock body do: [ :field |
+			field storage: DASLType uniformStorage.
+			field accept: self.
+		]
+	].
+
+]
+
+{ #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitCodeBlock: codeBlock [
 	codeBlock interfaceList do: [ :iface | iface accept: self ].
 	

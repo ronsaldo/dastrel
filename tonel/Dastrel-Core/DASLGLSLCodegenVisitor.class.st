@@ -62,6 +62,22 @@ DASLGLSLCodegenVisitor class >> initialize [
 ]
 
 { #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateBufferBlock: uniformBlock [
+	| prefix instanceName layoutString |
+	instanceName := uniformBlock name , '_dastrel_singleton_'.
+	prefix := instanceName , '.'.
+	layoutString := self generateUniformLayoutString: uniformBlock.
+	self
+		printLine: layoutString , 'buffer ' , uniformBlock name;
+		printLine: '{';
+		withIndentation: [
+			uniformBlock body do: [ :var | self generateUniformVar: var prefix: prefix].
+		];
+		printLine: '} ' , instanceName , ';';
+		newline
+]
+
+{ #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateBuiltInCall: solvedFunction self: callSelf arguments: arguments [
 	| samplerType |
 	callSelf ifNotNil: [ 
@@ -234,15 +250,21 @@ DASLGLSLCodegenVisitor >> generateUniformGlobal: uniformGlobal [
 
 { #category : #'code generation' }
 DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
-	| layoutProperties |
+	| layoutProperties pushConstant |
 	layoutProperties := OrderedCollection new.
+	pushConstant := false.
 	uniform attributes keysAndValuesDo: [ :key :value |
 		(key value = #binding or: [ key value = #set ]) ifTrue: [
 			layoutProperties add: key value -> value value
+		].
+	
+		key value = #push_constant ifTrue: [ 
+			layoutProperties add: key value.
+			pushConstant := true.
 		]
 	].
 
-	uniform isUniformBlock ifTrue: [ 
+	(uniform isUniformBlock and: [ pushConstant not ]) ifTrue: [ 
 		layoutProperties add: #std140
 	].
 

@@ -128,6 +128,10 @@ DASLBlockSemanticVisitor >> visitBreakStatement: statement [
 ]
 
 { #category : #visitor }
+DASLBlockSemanticVisitor >> visitBufferBlock: interface [
+]
+
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitCallBlockStatement: callBlockStatement [
 	| block |
 	callBlockStatement blockReference accept: self.

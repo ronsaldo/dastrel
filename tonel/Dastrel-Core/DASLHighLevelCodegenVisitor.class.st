@@ -18,6 +18,16 @@ DASLHighLevelCodegenVisitor >> decreaseTabCount [
 ]
 
 { #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateBufferBlock: block [
+	self subclassResponsibility.
+]
+
+{ #category : #'code generation' }
+DASLHighLevelCodegenVisitor >> generateBufferBlocks: translationUnit [
+	translationUnit modules select: #isBufferBlock thenDo: [ :block | self generateBufferBlock: block ]
+]
+
+{ #category : #'code generation' }
 DASLHighLevelCodegenVisitor >> generateBuiltInCall: solvedFunction self: callSelf arguments: arguments [
 	^ self generateCallNamed: solvedFunction name self: callSelf arguments: arguments
 ]
@@ -144,6 +154,7 @@ DASLHighLevelCodegenVisitor >> generateTranslationUnit: translationUnit [
 	self
 		generateStructures: translationUnit;
 		generateUniformBlocks: translationUnit;
+		generateBufferBlocks: translationUnit;
 		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;

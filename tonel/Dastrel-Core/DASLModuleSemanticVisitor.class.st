@@ -9,6 +9,13 @@ Class {
 }
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitBufferBlock: bufferBlock [
+	currentScope at: bufferBlock name put: bufferBlock ifPresent: [
+		self error: 'buffer block overrides a previously defined symbol' at: bufferBlock
+	].
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitCodeBlock: codeBlock [
 	currentScope at: codeBlock name put: codeBlock ifPresent: [
 		self error: 'code block overrides a previously defined symbol' at: codeBlock

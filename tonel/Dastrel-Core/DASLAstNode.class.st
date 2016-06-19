@@ -19,6 +19,11 @@ DASLAstNode >> initialize [
 ]
 
 { #category : #testing }
+DASLAstNode >> isBufferBlock [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isBuiltInFunction [
 	^ false
 ]

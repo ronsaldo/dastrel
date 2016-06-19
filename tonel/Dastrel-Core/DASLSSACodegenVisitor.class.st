@@ -101,6 +101,33 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> generateBufferBlock: bufferBlock [
+	| elementTypes blockType globalVar fieldNames |
+	elementTypes := bufferBlock body collect: #type.
+	fieldNames := bufferBlock body collect: #name.
+	blockType := DASLStructureType name: bufferBlock name types: elementTypes kind: DASLStructureType bufferBlockKind names: fieldNames.
+	globalVar := SLVMGlobalVariable name: bufferBlock name valueType: blockType asSlovimType storage: DASLType uniformStorage.
+	bufferBlock attributes keysAndValuesDo: [ :key :value |
+		globalVar propertyAt: key value asSymbol put: value value
+	].
+
+	ssaModule add: globalVar.
+	bufferBlock codegenValue: globalVar.
+	
+	bufferBlock body do: [ :var |
+		var codegenValue: [:currentBuilder |
+			currentBuilder getReference: globalVar element: (SLVMConstantValue int: var fieldIndex)
+		]
+	].
+
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateBufferBlocks: translationUnit [
+	translationUnit modules select: #isBufferBlock thenDo: [ :block | self generateBufferBlock: block ]
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument arguments: arguments [
 	| functionType expectedArgumentTypes coercedArguments leftValue rightValue selfType selfBaseType operand operationMapping operandType mappedOperation builtInFunctionRef |
 	functionType := builtInFunction functionType.
@@ -356,11 +383,13 @@ DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
-	| elementTypes blockType globalVar fieldNames |
+	| elementTypes blockType globalVar fieldNames storage |
 	elementTypes := uniformBlock body collect: #type.
 	fieldNames := uniformBlock body collect: #name.
 	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
-	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType asSlovimType storage: DASLType uniformStorage.
+	storage := (uniformBlock attributes includesKey: #push_constant) ifTrue: [ DASLType pushConstantStorage ] ifFalse: [ DASLType uniformStorage ].
+	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType asSlovimType storage: storage.
+	
 	uniformBlock attributes keysAndValuesDo: [ :key :value |
 		globalVar propertyAt: key value asSymbol put: value value
 	].
@@ -734,6 +763,7 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 	
 	self
 		generateUniformBlocks: translationUnit;
+		generateBufferBlocks: translationUnit;
 		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;

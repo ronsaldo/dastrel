@@ -120,7 +120,9 @@ Class {
 		'keywordList',
 		'keywordElement',
 		'leftArrow',
-		'typeArraySubscript'
+		'typeArraySubscript',
+		'kwBuffer',
+		'buffer'
 	],
 	#classVars : [
 		'Keywords'
@@ -260,6 +262,11 @@ DASLGrammar >> breakStatement [
 ]
 
 { #category : #grammar }
+DASLGrammar >> buffer [
+	^ kwBuffer , blockAttributes optional , identifier , interfaceImplementations optional, leftCBracket, uniformBody , rightCBracket
+]
+
+{ #category : #grammar }
 DASLGrammar >> callArguments [
 	^ expression , (comma , expression) star
 ]
@@ -391,7 +398,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / interface / uniformGlobal / struct / uniform / semantic / codeBlock / function
+	^ import / interface / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -472,6 +479,11 @@ DASLGrammar >> kwAlignOf [
 { #category : #keywords }
 DASLGrammar >> kwBreak [
 	^ self keywordParser: 'break'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwBuffer [
+	^ self keywordParser: 'buffer'
 ]
 
 { #category : #keywords }
@@ -567,6 +579,11 @@ DASLGrammar >> kwSemantic [
 { #category : #keywords }
 DASLGrammar >> kwSizeOf [
 	^ self keywordParser: 'sizeof'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwStorage [
+	^ self keywordParser: 'storage'
 ]
 
 { #category : #keywords }

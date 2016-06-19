@@ -67,6 +67,17 @@ DASLParser >> breakStatement [
 ]
 
 { #category : #grammar }
+DASLParser >> buffer [
+	^ super buffer ==> [ :block | DASLBufferBlock new
+			position: (self positionFromToken: block first);
+			attributes: block second;
+			name: block third value;
+			interfaceList: block fourth;
+			body: block sixth;
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> callArguments [
 	^ super callArguments ==> [ :args | { args first } , (args second collect: #second) ]
 ]

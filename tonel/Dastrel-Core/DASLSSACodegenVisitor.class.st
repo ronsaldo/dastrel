@@ -73,12 +73,21 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 ]
 
 { #category : #coercing }
+DASLSSACodegenVisitor >> constructMatrix: type arguments: arguments [
+	| baseType coercionType convertedArguments |
+	baseType := type baseType.
+	coercionType := type columnType.
+	convertedArguments := arguments collect: [ :arg | self coerce: arg into: coercionType ].
+	self assert: arguments size = type columns.
+	^ builder makeMatrix: type asSlovimType arguments: convertedArguments
+]
+
+{ #category : #coercing }
 DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 	| baseType expandedArguments |
 	baseType := type baseType.
 	expandedArguments := OrderedCollection new.
 	arguments do: [ :arg | self extractImplicitVectorElements: arg typeElement: baseType into: expandedArguments].
-	self assert: expandedArguments size = type elements.
 	^ builder makeVector: type asSlovimType arguments: expandedArguments asArray
 ]
 
@@ -89,10 +98,7 @@ DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeEleme
 	vectorOrScalarTypeNoRef isReferenceType ifTrue: [ vectorOrScalarTypeNoRef := vectorOrScalarTypeNoRef baseType ].
 	vectorOrScalarTypeNoRef isVectorType ifTrue: [
 		loadedVector := self coerce: vectorOrScalar into: vectorOrScalarTypeNoRef.
-		self assert: vectorOrScalarTypeNoRef baseType asSlovimType = typeElement asSlovimType.
-		1 to: vectorOrScalarTypeNoRef elements do: [ :i |
-			expandedArguments add: (builder extractVector: loadedVector element: (builder constInt: i-1))
-		].
+		expandedArguments add: loadedVector.
 		^ self
 	].
 
@@ -188,6 +194,7 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 { #category : #coercing }
 DASLSSACodegenVisitor >> generateCastOrConstructionOf: type arguments: argumentValues [
 	type isVectorType ifTrue: [ ^ self constructVector: type arguments: argumentValues ].
+	type isMatrixType ifTrue: [ ^ self constructMatrix: type arguments: argumentValues ].
 	self halt.
 ]
 

@@ -27,6 +27,8 @@ Class {
 		'Textured2DType',
 		'Textured3DArrayType',
 		'Textured3DType',
+		'TexturedCubeArrayType',
+		'TexturedCubeType',
 		'UCharType',
 		'UIntType',
 		'ULongType',
@@ -230,6 +232,8 @@ DASLType class >> textureAndSamplerTypes [
 	Textured2DArrayType := DASLTextureType new name: #texture2DArray; sampledType: FloatType; dimensions: 2; array: true; depth: false; multisample: false; sampled: true.
 	Textured3DType := DASLTextureType new name: #texture3D; dimensions: 3; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
 	Textured3DArrayType := DASLTextureType new name: #texture3DArray; sampledType: FloatType; dimensions: 3; array: true; depth: false; multisample: false; sampled: true.
+	TexturedCubeType := DASLTextureType new name: #textureCube; dimensions: 4; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
+	TexturedCubeArrayType := DASLTextureType new name: #textureCubeArray; sampledType: FloatType; dimensions: 4; array: true; depth: false; multisample: false; sampled: true.
 	
 	^ {
 		SamplerType .
@@ -238,7 +242,9 @@ DASLType class >> textureAndSamplerTypes [
 		Textured2DType .
 		Textured2DArrayType .
 		Textured3DType .
-		Textured3DType .
+		Textured3DArrayType .
+		TexturedCubeType .
+		TexturedCubeArrayType .
 	}
 ]
 

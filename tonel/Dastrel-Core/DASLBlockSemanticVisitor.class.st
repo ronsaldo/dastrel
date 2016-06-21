@@ -395,21 +395,36 @@ DASLBlockSemanticVisitor >> visitStructureBlock: interface [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitSubscriptExpression: subscriptAccess [
-	| referencedType baseType elementType |
+	| referencedType baseType elementType isBounded elements |
 	subscriptAccess reference accept: self.
 	subscriptAccess index accept: self.
 	
 	referencedType := subscriptAccess reference type.
 	referencedType isReferenceType ifFalse: [ self error: 'Expected a reference.' at: subscriptAccess ].
 	baseType := referencedType baseType.
-	baseType isArrayType ifFalse: [ self error: 'Expected an array.' at: subscriptAccess ].
+	(baseType isArrayType or: [ baseType isMatrixType or: [ baseType isVectorType ]]) ifFalse: [ self error: 'Expected an array.' at: subscriptAccess ].
+
+	baseType isMatrixType ifTrue: [ 
+		elementType := baseType columnType.
+		isBounded := true.
+		elements := baseType columns.
+	] ifFalse: [ 
+		baseType isVectorType ifTrue: [ 
+			elementType := baseType baseType.
+			isBounded := true.
+			elements := baseType elements.
+		] ifFalse: [
+			elementType := baseType baseType.
+			isBounded := baseType isBounded.
+			elements := baseType elements.
+		]
+	].
 
 	(self hasImplicitCoercion: subscriptAccess index type to: DASLType intType) ifFalse: [ self error: 'Expected an integer index.' at: subscriptAccess index].
-	(baseType isBounded and: [ subscriptAccess index isConstantExpression and: [ subscriptAccess index evaluateConstant >= baseType elements ] ]) ifTrue: [
+	(isBounded and: [ subscriptAccess index isConstantExpression and: [ subscriptAccess index evaluateConstant >= elements ] ]) ifTrue: [
 		self error: 'Array access is outside of bounds.' at: subscriptAccess index
 	]. 
 
-	elementType := baseType baseType.
 	subscriptAccess type: (DASLReferenceType baseType: elementType storage: referencedType storage).
 ]
 

@@ -276,7 +276,7 @@ DASLGrammar >> callBlockStatement [
 
 { #category : #grammar }
 DASLGrammar >> callExpression [
-	^ leftParent , callArguments , rightParent
+	^ leftParent , callArguments optional, rightParent
 ]
 
 { #category : #grammar }
@@ -386,7 +386,7 @@ DASLGrammar >> functionArgumentsDecl [
 
 { #category : #grammar }
 DASLGrammar >> functionPrototype [
-	^ kwFunction , identifier , leftParent , functionArgumentsDecl , rightParent , arrow , functionReturnTypes
+	^ kwFunction , identifier , leftParent , functionArgumentsDecl optional , rightParent , arrow , functionReturnTypes
 ]
 
 { #category : #grammar }

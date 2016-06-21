@@ -97,7 +97,7 @@ DASLParser >> callBlockStatement [
 DASLParser >> callExpression [
 	^ super callExpression ==> [ :expr | DASLCallExpression new
 			position: (self positionFromToken: expr first);
-			arguments: expr second;
+			arguments: (expr second ifNil: [ #() ]);
 			yourself ]
 ]
 
@@ -202,7 +202,7 @@ DASLParser >> functionPrototype [
 	^ super functionPrototype ==> [ :tokens | DASLFunctionPrototype new
 			position: (self positionFromToken: tokens first);
 			name: tokens second value;
-			arguments: tokens fourth;
+			arguments: (tokens fourth ifNil: [ #() ]);
 			returnType: tokens seventh;
 			yourself]
 ]

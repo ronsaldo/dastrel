@@ -96,6 +96,11 @@ DASLMatrixType >> isMatrixType [
 ]
 
 { #category : #accessing }
+DASLMatrixType >> memberAt: constantValue [
+	^ self columnType
+]
+
+{ #category : #accessing }
 DASLMatrixType >> name [
 	^ self printString asSymbol
 ]

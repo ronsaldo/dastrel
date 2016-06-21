@@ -38,11 +38,13 @@ DASLGLSLCodegenVisitor class >> initialize [
 		float4x4 mat4
 		
 		texture2D texture2D
+		textureCube textureCube
 		sampler sampler
 	).
 	
 	SamplerTypeMapping := #(
 		texture2D sampler2D
+		textureCube samplerCube
 	).
 	
 	TypeDictionary := Dictionary new.

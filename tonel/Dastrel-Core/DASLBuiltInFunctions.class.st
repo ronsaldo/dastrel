@@ -217,6 +217,7 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 			(texture1D float => float4)
 			(texture2D float2 => float4)
 			(texture3D float3 => float4)
+			(textureCube float3 => float4)
 		)
 	)
 ]

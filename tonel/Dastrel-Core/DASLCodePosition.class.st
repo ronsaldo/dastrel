@@ -3,6 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'fileName',
+		'offset',
 		'line',
 		'column'
 	],
@@ -12,16 +13,6 @@ Class {
 { #category : #default }
 DASLCodePosition class >> default [
 	^ self new
-]
-
-{ #category : #'instance creation' }
-DASLCodePosition class >> fromToken: aPPToken [
-	^ self new line: aPPToken line; column: aPPToken column; yourself
-]
-
-{ #category : #'instance creation' }
-DASLCodePosition class >> fromToken: aPPToken fileName: fileName [
-	^ self new fileName: fileName; line: aPPToken line; column: aPPToken column; yourself
 ]
 
 { #category : #accessing }
@@ -60,6 +51,16 @@ DASLCodePosition >> line [
 { #category : #accessing }
 DASLCodePosition >> line: anObject [
 	line := anObject
+]
+
+{ #category : #accessing }
+DASLCodePosition >> offset [
+	^ offset
+]
+
+{ #category : #accessing }
+DASLCodePosition >> offset: anObject [
+	offset := anObject
 ]
 
 { #category : #accessing }

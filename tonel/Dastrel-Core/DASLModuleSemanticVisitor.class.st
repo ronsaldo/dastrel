@@ -81,7 +81,7 @@ DASLModuleSemanticVisitor >> visitTranslationUnit: translationUnit [
 	currentDirectory := translationUnit fullPath asFileReference parent.
 	currentTranslationUnit := translationUnit.
 	self assert: currentDirectory isDirectory.
-	builtInScope := DASLBuiltInScope new.
+	builtInScope := DASLBuiltInScope uniqueInstance.
 	packageScope := DASLPackageScope new parentScope: builtInScope; node: translationUnit.
 	translationUnit package: packageScope.
 	self withScope: packageScope do: [

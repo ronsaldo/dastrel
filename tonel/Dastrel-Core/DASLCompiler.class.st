@@ -52,7 +52,6 @@ DASLCompiler >> compile [
 
 { #category : #accessing }
 DASLCompiler >> fileName: fileName [
-	parser fileName: fileName.
 	currentFileName := fileName.
 ]
 
@@ -99,7 +98,11 @@ DASLCompiler >> metalTarget [
 
 { #category : #parsing }
 DASLCompiler >> parse [
-	ast := parser parse: sourceCode.
+	ast := parser
+		compilationContext: compilationContext;
+		fileName: currentFileName;
+		parse: sourceCode.
+	ast isPetitFailure ifTrue: [ compilationContext parseError: ast fileName: currentFileName ].
 	ast fullPath: currentFileName.
 	compilationContext addTranslationUnit: ast.
 ]

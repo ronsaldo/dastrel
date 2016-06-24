@@ -91,6 +91,14 @@ DASLSemanticVisitor >> deReferenceType: aType [
 	^ aType
 ]
 
+{ #category : #'as yet unclassified' }
+DASLSemanticVisitor >> error: errorMessage at: position [
+	DASLSemanticError new
+		position: position;
+		errorMessage: errorMessage;
+		signal
+]
+
 { #category : #types }
 DASLSemanticVisitor >> hasImplicitCoercion: rawType to: rawCoercionType [
 	| type coercionType |

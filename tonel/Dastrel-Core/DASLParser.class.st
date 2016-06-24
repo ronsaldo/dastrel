@@ -2,6 +2,7 @@ Class {
 	#name : #DASLParser,
 	#superclass : #DASLGrammar,
 	#instVars : [
+		'compilationContext',
 		'fileName'
 	],
 	#category : #'Dastrel-Core-Parser'
@@ -110,6 +111,16 @@ DASLParser >> codeBlock [
 			interfaceList: block fourth;
 			body: block sixth;
 			yourself ]
+]
+
+{ #category : #accessing }
+DASLParser >> compilationContext [
+	^ compilationContext
+]
+
+{ #category : #accessing }
+DASLParser >> compilationContext: anObject [
+	compilationContext := anObject
 ]
 
 { #category : #grammar }
@@ -326,7 +337,7 @@ DASLParser >> parentExpression [
 
 { #category : #utility }
 DASLParser >> positionFromToken: aPPToken [
-	^ (DASLCodePosition fromToken: aPPToken) fileName: fileName; yourself
+	^ compilationContext positionFromToken: aPPToken fileName: fileName
 ]
 
 { #category : #grammar }

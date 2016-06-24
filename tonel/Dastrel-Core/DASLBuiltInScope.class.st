@@ -1,8 +1,21 @@
 Class {
 	#name : #DASLBuiltInScope,
 	#superclass : #DASLexicalScope,
+	#classVars : [
+		'BuiltInScope'
+	],
 	#category : #'Dastrel-Core-Semantic'
 }
+
+{ #category : #'instance creation' }
+DASLBuiltInScope class >> uniqueInstance [
+	"
+	This singleton is for performance reasons.
+	
+	BuiltInScope := nil.
+	"
+	^ BuiltInScope ifNil: [ BuiltInScope := DASLBuiltInScope new ]
+]
 
 { #category : #adding }
 DASLBuiltInScope >> addFunctionGroup: functionGroup [

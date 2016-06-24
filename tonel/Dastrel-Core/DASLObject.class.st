@@ -6,7 +6,10 @@ Class {
 
 { #category : #'error reporting' }
 DASLObject >> error: errorMessage at: position [
-	self error: position position printString , ': ' , errorMessage
+	DASLCompilationError new
+		position: position;
+		errorMessage: errorMessage;
+		signal
 ]
 
 { #category : #'as yet unclassified' }

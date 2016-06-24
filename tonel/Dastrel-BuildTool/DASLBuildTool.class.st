@@ -21,7 +21,7 @@ DASLBuildTool class >> rebuild: jsonFileName [
 	^ self new rebuild: jsonFileName
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #building }
 DASLBuildTool >> build: jsonFileName [
 	| project |
 	project := DASLBuildProject loadFromFileNamed: jsonFileName.
@@ -30,7 +30,13 @@ DASLBuildTool >> build: jsonFileName [
 
 { #category : #'as yet unclassified' }
 DASLBuildTool >> buildElements: aCollectionOfElements [
-	aCollectionOfElements do: #build
+	| percentage |
+	aCollectionOfElements doWithIndex: [ :el :index |
+		percentage := index - 1 / (aCollectionOfElements size - 1) asFloat.
+		el buildReportPercentage: percentage
+	].
+
+
 ]
 
 { #category : #'as yet unclassified' }

@@ -31,6 +31,13 @@ DASLBuildItem >> build [
 	"Here goes the actual item building."
 ]
 
+{ #category : #'as yet unclassified' }
+DASLBuildItem >> buildReportPercentage: percentage [
+	self 
+		reportPercentage: percentage;
+		build
+]
+
 { #category : #accessing }
 DASLBuildItem >> dependencies [
 	^ dependencies
@@ -114,6 +121,14 @@ DASLBuildItem >> relativePathToString: aRelativePath [
 		out nextPutAll: (aRelativePath at: 1).
 		2 to: aRelativePath size do: [ :i | out nextPut: $/; nextPutAll: (aRelativePath at: i) ]
 	]
+]
+
+{ #category : #'as yet unclassified' }
+DASLBuildItem >> reportPercentage: percentage [
+	| message |
+	message := '{1}%: {2}' format: { (percentage * 100) asInteger . self name}.
+	Transcript show: message; cr.
+	FileStream stdout nextPutAll: message; lf.
 ]
 
 { #category : #accessing }

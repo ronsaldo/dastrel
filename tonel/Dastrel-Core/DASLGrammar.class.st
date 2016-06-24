@@ -137,14 +137,14 @@ DASLGrammar class >> initialize [
 	"
 	super initialize.
 	
-	Keywords := #(
+	Keywords := Set newFrom: #(
 		in out inout
+		let const
 		uniform
 		interface semantic implements struct
 		sizeof alignof
 		function code_block graph_block
 		using discard return
-		let const
 		import
 		case
 		if else for do while switch break continue
@@ -406,7 +406,20 @@ DASLGrammar >> identStart [
 
 { #category : #tokens }
 DASLGrammar >> identifier [
-	^ (identStart , (identStart / #digit asParser) star) token trim: ignorable.
+	^ ((identStart , (identStart / #digit asParser) star) token trim: ignorable) >=> [ :context :aBlock |
+		| parseResult |
+		
+		parseResult := aBlock value.
+		parseResult isPetitFailure ifFalse: [
+			(Keywords includes: parseResult inputValue) ifTrue: [
+				^ PPFailure message: 'keyword matched' context: context
+			] ifFalse: [
+				parseResult
+			].
+		] ifTrue: [
+			parseResult
+		]
+	]
 ]
 
 { #category : #grammar }

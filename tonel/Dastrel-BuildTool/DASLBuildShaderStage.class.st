@@ -63,16 +63,23 @@ DASLBuildShaderStage >> build [
 		compiler := DASLCompiler new.
 		compiler sourceFromFileNamed: sources first fileReference.
 		compiler perform: targetSelector.
-		compiler compile.
-		result := compiler generatedCode.
-		result isString ifTrue: [
-			destinationFullName writeStreamDo: [ :out |
-				out truncate.
-				out nextPutAll: result.
-			]
-		] ifFalse: [
-			result saveTo: destinationFullName
-		].
+		[
+			compiler compile.
+			
+			result := compiler generatedCode.
+			result isString ifTrue: [
+				destinationFullName writeStreamDo: [ :out |
+					out truncate.
+					out nextPutAll: result.
+				]
+			] ifFalse: [
+				result saveTo: destinationFullName
+			].
+
+		] on: DASLCompilationError do: [ :error |
+			error printCompilationError.
+			^ self
+		]
 	].
 ]
 

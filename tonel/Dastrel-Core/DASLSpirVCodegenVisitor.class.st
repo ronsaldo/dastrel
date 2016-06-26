@@ -5,8 +5,8 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLSpirVCodegenVisitor >> passOn: ast [
+DASLSpirVCodegenVisitor >> passOn: ast optimizationLevel: optimizationLevel [
 	| ssaModule |
-	ssaModule := DASLSSACodegenVisitor passOn: ast.
+	ssaModule := DASLSSACodegenVisitor new passOn: ast optimizationLevel: optimizationLevel.
 	^ SLVMSpirVTranslator new translateSSAModule: ssaModule
 ]

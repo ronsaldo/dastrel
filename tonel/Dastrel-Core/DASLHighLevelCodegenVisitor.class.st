@@ -219,7 +219,7 @@ DASLHighLevelCodegenVisitor >> newline [
 ]
 
 { #category : #'as yet unclassified' }
-DASLHighLevelCodegenVisitor >> passOn: anAst [
+DASLHighLevelCodegenVisitor >> passOn: anAst optimizationLevel: optimizationLevel [
 	^ ByteString streamContents: [ :out |
 		outputStream := out.
 		self generateCommon.

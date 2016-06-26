@@ -348,7 +348,7 @@ DASLSSACodegenVisitor >> generateLogicalAnd: operation [
 	
 	"Merge the results"
 	builder currentBlock: resultBlock.
-	phiNode := builder phi: 'landResult'.
+	phiNode := builder phi: SLVMType bool name: 'landResult'.
 	phiNode addValue: (SLVMConstantValue bool: false) from: leftBlock.
 	phiNode addValue: conditionValue from: rightBlock.
 	^ phiNode
@@ -374,7 +374,7 @@ DASLSSACodegenVisitor >> generateLogicalOr: operation [
 	
 	"Merge the results"
 	builder currentBlock: resultBlock.
-	phiNode := builder phi: 'landResult'.
+	phiNode := builder phi: SLVMType bool name: 'lorResult'.
 	phiNode addValue: (SLVMConstantValue bool: true) from: leftBlock.
 	phiNode addValue: conditionValue from: rightBlock.
 	^ phiNode
@@ -499,6 +499,14 @@ DASLSSACodegenVisitor >> initialize [
 DASLSSACodegenVisitor >> passOn: ast [
 	ssaModule := SLVMModule new.
 	^ ast accept: self.
+]
+
+{ #category : #'as yet unclassified' }
+DASLSSACodegenVisitor >> passOn: ast optimizationLevel: optimizationLevel [
+	ssaModule := SLVMModule new.
+	ast accept: self.
+	ssaModule optimizeWithLevel: optimizationLevel.
+	^ ssaModule
 ]
 
 { #category : #visitor }

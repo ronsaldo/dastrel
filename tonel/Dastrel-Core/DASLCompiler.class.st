@@ -8,7 +8,8 @@ Class {
 		'parser',
 		'codeGenerator',
 		'generatedCode',
-		'currentFileName'
+		'currentFileName',
+		'optimizationLevel'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -57,7 +58,7 @@ DASLCompiler >> fileName: fileName [
 
 { #category : #'public access' }
 DASLCompiler >> generateCode [
-	generatedCode := codeGenerator passOn: ast.
+	generatedCode := codeGenerator passOn: ast optimizationLevel: optimizationLevel.
 
 ]
 
@@ -89,11 +90,22 @@ DASLCompiler >> initialize [
 	
 	parser := DASLParser new.
 	compilationContext := DASLCompilationContext new.
+	optimizationLevel := 0.
 ]
 
 { #category : #'public access' }
 DASLCompiler >> metalTarget [
 	codeGenerator := DASLMetalCodegenVisitor new.
+]
+
+{ #category : #accessing }
+DASLCompiler >> optimizationLevel [
+	^ optimizationLevel
+]
+
+{ #category : #accessing }
+DASLCompiler >> optimizationLevel: anObject [
+	optimizationLevel := anObject
 ]
 
 { #category : #parsing }

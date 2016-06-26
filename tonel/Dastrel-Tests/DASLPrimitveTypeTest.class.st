@@ -14,8 +14,8 @@ DASLPrimitveTypeTest >> testEqualBool [
 { #category : #tests }
 DASLPrimitveTypeTest >> testEqualFloat [
 	| floatType1 floatType2 |
-	floatType1 := DASLFloatType name: #dummy size: 4 alignment: 4.
-	floatType2 := DASLFloatType name: #dummy2 size: 4 alignment: 4.
+	floatType1 := DASLFloatType name: #dummy mangledName: #f size: 4 alignment: 4.
+	floatType2 := DASLFloatType name: #dummy2 mangledName: #f size: 4 alignment: 4.
 	self assert: floatType1 equals: floatType2.
 	self assert: floatType1 hash equals: floatType2 hash.
 
@@ -24,8 +24,8 @@ DASLPrimitveTypeTest >> testEqualFloat [
 { #category : #tests }
 DASLPrimitveTypeTest >> testEqualInteger [
 	| intType1 intType2 |
-	intType1 := DASLIntegerType name: #dummy size: 4 alignment: 4.
-	intType2 := DASLIntegerType name: #dummy2 size: 4 alignment: 4.
+	intType1 := DASLIntegerType name: #dummy mangledName: #i size: 4 alignment: 4.
+	intType2 := DASLIntegerType name: #dummy2 mangledName: #i size: 4 alignment: 4.
 	self assert: intType1 equals: intType2.
 	self assert: intType1 hash equals: intType2 hash.
 ]
@@ -41,7 +41,7 @@ DASLPrimitveTypeTest >> testNewBool [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNewFloat [
 	| floatType |
-	floatType := DASLFloatType name: #dummy size: 4 alignment: 4.
+	floatType := DASLFloatType name: #dummy mangledName: #f size: 4 alignment: 4.
 	self assert: floatType size equals: 4.
 	self assert: floatType alignment equals: 4.
 	self assert: floatType isFloatType.
@@ -50,7 +50,7 @@ DASLPrimitveTypeTest >> testNewFloat [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNewInteger [
 	| intType |
-	intType := DASLIntegerType name: #dummy size: 4 alignment: 4.
+	intType := DASLIntegerType name: #dummy mangledName: #i size: 4 alignment: 4.
 	self assert: intType size equals: 4.
 	self assert: intType alignment equals: 4.
 	self assert: intType isIntegerType.
@@ -59,8 +59,8 @@ DASLPrimitveTypeTest >> testNewInteger [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNotEqualFloat [
 	| floatType1 floatType2 |
-	floatType1 := DASLFloatType name: #dummy size: 4 alignment: 4.
-	floatType2 := DASLFloatType name: #dummy2 size: 8 alignment: 4.
+	floatType1 := DASLFloatType name: #dummy mangledName: #f size: 4 alignment: 4.
+	floatType2 := DASLFloatType name: #dummy2 mangledName: #d size: 8 alignment: 4.
 	self deny: floatType1 = floatType2
 
 ]
@@ -68,8 +68,8 @@ DASLPrimitveTypeTest >> testNotEqualFloat [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNotEqualFloat2 [
 	| floatType1 floatType2 |
-	floatType1 := DASLFloatType name: #dummy size: 8 alignment: 8.
-	floatType2 := DASLFloatType name: #dummy2 size: 8 alignment: 4.
+	floatType1 := DASLFloatType name: #dummy mangledName: #d size: 8 alignment: 8.
+	floatType2 := DASLFloatType name: #dummy2 mangledName: #d size: 8 alignment: 4.
 	self deny: floatType1 = floatType2
 
 ]
@@ -77,8 +77,8 @@ DASLPrimitveTypeTest >> testNotEqualFloat2 [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNotEqualInteger [
 	| intType1 intType2 |
-	intType1 := DASLIntegerType name: #dummy size: 4 alignment: 4.
-	intType2 := DASLIntegerType name: #dummy2 size: 8 alignment: 4.
+	intType1 := DASLIntegerType name: #dummy mangledName: #i size: 4 alignment: 4.
+	intType2 := DASLIntegerType name: #dummy2 mangledName: #i size: 8 alignment: 4.
 	self deny: intType1 = intType2
 
 ]
@@ -86,8 +86,8 @@ DASLPrimitveTypeTest >> testNotEqualInteger [
 { #category : #tests }
 DASLPrimitveTypeTest >> testNotEqualInteger2 [
 	| intType1 intType2 |
-	intType1 := DASLIntegerType name: #dummy size: 8 alignment: 4.
-	intType2 := DASLIntegerType name: #dummy2 size: 8 alignment: 8.
+	intType1 := DASLIntegerType name: #dummy mangledName: #i size: 8 alignment: 4.
+	intType2 := DASLIntegerType name: #dummy2 mangledName: #i size: 8 alignment: 8.
 	self deny: intType1 = intType2
 
 ]

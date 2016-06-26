@@ -4,14 +4,15 @@ Class {
 	#instVars : [
 		'name',
 		'size',
-		'alignment'
+		'alignment',
+		'mangledName'
 	],
 	#category : #'Dastrel-Core-Type'
 }
 
 { #category : #'instance creation' }
-DASLPrimitiveType class >> name: aName size: aSize alignment: anAlignment [
-	^ self new name: aName; size: aSize; alignment: anAlignment; yourself
+DASLPrimitiveType class >> name: aName mangledName: mangledName size: aSize alignment: anAlignment [
+	^ self new name: aName; mangledName: mangledName; size: aSize; alignment: anAlignment; yourself
 ]
 
 { #category : #comparing }
@@ -40,6 +41,16 @@ DASLPrimitiveType >> isPrimitiveType [
 ]
 
 { #category : #accessing }
+DASLPrimitiveType >> mangledName [
+	^ mangledName
+]
+
+{ #category : #accessing }
+DASLPrimitiveType >> mangledName: anObject [
+	mangledName := anObject
+]
+
+{ #category : #accessing }
 DASLPrimitiveType >> name [
 	^ name
 ]
@@ -47,6 +58,11 @@ DASLPrimitiveType >> name [
 { #category : #accessing }
 DASLPrimitiveType >> name: anObject [
 	name := anObject
+]
+
+{ #category : #printing }
+DASLPrimitiveType >> printMangledOn: aStream [
+	aStream nextPutAll: mangledName
 ]
 
 { #category : #printing }

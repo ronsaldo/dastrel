@@ -58,7 +58,10 @@ DASLFunctionPrototype >> functionType: anObject [
 
 { #category : #accessing }
 DASLFunctionPrototype >> mangledName [
-	^ name , ' ' , self functionType printString
+	^ ByteString streamContents: [ :out |
+		out nextPutAll: '_Z'; print: name size; nextPutAll: name.
+		functionType printFunctionMangledOn: out
+	]
 ]
 
 { #category : #accessing }

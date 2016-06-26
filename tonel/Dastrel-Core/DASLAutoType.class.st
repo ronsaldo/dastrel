@@ -23,3 +23,8 @@ DASLAutoType >> hash [
 DASLAutoType >> isAutoType [
 	^ true
 ]
+
+{ #category : #printing }
+DASLAutoType >> printMangledOn: aStream [
+	aStream nextPutAll: 'Da'
+]

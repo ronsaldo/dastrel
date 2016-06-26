@@ -92,6 +92,14 @@ DASLVectorType >> name [
 ]
 
 { #category : #printing }
+DASLVectorType >> printMangledOn: aStream [
+	aStream nextPutAll: 'u2'.
+	baseType printMangledOn: aStream.
+	aStream print: elements
+	
+]
+
+{ #category : #printing }
 DASLVectorType >> printOn: aStream [
 	aStream print: baseType; print: elements
 ]

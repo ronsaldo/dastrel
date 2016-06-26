@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLIntegerType class >> name: aName size: aSize alignment: anAlignment signed: aBoolean [
-	^ (self name: aName size: aSize alignment: anAlignment) signed: aBoolean; yourself
+DASLIntegerType class >> name: aName mangledName: mangledName size: aSize alignment: anAlignment signed: aBoolean [
+	^ (self name: aName mangledName: mangledName size: aSize alignment: anAlignment) signed: aBoolean; yourself
 ]
 
 { #category : #comparing }

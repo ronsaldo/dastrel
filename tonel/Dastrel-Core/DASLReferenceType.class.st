@@ -69,6 +69,13 @@ DASLReferenceType >> isReferenceType [
 ]
 
 { #category : #printing }
+DASLReferenceType >> printMangledOn: aStream [
+	aStream nextPut: $R.
+	baseType printMangledOn: aStream.
+	
+]
+
+{ #category : #printing }
 DASLReferenceType >> printOn: aStream [
 	aStream print: baseType;
 		nextPutAll: ' ref '; print: storage

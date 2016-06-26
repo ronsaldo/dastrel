@@ -49,6 +49,21 @@ DASLFunctionType >> isFunctionType [
 ]
 
 { #category : #printing }
+DASLFunctionType >> printFunctionMangledOn: aStream [
+	arguments do: [ :arg | arg printMangledOn: aStream ].
+	arguments ifEmpty: [ aStream nextPut: $v ].
+]
+
+{ #category : #printing }
+DASLFunctionType >> printMangledOn: aStream [
+	aStream nextPut: $F.
+	returnType printMangledOn: aStream.
+	arguments do: [ :arg | arg printMangledOn: aStream ].
+	arguments ifEmpty: [ aStream nextPut: $v ].
+	aStream nextPut: $E.
+]
+
+{ #category : #printing }
 DASLFunctionType >> printOn: aStream [
 	aStream nextPutAll: 'function {('.
 	arguments doWithIndex: [ :arg :index |

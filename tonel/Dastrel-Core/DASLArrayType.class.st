@@ -74,6 +74,15 @@ DASLArrayType >> memberAt: constantValue [
 ]
 
 { #category : #printing }
+DASLArrayType >> printMangledOn: aStream [
+	aStream nextPut: $A.
+	aStream print: (elements ifNil: [0]).
+	aStream nextPut: $_.
+	baseType printMangledOn: aStream.
+	
+]
+
+{ #category : #printing }
 DASLArrayType >> printOn: aStream [
 	aStream print: baseType; nextPut: $[.
 	elements ifNotNil: [ aStream print: elements ].

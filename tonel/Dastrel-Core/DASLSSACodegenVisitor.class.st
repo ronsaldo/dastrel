@@ -303,7 +303,7 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	| functionType function |
 	functionType := aFunctionNode functionType.
-	function := SLVMFunction name: aFunctionNode mangledName functionType: functionType asSlovimType.
+	function := SLVMFunction name: aFunctionNode mangledName asSymbol functionType: functionType asSlovimType.
 	aFunctionNode codegenValue: function.
 	ssaModule add: function.
 ]

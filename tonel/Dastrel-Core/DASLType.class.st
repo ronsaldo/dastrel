@@ -166,20 +166,20 @@ DASLType class >> primitiveTypes [
 	AutoType := DASLAutoType new name: #auto.
 	
 	VoidType := DASLVoidType new name: #bool.
-	BoolType := DASLBoolType name: #bool size: 1 alignment: 1.
+	BoolType := DASLBoolType name: #bool mangledName: #b size: 1 alignment: 1.
 	
-	CharType := DASLIntegerType name: #char size: 1 alignment: 1.
-	ShortType := DASLIntegerType name: #short size: 2 alignment: 2.
-	IntType := DASLIntegerType name: #int size: 4 alignment: 4.
-	LongType := DASLIntegerType name: #long size: 8 alignment: 8.
+	CharType := DASLIntegerType name: #char mangledName: #a size: 1 alignment: 1.
+	ShortType := DASLIntegerType name: #short mangledName: #s size: 2 alignment: 2.
+	IntType := DASLIntegerType name: #int mangledName: #i size: 4 alignment: 4.
+	LongType := DASLIntegerType name: #long mangledName: #l size: 8 alignment: 8.
 
-	UCharType := DASLIntegerType name: #uchar size: 1 alignment: 1 signed: false.
-	UShortType := DASLIntegerType name: #ushort size: 2 alignment: 2 signed: false.
-	UIntType := DASLIntegerType name: #uint size: 4 alignment: 4 signed: false.
-	ULongType := DASLIntegerType name: #ulong size: 8 alignment: 8 signed: false.
+	UCharType := DASLIntegerType name: #uchar mangledName: #h size: 1 alignment: 1 signed: false.
+	UShortType := DASLIntegerType name: #ushort mangledName: #t size: 2 alignment: 2 signed: false.
+	UIntType := DASLIntegerType name: #uint mangledName: #j size: 4 alignment: 4 signed: false.
+	ULongType := DASLIntegerType name: #ulong mangledName: #m size: 8 alignment: 8 signed: false.
 	
-	FloatType := DASLFloatType name: #float size: 4 alignment: 4.	
-	DoubleType := DASLFloatType name: #double size: 8 alignment: 8.
+	FloatType := DASLFloatType name: #float mangledName: #f size: 4 alignment: 4.	
+	DoubleType := DASLFloatType name: #double mangledName: #d size: 8 alignment: 8.
 	
 	^ {
 		AutoType.
@@ -424,6 +424,11 @@ DASLType >> isVectorType [
 { #category : #testing }
 DASLType >> isVoidType [
 	^ false
+]
+
+{ #category : #printing }
+DASLType >> printMangledOn: aStream [
+	self subclassResponsibility
 ]
 
 { #category : #accessing }

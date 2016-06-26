@@ -30,6 +30,11 @@ DASLVoidType >> isVoidType [
 ]
 
 { #category : #printing }
+DASLVoidType >> printMangledOn: aStream [
+	aStream nextPut: $v
+]
+
+{ #category : #printing }
 DASLVoidType >> printOn: aStream [
 	aStream nextPutAll: 'void'
 ]

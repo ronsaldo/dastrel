@@ -348,7 +348,7 @@ DASLSSACodegenVisitor >> generateLogicalAnd: operation [
 	
 	"Merge the results"
 	builder currentBlock: resultBlock.
-	phiNode := builder phi: SLVMType bool name: 'landResult'.
+	phiNode := builder phi: SLVMType boolType name: 'landResult'.
 	phiNode addValue: (SLVMConstantValue bool: false) from: leftBlock.
 	phiNode addValue: conditionValue from: rightBlock.
 	^ phiNode
@@ -374,7 +374,7 @@ DASLSSACodegenVisitor >> generateLogicalOr: operation [
 	
 	"Merge the results"
 	builder currentBlock: resultBlock.
-	phiNode := builder phi: SLVMType bool name: 'lorResult'.
+	phiNode := builder phi: SLVMType boolType name: 'lorResult'.
 	phiNode addValue: (SLVMConstantValue bool: true) from: leftBlock.
 	phiNode addValue: conditionValue from: rightBlock.
 	^ phiNode

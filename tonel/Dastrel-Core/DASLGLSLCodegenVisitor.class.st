@@ -37,6 +37,20 @@ DASLGLSLCodegenVisitor class >> initialize [
 		float3x3 mat3
 		float4x4 mat4
 		
+		int2 ivec2
+		int3 ivec3
+		int4 ivec4
+		uint2 uivec2
+		uint3 uivec3
+		uint4 uivec4
+
+		short2 svec2
+		short3 svec3
+		short4 svec4
+		ushort2 usvec2
+		ushort3 usvec3
+		ushort4 usvec4
+		
 		texture2D texture2D
 		textureCube textureCube
 		sampler sampler

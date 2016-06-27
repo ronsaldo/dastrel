@@ -95,7 +95,7 @@ DASLSemanticVisitor >> deReferenceType: aType [
 DASLSemanticVisitor >> error: errorMessage at: position [
 	DASLSemanticError new
 		position: position;
-		errorMessage: errorMessage;
+		messageText: errorMessage;
 		signal
 ]
 

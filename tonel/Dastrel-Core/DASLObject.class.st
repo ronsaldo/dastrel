@@ -8,7 +8,7 @@ Class {
 DASLObject >> error: errorMessage at: position [
 	DASLCompilationError new
 		position: position;
-		errorMessage: errorMessage;
+		messageText: errorMessage;
 		signal
 ]
 

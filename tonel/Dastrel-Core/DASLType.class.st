@@ -288,6 +288,30 @@ DASLType class >> vectorTypes [
 		DASLVectorType baseType: DoubleType elements: 2.
 		DASLVectorType baseType: DoubleType elements: 3.
 		DASLVectorType baseType: DoubleType elements: 4.
+		
+		DASLVectorType baseType: IntType elements: 2.
+		DASLVectorType baseType: IntType elements: 3.
+		DASLVectorType baseType: IntType elements: 4.
+		
+		DASLVectorType baseType: UIntType elements: 2.
+		DASLVectorType baseType: UIntType elements: 3.
+		DASLVectorType baseType: UIntType elements: 4.
+
+		DASLVectorType baseType: ShortType elements: 2.
+		DASLVectorType baseType: ShortType elements: 3.
+		DASLVectorType baseType: ShortType elements: 4.
+
+		DASLVectorType baseType: UShortType elements: 2.
+		DASLVectorType baseType: UShortType elements: 3.
+		DASLVectorType baseType: UShortType elements: 4.
+
+		DASLVectorType baseType: CharType elements: 2.
+		DASLVectorType baseType: CharType elements: 3.
+		DASLVectorType baseType: CharType elements: 4.
+
+		DASLVectorType baseType: UCharType elements: 2.
+		DASLVectorType baseType: UCharType elements: 3.
+		DASLVectorType baseType: UCharType elements: 4.
 	}
 ]
 

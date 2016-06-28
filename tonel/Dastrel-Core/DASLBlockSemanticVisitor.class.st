@@ -420,7 +420,16 @@ DASLBlockSemanticVisitor >> visitSubscriptExpression: subscriptAccess [
 		]
 	].
 
-	(self hasImplicitCoercion: subscriptAccess index type to: DASLType intType) ifFalse: [ self error: 'Expected an integer index.' at: subscriptAccess index].
+	(self hasImplicitCoercion: subscriptAccess index type to: DASLType intType) ifTrue: [ 
+		subscriptAccess coercionType: DASLType intType.
+	] ifFalse: [ 
+		(self hasImplicitCoercion: subscriptAccess index type to: DASLType uintType) ifTrue: [ 
+			subscriptAccess coercionType: DASLType uintType.
+		] ifFalse: [ 
+			self error: 'Expected an integer index.' at: subscriptAccess index
+		]
+	].
+
 	(isBounded and: [ subscriptAccess index isConstantExpression and: [ subscriptAccess index evaluateConstant >= elements ] ]) ifTrue: [
 		self error: 'Array access is outside of bounds.' at: subscriptAccess index
 	]. 

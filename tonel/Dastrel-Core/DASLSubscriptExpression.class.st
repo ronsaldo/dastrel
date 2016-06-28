@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'reference',
 		'index',
-		'type'
+		'type',
+		'coercionType'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -12,6 +13,16 @@ Class {
 { #category : #visitor }
 DASLSubscriptExpression >> accept: aVisitor [
 	^ aVisitor visitSubscriptExpression: self
+]
+
+{ #category : #accessing }
+DASLSubscriptExpression >> coercionType [
+	^ coercionType
+]
+
+{ #category : #accessing }
+DASLSubscriptExpression >> coercionType: anObject [
+	coercionType := anObject
 ]
 
 { #category : #accessing }

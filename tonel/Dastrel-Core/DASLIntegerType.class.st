@@ -24,7 +24,7 @@ DASLIntegerType >> accept: aVisitor [
 
 { #category : #converting }
 DASLIntegerType >> asSlovimType [
-	^ SLVMIntegerType name: name size: size alignment: alignment
+	^ SLVMIntegerType name: name size: size alignment: alignment signed: signed
 ]
 
 { #category : #comparing }

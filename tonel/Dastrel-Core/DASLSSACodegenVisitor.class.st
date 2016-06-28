@@ -823,7 +823,7 @@ DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
 DASLSSACodegenVisitor >> visitSubscriptExpression: subscriptAccess [
 	| reference index |
 	reference := subscriptAccess reference accept: self.
-	index := self coerce: (subscriptAccess index accept: self) into: DASLType intType.
+	index := self coerce: (subscriptAccess index accept: self) into: subscriptAccess coercionType.
 	^ builder getReference: reference element: index
 ]
 

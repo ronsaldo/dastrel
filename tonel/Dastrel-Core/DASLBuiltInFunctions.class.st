@@ -81,19 +81,22 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 DASLBuiltInFunctions class >> builtInCommon [
 	^ #(
 		(
-			((min umin) (max umax)) (expandToVector)
+			((min #'math.umin')
+			(max #'math.umax')) (expandToVector)
 			(uint uint => uint)
 			(ulong ulong => ulong)
 		)
 		
 		(
-			((min smin) (max smax)) (expandToVector)
+			((min #'math.smin')
+			(max #'math.smax')) (expandToVector)
 			(int int => int)
 			(long long => long)
 		)
 		
 		(
-			((min fmin) (max fmax)) (expandToVector)
+			((min #'math.fmin')
+			(max #'math.fmax')) (expandToVector)
 			(float float => float)
 			(double double => double)
 		)
@@ -137,33 +140,59 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 DASLBuiltInFunctions class >> builtInMathFunctions [
 	^ #(	
 		(
-			(smoothstep step) (expandToVector)
+			((smoothstep #'math.smoothstep')
+			 (step #'math.step')) (expandToVector)
 			(float float float => float)
 			(double double double => double)
 		)
 
 		(
-			((mix fmix)) (expandToVector)
+			((mix #'math.fmix')) (expandToVector)
 			(float float float => float)
 			(double double double => double)
 		)
 		
 		(
-			(pow atan2) (expandToVector)
+			((pow #'math.pow')
+			 (atan2 #'math.atan2')) (expandToVector)
 			(float float => float)
 			(double double => double)
 		)
 		
 		(
-			(asin sin asinh sinh
-			acos cos acosh cosh
-			atan tan atanh
-			exp exp2 log log2
-			sqrt inverseSqrt
-			floor ceil trunc round roundEven fract
-			degrees radians 
-			fabs
-			(sign fsign)) (expandToVector)
+			((asin #'math.asin')
+			(sin #'math.sin')
+			(asinh #'math.asinh')
+			(sinh #'math.sinh')
+
+			(acos #'math.acos')
+			(cos #'math.cos')
+			(acosh #'math.acosh')
+			(cosh #'math.cosh')
+
+			(atan #'math.atan')
+			(tan #'math.tan')
+			(atanh #'math.atanh')
+
+			(exp #'math.exp')
+			(exp2 #'math.exp2')
+			(log #'math.log')
+			(log2 #'math.log2')
+			
+			(sqrt #'math.sqrt')
+			(inverseSqrt #'math.inverseSqrt')
+			(floor #'math.floor')
+			(ceil #'math.ceil')
+			(trunc #'math.trunc')
+			(round #'math.round')
+			(roundEven #'math.roundEven')
+			(fract #'math.fract')
+
+			(degrees #'math.degrees')
+			(radians #'math.radians')
+			(fabs #'math.fabs')
+
+			(sign #'math.fsign')) (expandToVector)
 			(float => float)
 			(double => double)
 		)
@@ -174,7 +203,7 @@ DASLBuiltInFunctions class >> builtInMathFunctions [
 DASLBuiltInFunctions class >> builtInMatrixFunctions [
 	^ #(
 		(
-			(transpose) ()
+			((transpose #'matrix.transpose')) ()
 			(float3x3 float3x3 => float3x3)
 			(float4x4 float4x4 => float4x4)
 			
@@ -226,7 +255,7 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 DASLBuiltInFunctions class >> builtInVectorFunctions [
 	^ #(
 		(
-			(dot) ()
+			((dot #'vector.dot')) ()
 			(float2 float2 => float)
 			(float3 float3 => float)
 			(float4 float4 => float)
@@ -237,13 +266,13 @@ DASLBuiltInFunctions class >> builtInVectorFunctions [
 		)
 
 		(
-			(cross) ()
+			((cross #'vector.cross')) ()
 			(float3 float3 => float3)
 			(double3 double3 => double3)
 		)
 
 		(
-			(length) ()
+			((length #'vector.length')) ()
 			(float2 => float)
 			(float3 => float)
 			(float4 => float)
@@ -254,7 +283,7 @@ DASLBuiltInFunctions class >> builtInVectorFunctions [
 		)
 		
 		(
-			(normalize) ()
+			((normalize #'vector.normalize')) ()
 			(float2 => float2)
 			(float3 => float3)
 			(float4 => float4)
@@ -265,13 +294,13 @@ DASLBuiltInFunctions class >> builtInVectorFunctions [
 		)
 		
 		(
-			(reflect) (expandToVector)
+			((reflect #'vector.reflect')) (expandToVector)
 			(float float => float)
 			(double double => double)
 		)
 
 		(
-			(refract) ()
+			((refract #'vector.refract')) ()
 			(float2 float2 float => float2)
 			(float3 float3 float => float3)
 			(float4 float4 float => float4)

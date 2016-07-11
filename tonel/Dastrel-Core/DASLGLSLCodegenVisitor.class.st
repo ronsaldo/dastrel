@@ -265,7 +265,7 @@ DASLGLSLCodegenVisitor >> generateUniformGlobal: uniformGlobal [
 ]
 
 { #category : #'code generation' }
-DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
+DASLGLSLCodegenVisitor >> generateUniformLayoutContentString: uniform [
 	| layoutProperties pushConstant |
 	layoutProperties := OrderedCollection new.
 	pushConstant := false.
@@ -293,7 +293,7 @@ DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
 	].
 
 	^ ByteString streamContents: [ :out |
-		out nextPutAll: 'layout ('.
+		out nextPutAll: ' ('.
 		layoutProperties doWithIndex: [ :prop :index |
 			index > 1 ifTrue: [ out nextPutAll: ', ' ].
 			prop isSymbol ifTrue: [
@@ -306,6 +306,14 @@ DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
 		out nextPutAll: ') '
 	]
 	
+]
+
+{ #category : #'code generation' }
+DASLGLSLCodegenVisitor >> generateUniformLayoutString: uniform [
+	| content |
+	content := self generateUniformLayoutContentString: uniform.
+	content ifEmpty: [ ^ self ].
+	^ 'layout', content
 ]
 
 { #category : #'code generation' }

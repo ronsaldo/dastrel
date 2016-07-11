@@ -1,3 +1,6 @@
+"
+I provide the Dastrel AST visitor interface.
+"
 Class {
 	#name : #DASLAstVisitor,
 	#superclass : #DASLObject,

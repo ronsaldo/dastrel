@@ -304,6 +304,7 @@ DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	| functionType function |
 	functionType := aFunctionNode functionType.
 	function := SLVMFunction name: aFunctionNode mangledName asSymbol functionType: functionType asSlovimType.
+	function unmangledName: aFunctionNode name.
 	aFunctionNode codegenValue: function.
 	ssaModule add: function.
 ]
@@ -421,7 +422,7 @@ DASLSSACodegenVisitor >> generateSampler: sampler operation: operation argument:
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateSemanticBlock: semanticBlock [
 	| prefix |
-	prefix := semanticBlock name , '.'.
+	prefix := semanticBlock name , '_sve_'.
 	semanticBlock body do: [ :var | self generateSemanticVar: var prefix: prefix].
 ]
 

@@ -165,7 +165,7 @@ DASLType class >> outputStorage [
 DASLType class >> primitiveTypes [
 	AutoType := DASLAutoType new name: #auto.
 	
-	VoidType := DASLVoidType new name: #bool.
+	VoidType := DASLVoidType new name: #void.
 	BoolType := DASLBoolType name: #bool mangledName: #b size: 1 alignment: 1.
 	
 	CharType := DASLIntegerType name: #char mangledName: #a size: 1 alignment: 1.

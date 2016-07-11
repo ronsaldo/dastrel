@@ -8,5 +8,5 @@ Class {
 DASLSpirVCodegenVisitor >> passOn: ast optimizationLevel: optimizationLevel [
 	| ssaModule |
 	ssaModule := DASLSSACodegenVisitor new passOn: ast optimizationLevel: optimizationLevel.
-	^ SLVMSpirVTranslator new translateSSAModule: ssaModule
+	^ SLVMSpirVCodeGenerator translateModule: ssaModule
 ]

@@ -1,6 +1,3 @@
-"
-I represent a position in a source code file or stream. I am used mostly for printing error messages and for generating debug information.
-"
 Class {
 	#name : #DASLCodePosition,
 	#superclass : #Object,

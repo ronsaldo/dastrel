@@ -1,6 +1,3 @@
-"
-I represent a Dastrel AST node.
-"
 Class {
 	#name : #DASLAstNode,
 	#superclass : #DASLObject,

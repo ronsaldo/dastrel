@@ -1,6 +1,3 @@
-"
-I am the super class of many classes in the Dastrel compiler. I provide some utility methods.
-"
 Class {
 	#name : #DASLObject,
 	#superclass : #Object,
@@ -10,7 +7,7 @@ Class {
 { #category : #'error reporting' }
 DASLObject >> error: errorMessage at: position [
 	DASLCompilationError new
-		position: position;
+		position: position position;
 		messageText: errorMessage;
 		signal
 ]

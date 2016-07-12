@@ -94,7 +94,7 @@ DASLSemanticVisitor >> deReferenceType: aType [
 { #category : #'as yet unclassified' }
 DASLSemanticVisitor >> error: errorMessage at: position [
 	DASLSemanticError new
-		position: position;
+		position: position position;
 		messageText: errorMessage;
 		signal
 ]

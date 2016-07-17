@@ -140,12 +140,17 @@ DASLBuiltInFunctions class >> builtInLogicalFunctions [
 DASLBuiltInFunctions class >> builtInMathFunctions [
 	^ #(	
 		(
-			((smoothstep #'math.smoothstep')
-			 (step #'math.step')) (expandToVector)
+			((smoothstep #'math.smoothstep')) (expandToVector)
 			(float float float => float)
 			(double double double => double)
 		)
 
+		(
+			((step #'math.step')) (expandToVector)
+			(float float => float)
+			(double double => double)
+		)
+		
 		(
 			((mix #'math.fmix')) (expandToVector)
 			(float float float => float)

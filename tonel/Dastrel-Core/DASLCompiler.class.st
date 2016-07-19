@@ -64,12 +64,14 @@ DASLCompiler >> generateCode [
 		generatedCode := ssaModule.
 		^ self
 	].
-	generatedCode := codeGenerator translateModule: ssaModule
+	generatedCode := codeGenerator
+		optimizationLevel: optimizationLevel;
+		translateModule: ssaModule
 ]
 
 { #category : #'public access' }
 DASLCompiler >> generateSSAModule [
-	ssaModule := DASLSSACodegenVisitor new passOn: ast optimizationLevel: optimizationLevel.
+	ssaModule := DASLSSACodegenVisitor new passOn: ast
 
 ]
 
@@ -78,12 +80,12 @@ DASLCompiler >> generatedCode [
 	^ generatedCode
 ]
 
-{ #category : #'public access' }
+{ #category : #targets }
 DASLCompiler >> glslTarget [
 	self target: #glsl
 ]
 
-{ #category : #'public access' }
+{ #category : #targets }
 DASLCompiler >> hlslTarget [
 	self target: #hlsl
 ]
@@ -104,7 +106,7 @@ DASLCompiler >> initialize [
 	optimizationLevel := 0.
 ]
 
-{ #category : #'public access' }
+{ #category : #targets }
 DASLCompiler >> metalTarget [
 	self target: #metal
 ]
@@ -153,7 +155,7 @@ DASLCompiler >> sourceFromFileNamed: aFileName [
 		sourceCode: aFileName asFileReference contents
 ]
 
-{ #category : #'public access' }
+{ #category : #targets }
 DASLCompiler >> spirVTarget [
 	self target: #'spir-v'
 ]
@@ -163,7 +165,12 @@ DASLCompiler >> ssaModule [
 	^ ssaModule
 ]
 
-{ #category : #'public access' }
+{ #category : #targets }
+DASLCompiler >> ssaTarget [
+	self target: #ssa
+]
+
+{ #category : #targets }
 DASLCompiler >> target: target [
 	codeGenerator := SLVMCodeGenerator generatorNamed: target.
 ]

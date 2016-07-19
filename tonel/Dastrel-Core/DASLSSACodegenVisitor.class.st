@@ -499,14 +499,7 @@ DASLSSACodegenVisitor >> initialize [
 { #category : #compilation }
 DASLSSACodegenVisitor >> passOn: ast [
 	ssaModule := SLVMModule new.
-	^ ast accept: self.
-]
-
-{ #category : #'as yet unclassified' }
-DASLSSACodegenVisitor >> passOn: ast optimizationLevel: optimizationLevel [
-	ssaModule := SLVMModule new.
 	ast accept: self.
-	ssaModule optimizeWithLevel: optimizationLevel.
 	^ ssaModule
 ]
 

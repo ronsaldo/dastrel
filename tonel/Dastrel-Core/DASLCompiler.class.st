@@ -53,6 +53,11 @@ DASLCompiler >> compile [
 		generateCode
 ]
 
+{ #category : #targets }
+DASLCompiler >> cppTarget [
+	self target: #cpp
+]
+
 { #category : #accessing }
 DASLCompiler >> fileName: fileName [
 	currentFileName := fileName.

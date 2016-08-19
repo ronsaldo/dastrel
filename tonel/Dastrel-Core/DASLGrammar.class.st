@@ -412,7 +412,7 @@ DASLGrammar >> identifier [
 		parseResult := aBlock value.
 		parseResult isPetitFailure ifFalse: [
 			(Keywords includes: parseResult inputValue) ifTrue: [
-				^ PPFailure message: 'keyword matched' context: context
+				PPFailure message: 'keyword matched' context: context
 			] ifFalse: [
 				parseResult
 			].
@@ -714,7 +714,7 @@ DASLGrammar >> questionMark [
 
 { #category : #grammar }
 DASLGrammar >> returnStatement [
-	^ kwReturn , callArguments , semicolon
+	^ kwReturn , callArguments optional , semicolon
 ]
 
 { #category : #tokens }

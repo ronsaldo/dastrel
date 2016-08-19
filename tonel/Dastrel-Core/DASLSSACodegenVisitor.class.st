@@ -800,7 +800,7 @@ DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
 	| returnType returnTypes returnValues |
 	returnType := currentFunctionType returnType.
 	returnTypes := returnType isTupleType ifTrue: [ returnType types ] ifFalse: [ { returnType } ].
-	returnValues := returnStatement value collect: [:value | value accept: self].
+	returnValues := (returnStatement value ifNil: [#()]) collect: [:value | value accept: self].
 	
 	returnType isVoidType ifTrue: [
 		^ builder returnVoid

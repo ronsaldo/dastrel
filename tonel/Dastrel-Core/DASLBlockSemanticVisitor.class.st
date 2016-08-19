@@ -376,7 +376,10 @@ DASLBlockSemanticVisitor >> visitPrefixUnaryOperation: operation [
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitReturnStatement: returnStatement [
 	| expectedReturnType returnType |
-	currentFunction ifNil: [ self error: 'return only can be used inside of functions' at: returnStatement ].
+	currentFunction ifNil: [
+		returnStatement value ifNil: [ ^ self ].
+		self error: 'return only can be used inside of functions' at: returnStatement
+	].
 	
 	returnStatement value do: [ :val | val accept: self ].
 	

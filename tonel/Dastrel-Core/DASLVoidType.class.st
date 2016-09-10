@@ -15,7 +15,7 @@ DASLVoidType >> accept: aVisitor [
 ]
 
 { #category : #'as yet unclassified' }
-DASLVoidType >> asSlovimType [
+DASLVoidType >> asSlovimType: compilationTarget [
 	^ SLVMType voidType
 ]
 

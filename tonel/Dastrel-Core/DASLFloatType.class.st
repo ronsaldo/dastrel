@@ -10,7 +10,7 @@ DASLFloatType >> accept: aVisitor [
 ]
 
 { #category : #converting }
-DASLFloatType >> asSlovimType [
+DASLFloatType >> asSlovimType: compilationTarget [
 	^ SLVMFloatType name: name size: size alignment: alignment
 ]
 

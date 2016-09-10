@@ -23,7 +23,7 @@ DASLIntegerType >> accept: aVisitor [
 ]
 
 { #category : #converting }
-DASLIntegerType >> asSlovimType [
+DASLIntegerType >> asSlovimType: compilationTarget [
 	^ SLVMIntegerType name: name size: size alignment: alignment signed: signed
 ]
 

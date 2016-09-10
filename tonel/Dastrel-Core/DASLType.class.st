@@ -336,7 +336,7 @@ DASLType >> alignment [
 ]
 
 { #category : #converting }
-DASLType >> asSlovimType [
+DASLType >> asSlovimType: compilationTarget [
 	self subclassResponsibility
 ]
 

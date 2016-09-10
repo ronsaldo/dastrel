@@ -49,8 +49,8 @@ DASLStructureType >> alignment [
 ]
 
 { #category : #converting }
-DASLStructureType >> asSlovimType [
-	^ SLVMStructureType name: name types: (types collect: #asSlovimType) kind: kind names: names
+DASLStructureType >> asSlovimType: compilationTarget [
+	^ SLVMStructureType name: name types: (types collect: [ :arg | arg asSlovimType: compilationTarget ]) kind: kind names: names
 ]
 
 { #category : #private }

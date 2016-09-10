@@ -10,7 +10,8 @@ Class {
 		'visitedTranslationUnits',
 		'breakBlock',
 		'continueBlock',
-		'currentFunctionType'
+		'currentFunctionType',
+		'compilationTarget'
 	],
 	#classVars : [
 		'BinaryOperationMap',
@@ -56,20 +57,33 @@ DASLSSACodegenVisitor class >> initialize [
 DASLSSACodegenVisitor >> coerce: value into: targetType [
 	| valueType coercedScalar |
 	self flag: 'TODO: Implement this properly.'.
-	targetType isSlovimType ifFalse: [ ^ self coerce: value into: targetType asSlovimType].
-	
+	targetType isSlovimType
+		ifFalse: [ ^ self coerce: value into: (targetType asSlovimType: compilationTarget) ].
 	valueType := value type.
-	valueType = targetType ifTrue: [ ^ value ].
-	targetType isReferenceType ifTrue: [ self error: 'invalid implicit conversion between reference types.' ].
-	valueType isReferenceType ifTrue: [ ^ self coerce: (builder load: value) into: targetType ].
-	
-	"Scalar to vector"
-	(targetType isVectorType and: [valueType isVectorType not]) ifTrue: [
-		coercedScalar := self coerce: value into: targetType baseType.
-		^ builder makeVector: targetType arguments: ((1 to: targetType elements) collect: [:i | coercedScalar]) 
-	].
+	valueType = targetType
+		ifTrue: [ ^ value ].
+	targetType isPointerType
+		ifTrue: [ self error: 'invalid implicit conversion between reference types.' ].
+	valueType isPointerType
+		ifTrue: [ ^ self coerce: (builder load: value) into: targetType ].
 
-	self halt.
+	"Scalar to vector"
+	(targetType isVectorType and: [ valueType isVectorType not ])
+		ifTrue: [ coercedScalar := self coerce: value into: targetType baseType.
+			^ builder
+				makeVector: targetType
+				arguments: ((1 to: targetType elements) collect: [ :i | coercedScalar ]) ].
+	self halt
+]
+
+{ #category : #'as yet unclassified' }
+DASLSSACodegenVisitor >> compilationTarget [
+	^ compilationTarget
+]
+
+{ #category : #'as yet unclassified' }
+DASLSSACodegenVisitor >> compilationTarget: aCompilationTarget [
+	compilationTarget := aCompilationTarget
 ]
 
 { #category : #coercing }
@@ -77,9 +91,12 @@ DASLSSACodegenVisitor >> constructMatrix: type arguments: arguments [
 	| baseType coercionType convertedArguments |
 	baseType := type baseType.
 	coercionType := type columnType.
-	convertedArguments := arguments collect: [ :arg | self coerce: arg into: coercionType ].
+	convertedArguments := arguments
+		collect: [ :arg | self coerce: arg into: coercionType ].
 	self assert: arguments size = type columns.
-	^ builder makeMatrix: type asSlovimType arguments: convertedArguments
+	^ builder
+		makeMatrix: (type asSlovimType: compilationTarget)
+		arguments: convertedArguments
 ]
 
 { #category : #coercing }
@@ -87,15 +104,22 @@ DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 	| baseType expandedArguments |
 	baseType := type baseType.
 	expandedArguments := OrderedCollection new.
-	arguments do: [ :arg | self extractImplicitVectorElements: arg typeElement: baseType into: expandedArguments].
-	^ builder makeVector: type asSlovimType arguments: expandedArguments asArray
+	arguments
+		do: [ :arg | 
+			self
+				extractImplicitVectorElements: arg
+				typeElement: baseType
+				into: expandedArguments ].
+	^ builder
+		makeVector: (type asSlovimType: compilationTarget)
+		arguments: expandedArguments asArray
 ]
 
 { #category : #coercing }
 DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeElement: typeElement into: expandedArguments [
 	| vectorOrScalarTypeNoRef loadedVector |
 	vectorOrScalarTypeNoRef := vectorOrScalar type.
-	vectorOrScalarTypeNoRef isReferenceType ifTrue: [ vectorOrScalarTypeNoRef := vectorOrScalarTypeNoRef baseType ].
+	vectorOrScalarTypeNoRef isPointerType ifTrue: [ vectorOrScalarTypeNoRef := vectorOrScalarTypeNoRef baseType ].
 	vectorOrScalarTypeNoRef isVectorType ifTrue: [
 		loadedVector := self coerce: vectorOrScalar into: vectorOrScalarTypeNoRef.
 		expandedArguments add: loadedVector.
@@ -111,21 +135,28 @@ DASLSSACodegenVisitor >> generateBufferBlock: bufferBlock [
 	| elementTypes blockType globalVar fieldNames |
 	elementTypes := bufferBlock body collect: #type.
 	fieldNames := bufferBlock body collect: #name.
-	blockType := DASLStructureType name: bufferBlock name types: elementTypes kind: DASLStructureType bufferBlockKind names: fieldNames.
-	globalVar := SLVMGlobalVariable name: bufferBlock name valueType: blockType asSlovimType storage: DASLType uniformStorage.
-	bufferBlock attributes keysAndValuesDo: [ :key :value |
-		globalVar propertyAt: key value asSymbol put: value value
-	].
-
+	blockType := DASLStructureType
+		name: bufferBlock name
+		types: elementTypes
+		kind: DASLStructureType bufferBlockKind
+		names: fieldNames.
+	globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: bufferBlock name
+		valueType: (blockType asSlovimType: compilationTarget)
+		storage: DASLType uniformStorage.
+	bufferBlock attributes
+		keysAndValuesDo:
+			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
 	ssaModule add: globalVar.
 	bufferBlock codegenValue: globalVar.
-	
-	bufferBlock body do: [ :var |
-		var codegenValue: [:currentBuilder |
-			currentBuilder getReference: globalVar element: (SLVMConstantValue int: var fieldIndex)
-		]
-	].
-
+	bufferBlock body
+		do: [ :var | 
+			var
+				codegenValue: [ :currentBuilder | 
+					currentBuilder
+						getReference: globalVar
+						element: (SLVMConstantValue int: var fieldIndex) ] ]
 ]
 
 { #category : #visitor }
@@ -138,56 +169,54 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 	| functionType expectedArgumentTypes coercedArguments leftValue rightValue selfType selfBaseType operand operationMapping operandType mappedOperation builtInFunctionRef |
 	functionType := builtInFunction functionType.
 	expectedArgumentTypes := functionType arguments.
-	coercedArguments := arguments collectWithIndex: [ :argument :index |
-		self coerce: argument into: (expectedArgumentTypes at: index)
-	].
-
-	selfArgument ifNotNil: [
-		selfType := selfArgument type.
-		self assert: selfType isReferenceType.
-		selfBaseType := selfType baseType.
-		selfBaseType isSamplerType ifTrue: [
-			self assert: arguments size >= 1.
-			^ self generateSampler: selfArgument operation: builtInFunction name argument: coercedArguments.
-		].
-	].
-
-	(arguments size = 2 and: [BinaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
-		"Give a special treatment to the multiplication"
-		builtInFunction name = #* ifTrue: [ 
-			^ self generateMultiplication: coercedArguments first with: coercedArguments second
-		].
-	
-		leftValue := coercedArguments first.
-		rightValue := coercedArguments second.
-		self assert: leftValue type = rightValue type.
-		operandType := leftValue type.
-		
-		operationMapping := BinaryOperationMap at: builtInFunction name.
-		(operandType isFloatType or: [operandType isVectorType and: [operandType baseType isFloatType ] ]) ifTrue: [ 
-			mappedOperation := operationMapping second.
-		] ifFalse: [
-			mappedOperation := operationMapping first.
-		].
-		^ builder addOperation: mappedOperation left: leftValue right: rightValue
-	].
-
-	(arguments size = 1 and: [UnaryOperationMap includesKey: builtInFunction name]) ifTrue: [ 
-		"Give a special treatment to the multiplication"
-		operationMapping := UnaryOperationMap at: builtInFunction name.
-		operand := coercedArguments first.
-		
-		operandType := operand type.
-		
-		(operandType isFloatType or: [operandType isVectorType and: [operandType baseType isFloatType ] ]) ifTrue: [ 
-			mappedOperation := operationMapping second.
-		] ifFalse: [
-			mappedOperation := operationMapping first.
-		].
-		^ builder addOperation: mappedOperation operand: operand
-	].
-
-	builtInFunctionRef := SLVMConstantBuiltInFunction name: builtInFunction canonicalName functionType: builtInFunction functionType asSlovimType.
+	coercedArguments := arguments
+		collectWithIndex:
+			[ :argument :index | self coerce: argument into: (expectedArgumentTypes at: index) ].
+	selfArgument
+		ifNotNil: [ selfType := selfArgument type.
+			self assert: selfType isPointerType.
+			selfBaseType := selfType baseType.
+			selfBaseType isSamplerType
+				ifTrue: [ self assert: arguments size >= 1.
+					^ self
+						generateSampler: selfArgument
+						operation: builtInFunction name
+						argument: coercedArguments ] ].
+	(arguments size = 2
+		and: [ BinaryOperationMap includesKey: builtInFunction name ])
+		ifTrue: [ "Give a special treatment to the multiplication"
+			builtInFunction name = #*
+				ifTrue: [ ^ self
+						generateMultiplication: coercedArguments first
+						with: coercedArguments second ].
+			leftValue := coercedArguments first.
+			rightValue := coercedArguments second.
+			self assert: leftValue type = rightValue type.
+			operandType := leftValue type.
+			operationMapping := BinaryOperationMap at: builtInFunction name.
+			(operandType isFloatType
+				or: [ operandType isVectorType and: [ operandType baseType isFloatType ] ])
+				ifTrue: [ mappedOperation := operationMapping second ]
+				ifFalse: [ mappedOperation := operationMapping first ].
+			^ builder
+				addOperation: mappedOperation
+				left: leftValue
+				right: rightValue ].
+	(arguments size = 1
+		and: [ UnaryOperationMap includesKey: builtInFunction name ])
+		ifTrue: [ "Give a special treatment to the multiplication"
+			operationMapping := UnaryOperationMap at: builtInFunction name.
+			operand := coercedArguments first.
+			operandType := operand type.
+			(operandType isFloatType
+				or: [ operandType isVectorType and: [ operandType baseType isFloatType ] ])
+				ifTrue: [ mappedOperation := operationMapping second ]
+				ifFalse: [ mappedOperation := operationMapping first ].
+			^ builder addOperation: mappedOperation operand: operand ].
+	builtInFunctionRef := SLVMConstantBuiltInFunction
+		pointerSize: compilationTarget pointerSize
+		name: builtInFunction canonicalName
+		functionType: (builtInFunction functionType asSlovimType: compilationTarget).
 	^ builder call: builtInFunctionRef arguments: coercedArguments
 ]
 
@@ -229,31 +258,31 @@ DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 	"TODO: Generate the proper function type."
+
 	| functionType argumentDecls function argDecl |
 	argumentDecls := OrderedCollection new.
-	aCodeBlock outputs ifNotNil: [
-		aCodeBlock outputs keysAndValuesDo: [ :name :decl |
-			argumentDecls add: decl.
-		]
-	].
-
-	aCodeBlock inputs ifNotNil: [
-		aCodeBlock inputs keysAndValuesDo: [ :name :decl |
-			argumentDecls add: decl.
-		]
-	].
-
-	functionType := DASLFunctionType arguments: (argumentDecls collect: #type) returnType: DASLType voidType.
+	aCodeBlock outputs
+		ifNotNil: [ aCodeBlock outputs
+				keysAndValuesDo: [ :name :decl | argumentDecls add: decl ] ].
+	aCodeBlock inputs
+		ifNotNil: [ aCodeBlock inputs
+				keysAndValuesDo: [ :name :decl | argumentDecls add: decl ] ].
+	functionType := DASLFunctionType
+		arguments: (argumentDecls collect: #type)
+		returnType: DASLType voidType.
 	aCodeBlock functionType: functionType.
-	function := SLVMFunction name: aCodeBlock name functionType: functionType asSlovimType.
-	function arguments doWithIndex: [ :arg :index |
-		argDecl := argumentDecls at: index.
-		argDecl codegenValue: arg.
-		arg name: argDecl name
-	].
-
+	function := SLVMFunction
+		pointerSize: compilationTarget pointerSize
+		name: aCodeBlock name
+		functionType: (functionType asSlovimType: compilationTarget).
+	function compilationTarget: compilationTarget.
+	function arguments
+		doWithIndex: [ :arg :index | 
+			argDecl := argumentDecls at: index.
+			argDecl codegenValue: arg.
+			arg name: argDecl name ].
 	aCodeBlock codegenValue: function.
-	ssaModule add: aCodeBlock codegenValue.
+	ssaModule add: aCodeBlock codegenValue
 ]
 
 { #category : #visitor }
@@ -303,10 +332,14 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	| functionType function |
 	functionType := aFunctionNode functionType.
-	function := SLVMFunction name: aFunctionNode mangledName asSymbol functionType: functionType asSlovimType.
+	function := SLVMFunction
+		pointerSize: compilationTarget
+		name: aFunctionNode mangledName asSymbol
+		functionType: (functionType asSlovimType: compilationTarget).
+	function compilationTarget: compilationTarget.
 	function unmangledName: aFunctionNode name.
 	aFunctionNode codegenValue: function.
-	ssaModule add: function.
+	ssaModule add: function
 ]
 
 { #category : #visitor }
@@ -435,10 +468,14 @@ DASLSSACodegenVisitor >> generateSemanticBlocks: translationUnit [
 DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 	| fullName globalVar |
 	fullName := namePrefix , aVariable name.
-	globalVar := SLVMGlobalVariable name: fullName valueType: aVariable type asSlovimType storage: aVariable storage.
+	globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: fullName
+		valueType: (aVariable type asSlovimType: compilationTarget)
+		storage: aVariable storage.
 	aVariable codegenValue: globalVar.
 	globalVar propertyAt: #location put: aVariable flow location.
-	ssaModule add: globalVar.
+	ssaModule add: globalVar
 ]
 
 { #category : #visitor }
@@ -446,25 +483,35 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	| elementTypes blockType globalVar fieldNames storage isPushConstant |
 	elementTypes := uniformBlock body collect: #type.
 	fieldNames := uniformBlock body collect: #name.
-	blockType := DASLStructureType name: uniformBlock name types: elementTypes kind: DASLStructureType blockKind names: fieldNames.
-
-	isPushConstant := uniformBlock attributes keys detect: [:key | key value == #push_constant] ifFound: [ true] ifNone: [ false ].
-	storage := isPushConstant ifTrue: [ DASLType pushConstantStorage ] ifFalse: [ DASLType uniformStorage ].
-	globalVar := SLVMGlobalVariable name: uniformBlock name valueType: blockType asSlovimType storage: storage.
-	
-	uniformBlock attributes keysAndValuesDo: [ :key :value |
-		globalVar propertyAt: key value asSymbol put: value value
-	].
-
+	blockType := DASLStructureType
+		name: uniformBlock name
+		types: elementTypes
+		kind: DASLStructureType blockKind
+		names: fieldNames.
+	isPushConstant := uniformBlock attributes keys
+		detect: [ :key | key value == #push_constant ]
+		ifFound: [ true ]
+		ifNone: [ false ].
+	storage := isPushConstant
+		ifTrue: [ DASLType pushConstantStorage ]
+		ifFalse: [ DASLType uniformStorage ].
+	globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: uniformBlock name
+		valueType: (blockType asSlovimType: compilationTarget)
+		storage: storage.
+	uniformBlock attributes
+		keysAndValuesDo:
+			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
 	ssaModule add: globalVar.
 	uniformBlock codegenValue: globalVar.
-	
-	uniformBlock body do: [ :var |
-		var codegenValue: [:currentBuilder |
-			currentBuilder getReference: globalVar element: (SLVMConstantValue int: var fieldIndex)
-		]
-	].
-
+	uniformBlock body
+		do: [ :var | 
+			var
+				codegenValue: [ :currentBuilder | 
+					currentBuilder
+						getReference: globalVar
+						element: (SLVMConstantValue int: var fieldIndex) ] ]
 ]
 
 { #category : #visitor }
@@ -475,14 +522,16 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
 	| globalVar |
-	globalVar := SLVMGlobalVariable name: uniformGlobal name valueType: uniformGlobal type asSlovimType storage: DASLType uniformConstantStorage.
+	globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: uniformGlobal name
+		valueType: (uniformGlobal type asSlovimType: compilationTarget)
+		storage: DASLType uniformConstantStorage.
 	uniformGlobal codegenValue: globalVar.
-	uniformGlobal attributes keysAndValuesDo: [ :key :value |
-		globalVar propertyAt: key value asSymbol put: value value
-	].
-
-	ssaModule add: globalVar.
-
+	uniformGlobal attributes
+		keysAndValuesDo:
+			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
+	ssaModule add: globalVar
 ]
 
 { #category : #visitor }
@@ -494,6 +543,7 @@ DASLSSACodegenVisitor >> generateUniformGlobals: translationUnit [
 DASLSSACodegenVisitor >> initialize [
 	super initialize.
 	visitedTranslationUnits := Set new.
+	compilationTarget := SLVM32BitsPointerCompilationTarget new.
 ]
 
 { #category : #compilation }
@@ -508,7 +558,7 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 	| value variable coercedValued |
 	value := assignment value accept: self.
 	variable := assignment reference accept: self.
-	self assert: variable type isReferenceType.
+	self assert: variable type isPointerType.
 	assignment builtInFunction ifNotNil: [
 		value := self generateBuiltInCall: assignment builtInFunction self: nil arguments: { variable . value } 
 	].
@@ -547,43 +597,40 @@ DASLSSACodegenVisitor >> visitBreakStatement: statement [
 DASLSSACodegenVisitor >> visitCallBlockStatement: statement [
 	| block arguments resultValue resultExpression outputsToStore tempVar argumentExpression argumentValue |
 	block := statement blockReference type block.
-	
 	arguments := OrderedCollection new.
 	outputsToStore := OrderedCollection new.
-	
-	block outputs ifNotNil: [
-		block outputs keysAndValuesDo: [ :outputName :outputDecl |
-			resultExpression := statement results at: outputName ifAbsent: [ nil. ].
-			resultValue := resultExpression ifNotNil: [ resultExpression accept: self ] ifNil: [ allocaBuilder alloca: outputDecl type baseType ].
-			resultValue type ~= outputDecl type ifTrue: [
-				tempVar := allocaBuilder alloca: outputDecl type baseType asSlovimType.
-				arguments add: tempVar.
-				outputsToStore add: {tempVar . resultValue} 
-			] ifFalse: [
-				arguments add: tempVar
-			]
-		]
-	].
-
-	block inputs ifNotNil: [
-		block inputs keysAndValuesDo: [ :inputName :inputDecl |
-			argumentExpression := statement arguments at: inputName ifAbsent: [ nil. ].
-			argumentExpression ifNotNil:[
-				argumentValue := self coerce: (argumentExpression accept: self) into: inputDecl type
-			] ifNil: [
-				self halt.
-			].
-		
-			arguments add: argumentValue.
-		]
-	].
-
+	block outputs
+		ifNotNil: [ block outputs
+				keysAndValuesDo: [ :outputName :outputDecl | 
+					resultExpression := statement results at: outputName ifAbsent: [ nil ].
+					resultValue := resultExpression
+						ifNotNil: [ resultExpression accept: self ]
+						ifNil: [ allocaBuilder alloca: outputDecl type baseType ].
+					resultValue type ~= outputDecl type
+						ifTrue: [ tempVar := allocaBuilder
+								alloca: (outputDecl type baseType asSlovimType: compilationTarget).
+							arguments add: tempVar.
+							outputsToStore
+								add:
+									{tempVar.
+									resultValue} ]
+						ifFalse: [ arguments add: tempVar ] ] ].
+	block inputs
+		ifNotNil: [ block inputs
+				keysAndValuesDo: [ :inputName :inputDecl | 
+					argumentExpression := statement arguments
+						at: inputName
+						ifAbsent: [ nil ].
+					argumentExpression
+						ifNotNil: [ argumentValue := self
+								coerce: (argumentExpression accept: self)
+								into: inputDecl type ]
+						ifNil: [ self halt ].
+					arguments add: argumentValue ] ].
 	builder call: block codegenValue arguments: arguments asArray.
-	
-	outputsToStore do: [ :output |
-		builder store: (builder load: output first) in: output second. 
-	].
-
+	outputsToStore
+		do:
+			[ :output | builder store: (builder load: output first) in: output second ]
 ]
 
 { #category : #visitor }
@@ -608,7 +655,7 @@ DASLSSACodegenVisitor >> visitCallExpression: callExpression [
 	function isType ifTrue: [ ^ self generateCastOrConstructionOf: function arguments: arguments ].
 	
 	functionRefType := function type.
-	self assert: functionRefType isReferenceType.
+	self assert: functionRefType isPointerType.
 	functionType := functionRefType baseType.
 	self assert: functionType isFunctionType.
 	
@@ -633,7 +680,9 @@ DASLSSACodegenVisitor >> visitExpressionStatement: expressionStatement [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitFloat: literal [
-	^ SLVMConstantValue type: literal type asSlovimType value: literal value
+	^ SLVMConstantValue
+		type: (literal type asSlovimType: compilationTarget)
+		value: literal value
 ]
 
 { #category : #visitor }
@@ -740,14 +789,14 @@ DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 	| valueType variable initialValue coercedInitialValue |
 	localDeclaration flow ifNotNil: [ ^ self ].
 	valueType := localDeclaration type.
-	variable := allocaBuilder alloca: valueType asSlovimType name: localDeclaration name.
+	variable := allocaBuilder
+		alloca: (valueType asSlovimType: compilationTarget)
+		name: localDeclaration name.
 	localDeclaration codegenValue: variable.
-	localDeclaration initialValue ifNotNil: [ 
-		initialValue := localDeclaration initialValue accept: self.
-		coercedInitialValue := self coerce: initialValue into: valueType.
-		builder store: coercedInitialValue in: variable
-	].
-
+	localDeclaration initialValue
+		ifNotNil: [ initialValue := localDeclaration initialValue accept: self.
+			coercedInitialValue := self coerce: initialValue into: valueType.
+			builder store: coercedInitialValue in: variable ]
 ]
 
 { #category : #visitor }
@@ -764,7 +813,7 @@ DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	
 	accessKind = #swizzle ifTrue: [
 		indices := memberAccess memberIndex.
-		baseReference type isReferenceType ifTrue: [
+		baseReference type isPointerType ifTrue: [
 			baseReference := builder load: baseReference
 		].
 	

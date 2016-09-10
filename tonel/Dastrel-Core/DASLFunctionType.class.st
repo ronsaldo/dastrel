@@ -34,8 +34,10 @@ DASLFunctionType >> arguments: anObject [
 ]
 
 { #category : #converting }
-DASLFunctionType >> asSlovimType [
-	^ SLVMFunctionType arguments: (arguments collect: #asSlovimType) returnType: returnType asSlovimType
+DASLFunctionType >> asSlovimType: compilationTarget [
+	^ SLVMFunctionType
+		arguments: (arguments collect: [:arg | arg asSlovimType: compilationTarget])
+		returnType: (returnType asSlovimType: compilationTarget)
 ]
 
 { #category : #comparing }

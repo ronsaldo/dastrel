@@ -15,7 +15,7 @@ DASLSamplerType >> accept: aVisitor [
 ]
 
 { #category : #converting }
-DASLSamplerType >> asSlovimType [
+DASLSamplerType >> asSlovimType: compilationTarget [
 	^ SLVMType samplerType
 ]
 

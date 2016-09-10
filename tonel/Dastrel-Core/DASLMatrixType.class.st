@@ -56,8 +56,12 @@ DASLMatrixType >> alignment: anObject [
 ]
 
 { #category : #converting }
-DASLMatrixType >> asSlovimType [
-	^ SLVMMatrixType baseType: baseType asSlovimType rows: rows columns: columns alignment: alignment
+DASLMatrixType >> asSlovimType: compilationTarget [
+	^ SLVMMatrixType
+		baseType: (baseType asSlovimType: nil)
+		rows: rows
+		columns: columns
+		alignment: alignment
 ]
 
 { #category : #accessing }

@@ -38,8 +38,16 @@ DASLTextureType >> array: anObject [
 ]
 
 { #category : #converting }
-DASLTextureType >> asSlovimType [
-	^ SLVMTextureType new name: name; sampledType: sampledType asSlovimType; dimensions: dimensions; array: array; depth: depth; multisample: multisample; sampled: sampled; yourself
+DASLTextureType >> asSlovimType: compilationTarget [
+	^ SLVMTextureType new
+		name: name;
+		sampledType: (sampledType asSlovimType: compilationTarget);
+		dimensions: dimensions;
+		array: array;
+		depth: depth;
+		multisample: multisample;
+		sampled: sampled;
+		yourself
 ]
 
 { #category : #accessing }

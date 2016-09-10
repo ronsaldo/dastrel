@@ -44,8 +44,11 @@ DASLReferenceType >> accept: aVisitor [
 ]
 
 { #category : #converting }
-DASLReferenceType >> asSlovimType [
-	^ SLVMReferenceType baseType: baseType asSlovimType storage: storage
+DASLReferenceType >> asSlovimType: compilationTarget [
+	^ SLVMPointerType
+		size: compilationTarget pointerSize
+		baseType: (baseType asSlovimType: compilationTarget)
+		storage: storage
 ]
 
 { #category : #accessing }

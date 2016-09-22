@@ -143,6 +143,27 @@ DASLParser >> continueStatement [
 ]
 
 { #category : #grammar }
+DASLParser >> descriptorSet [
+	^ super descriptorSet ==> [ :tokens | DASLShaderSignatureDescriptorSet new
+			position: (self positionFromToken: tokens first);
+			properties: tokens second; 
+			name: tokens third value;
+			slots: tokens fifth;
+			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> descriptorSetElement [
+	^ super descriptorSetElement ==> [ :tokens | DASLShaderSignatureDescriptorSlot new
+			position: tokens first position;
+			name: tokens first value;
+			type: tokens third; 
+			arraySize: (tokens fourth ifNotNil: [ :subscript | subscript second value ] ifNil: [0]);
+			repetitionCount: (tokens fifth ifNotNil: [ :subscript | subscript second value ] ifNil: [1]);
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> discardStatement [
 	^ super discardStatement ==> [ :tokens | DASLDiscardStatement new
 			position: (self positionFromToken: tokens first);
@@ -359,6 +380,16 @@ DASLParser >> prefix: operation operate: operand [
 ]
 
 { #category : #grammar }
+DASLParser >> pushConstantSignature [
+	^ super pushConstantSignature ==> [ :tokens | DASLShaderSignaturePushConstant new
+			position: (self positionFromToken: tokens first);
+			properties: tokens second; 
+			name: tokens third value;
+			count: (tokens fourth ifNotNil: [ :count | count second value ] ifNil: [ 1 ] );
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> returnStatement [
 	^ super returnStatement ==> [ :tokens | DASLReturnStatement new
 			position: (self positionFromToken: tokens first);
@@ -374,6 +405,20 @@ DASLParser >> semantic [
 			interfaceList: block third;
 			body: block fifth;
 			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> shaderSignature [
+	^ super shaderSignature ==> [ :tokens | DASLShaderSignature new
+			position: (self positionFromToken: tokens first);
+			name: tokens second value;
+			elements: tokens fourth;
+			yourself ]
+]
+
+{ #category : #grammar }
+DASLParser >> shaderSignatureElementKeywordType [
+	^ super shaderSignatureElementKeywordType ==> [ :token | DASLIdentifier position: (self positionFromToken: token) token: token inputValue ]
 ]
 
 { #category : #grammar }

@@ -70,7 +70,7 @@ DASLCodePosition >> position [
 
 { #category : #'as yet unclassified' }
 DASLCodePosition >> printOn: aStream [
-	aStream nextPutAll: fileName.
+	aStream nextPutAll: fileName asString.
 	aStream nextPut: $:.
 	line printOn: aStream.
 	aStream nextPut: $:.

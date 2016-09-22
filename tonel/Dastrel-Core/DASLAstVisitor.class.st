@@ -157,6 +157,18 @@ DASLAstVisitor >> visitSemanticBlock: semanticBlock [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitShaderSignature: shaderSignature [
+]
+
+{ #category : #visitor }
+DASLAstVisitor >> visitShaderSignatureDescriptorSet: descriptorSet [
+]
+
+{ #category : #visitor }
+DASLAstVisitor >> visitShaderSignatureDescriptorSlot: descriptorSlot [
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitString: string [
 	self subclassResponsibility
 ]

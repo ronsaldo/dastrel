@@ -122,7 +122,18 @@ Class {
 		'leftArrow',
 		'typeArraySubscript',
 		'kwBuffer',
-		'buffer'
+		'buffer',
+		'kwShaderSignature',
+		'shaderSignature',
+		'shaderSignatureElement',
+		'descriptorSet',
+		'kwDescriptorSet',
+		'descriptorSetElement',
+		'shaderSignatureElementType',
+		'shaderSignatureElementKeywordType',
+		'multiply',
+		'pushConstantSignature',
+		'kwPushConstant'
 	],
 	#classVars : [
 		'Keywords'
@@ -140,7 +151,7 @@ DASLGrammar class >> initialize [
 	Keywords := Set newFrom: #(
 		in out inout
 		let const
-		uniform
+		uniform buffer
 		interface semantic implements struct
 		sizeof alignof
 		function code_block graph_block
@@ -148,6 +159,7 @@ DASLGrammar class >> initialize [
 		import
 		case
 		if else for do while switch break continue
+		shader_signature descriptor_set
 	).
 ]
 
@@ -315,6 +327,16 @@ DASLGrammar >> continueStatement [
 ]
 
 { #category : #grammar }
+DASLGrammar >> descriptorSet [
+	^ kwDescriptorSet , blockAttributes optional , identifier , leftCBracket , descriptorSetElement star , rightCBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> descriptorSetElement [
+	^ identifier , colon , shaderSignatureElementType , (leftBracket , integer , rightBracket) optional , (multiply , integer) optional, semicolon
+]
+
+{ #category : #grammar }
 DASLGrammar >> discardStatement [
 	^ kwDiscard , semicolon
 ]
@@ -396,7 +418,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / interface / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
+	^ import / shaderSignature / interface / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -513,6 +535,11 @@ DASLGrammar >> kwContinue [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwDescriptorSet [
+	^ self keywordParser: 'descriptor_set'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwDiscard [
 	^ self keywordParser: 'discard'
 ]
@@ -578,6 +605,11 @@ DASLGrammar >> kwOut [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwPushConstant [
+	^ self keywordParser: 'push_constant'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwReturn [
 	^ self keywordParser: 'return'
 ]
@@ -585,6 +617,11 @@ DASLGrammar >> kwReturn [
 { #category : #keywords }
 DASLGrammar >> kwSemantic [
 	^ self keywordParser: 'semantic'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwShaderSignature [
+	^ self keywordParser: 'shader_signature'
 ]
 
 { #category : #keywords }
@@ -662,6 +699,11 @@ DASLGrammar >> multiLineComment [
 	^ '/*' asParser , '*/' asParser negate star , '*/' asParser
 ]
 
+{ #category : #tokens }
+DASLGrammar >> multiply [
+	^ $* asParser token trim: ignorable
+]
+
 { #category : #ignorables }
 DASLGrammar >> newline [
 	^ String crlf asParser / String cr asParser / String lf asParser
@@ -707,6 +749,11 @@ DASLGrammar >> prefix: operation operate: operand [
 	^ { operation . operand }
 ]
 
+{ #category : #grammar }
+DASLGrammar >> pushConstantSignature [
+	^ kwPushConstant , blockAttributes optional , identifier , (multiply , integer) optional, semicolon
+]
+
 { #category : #tokens }
 DASLGrammar >> questionMark [
 	^ $? asParser token trim: ignorable
@@ -745,6 +792,26 @@ DASLGrammar >> semanticBody [
 { #category : #tokens }
 DASLGrammar >> semicolon [
 	^ $; asParser token trim: ignorable
+]
+
+{ #category : #grammar }
+DASLGrammar >> shaderSignature [
+	^ kwShaderSignature , identifier , leftCBracket , shaderSignatureElement star , rightCBracket 
+]
+
+{ #category : #grammar }
+DASLGrammar >> shaderSignatureElement [
+	^ descriptorSet / pushConstantSignature
+]
+
+{ #category : #grammar }
+DASLGrammar >> shaderSignatureElementKeywordType [
+	^ kwBuffer / kwUniform
+]
+
+{ #category : #grammar }
+DASLGrammar >> shaderSignatureElementType [
+	^ shaderSignatureElementKeywordType  / identifier
 ]
 
 { #category : #ignorables }

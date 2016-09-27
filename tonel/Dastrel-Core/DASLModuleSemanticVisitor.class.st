@@ -69,6 +69,40 @@ DASLModuleSemanticVisitor >> visitSemanticBlock: semanticBlock [
 ]
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitShaderSignature: shaderSignature [
+	| totalPushConstantCount totalBindingCount totalSetCount bindingCount "typeTotalBindingCount" |
+	compilationContext shaderSignatures at: shaderSignature name ifPresent: [
+		self error: 'overriding previously defined shader signature.' at: shaderSignature
+	].
+
+	totalSetCount := 0.
+	totalPushConstantCount := 0.
+	totalBindingCount := 0.
+	"typeTotalBindingCount := Dictionary new."
+	
+	shaderSignature elements do: [ :element |
+		element isShaderSignatureDescriptorSet ifTrue: [
+			bindingCount := 0.
+			element slots do: [ :slot|
+				slot
+					set: totalSetCount;
+					binding: bindingCount;
+					linearBinding: totalBindingCount.
+				bindingCount := bindingCount + slot repetitionCount.
+				totalBindingCount := totalBindingCount + slot repetitionCount.
+			].
+		
+			totalSetCount := totalSetCount + 1.
+		].
+	
+		element isShaderSignaturePushConstant ifTrue: [
+			totalPushConstantCount := totalPushConstantCount + element count
+		].
+	].
+
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitStructureBlock: structureBlock [
 	currentScope at: structureBlock name put: structureBlock ifPresent: [
 		self error: 'uniform block overrides a previously defined symbol' at: structureBlock

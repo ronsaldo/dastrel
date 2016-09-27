@@ -18,6 +18,11 @@ DASLShaderSignaturePushConstant >> count: anObject [
 	count := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLShaderSignaturePushConstant >> isShaderSignaturePushConstant [
+	^ false
+]
+
 { #category : #accessing }
 DASLShaderSignaturePushConstant >> properties [
 	^ properties

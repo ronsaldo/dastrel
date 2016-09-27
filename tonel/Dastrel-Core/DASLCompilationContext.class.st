@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'translationUnits',
-		'lineInfoCache'
+		'lineInfoCache',
+		'shaderSignatures'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -56,6 +57,7 @@ DASLCompilationContext >> initialize [
 	super initialize.
 	translationUnits := Dictionary new.
 	lineInfoCache := Dictionary new.
+	shaderSignatures := Dictionary new.
 ]
 
 { #category : #initialization }
@@ -92,4 +94,9 @@ DASLCompilationContext >> positionFromOffset: fileOffset fileName: fileName [
 { #category : #initialization }
 DASLCompilationContext >> positionFromToken: token fileName: fileName [
 	^ self positionFromOffset: token start fileName: fileName
+]
+
+{ #category : #'as yet unclassified' }
+DASLCompilationContext >> shaderSignatures [
+	^ shaderSignatures
 ]

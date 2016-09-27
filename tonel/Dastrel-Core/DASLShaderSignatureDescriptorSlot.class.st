@@ -4,7 +4,11 @@ Class {
 	#instVars : [
 		'type',
 		'arraySize',
-		'repetitionCount'
+		'repetitionCount',
+		'set',
+		'binding',
+		'linearBinding',
+		'typeLinearBinding'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -25,6 +29,37 @@ DASLShaderSignatureDescriptorSlot >> arraySize: anObject [
 ]
 
 { #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> binding [
+	^ binding
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> binding: anObject [
+	binding := anObject
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> linearBinding [
+	^ linearBinding
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> linearBinding: anObject [
+	linearBinding := anObject
+]
+
+{ #category : #'as yet unclassified' }
+DASLShaderSignatureDescriptorSlot >> printOn: aStream [
+	aStream nextPutAll: 'bindingSlot: '; print: name;
+		space; nextPutAll: 'type: '; print: type;
+		space; nextPutAll: 'repetitionCount: '; print: repetitionCount;
+		space; nextPutAll: 'set: '; print: set;
+		space; nextPutAll: 'binding: '; print: binding;
+		space; nextPutAll: 'linearBinding: '; print: linearBinding;
+		space; nextPutAll: 'typeLinearBinding: '; print: typeLinearBinding.
+]
+
+{ #category : #accessing }
 DASLShaderSignatureDescriptorSlot >> repetitionCount [
 	^ repetitionCount
 ]
@@ -35,6 +70,16 @@ DASLShaderSignatureDescriptorSlot >> repetitionCount: anObject [
 ]
 
 { #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> set [
+	^ set
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> set: anObject [
+	set := anObject
+]
+
+{ #category : #accessing }
 DASLShaderSignatureDescriptorSlot >> type [
 	^ type
 ]
@@ -42,4 +87,14 @@ DASLShaderSignatureDescriptorSlot >> type [
 { #category : #accessing }
 DASLShaderSignatureDescriptorSlot >> type: anObject [
 	type := anObject
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> typeLinearBinding [
+	^ typeLinearBinding
+]
+
+{ #category : #accessing }
+DASLShaderSignatureDescriptorSlot >> typeLinearBinding: anObject [
+	typeLinearBinding := anObject
 ]

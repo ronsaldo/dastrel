@@ -7,6 +7,16 @@ Class {
 	#category : #'Dastrel-Core-AST'
 }
 
+{ #category : #testing }
+DASLShaderSignatureElement >> isShaderSignatureDescriptorSet [
+	^ false
+]
+
+{ #category : #testing }
+DASLShaderSignatureElement >> isShaderSignaturePushConstant [
+	^ false
+]
+
 { #category : #accessing }
 DASLShaderSignatureElement >> name [
 	^ name

@@ -13,6 +13,11 @@ DASLShaderSignatureDescriptorSet >> accept: visitor [
 	^ visitor visitShaderSignatureDescriptorSet: self
 ]
 
+{ #category : #'as yet unclassified' }
+DASLShaderSignatureDescriptorSet >> isShaderSignatureDescriptorSet [
+	^ true
+]
+
 { #category : #accessing }
 DASLShaderSignatureDescriptorSet >> properties [
 	^ properties

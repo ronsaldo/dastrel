@@ -13,15 +13,16 @@ Class {
 	#category : #'Dastrel-BuildTool'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 DASLBuildShaderStage class >> initialize [
 	"
-	super initialize
+	self initialize
 	"
 	
 	LanguageDictionary := Dictionary newFromPairs: #(
 		'spir-v' (spirVTarget spv false)
 		glsl (glslTarget glsl true)
+		metal (metalTarget metal false)
 	).
 	
 	StageSuffixMap := Dictionary newFromPairs: #(

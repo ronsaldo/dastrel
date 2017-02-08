@@ -5,8 +5,47 @@ Class {
 		'currentDirectory',
 		'currentTranslationUnit'
 	],
+	#classVars : [
+		'MetalBindingTypeMap'
+	],
 	#category : #'Dastrel-Core-Semantic'
 }
+
+{ #category : #initialization }
+DASLModuleSemanticVisitor class >> initialize [
+	super initialize.
+	MetalBindingTypeMap := Dictionary newFromPairs: #(
+		uniform buffer
+		buffer buffer
+		texture texture
+		sampler sampler
+	).
+]
+
+{ #category : #visitor }
+DASLModuleSemanticVisitor >> computeMetalShaderSignatureBindings: shaderSignature [
+	| perTypeBindings metalType bindingCount |
+	perTypeBindings := Dictionary new.
+	shaderSignature elements do: [ :signatureElement |
+		signatureElement isShaderSignatureDescriptorSet ifTrue: [
+			signatureElement slots do: [ :slot |
+				metalType := MetalBindingTypeMap at: slot type value.
+				bindingCount := perTypeBindings at: metalType ifAbsent: [ 0 ].
+				slot
+					metalType: metalType;
+					metalBinding: bindingCount.
+				perTypeBindings at: metalType put: bindingCount + (slot repetitionCount max: 1)
+			]
+		].
+	
+		signatureElement isShaderSignaturePushConstant ifTrue: [
+			self flag: 'Make sure this is the last element'.
+			signatureElement
+				metalType: #buffer;
+				metalBinding: (perTypeBindings at: #buffer)
+		]
+	].
+]
 
 { #category : #visitor }
 DASLModuleSemanticVisitor >> visitBufferBlock: bufferBlock [
@@ -75,10 +114,11 @@ DASLModuleSemanticVisitor >> visitShaderSignature: shaderSignature [
 		self error: 'overriding previously defined shader signature.' at: shaderSignature
 	].
 
+	compilationContext shaderSignatures at: shaderSignature name put: shaderSignature.
+
 	totalSetCount := 0.
 	totalPushConstantCount := 0.
 	totalBindingCount := 0.
-	"typeTotalBindingCount := Dictionary new."
 	
 	shaderSignature elements do: [ :element |
 		element isShaderSignatureDescriptorSet ifTrue: [
@@ -100,6 +140,7 @@ DASLModuleSemanticVisitor >> visitShaderSignature: shaderSignature [
 		].
 	].
 
+	self computeMetalShaderSignatureBindings: shaderSignature
 ]
 
 { #category : #visitor }

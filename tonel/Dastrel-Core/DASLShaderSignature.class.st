@@ -24,6 +24,15 @@ DASLShaderSignature >> elements: anObject [
 ]
 
 { #category : #accessing }
+DASLShaderSignature >> memberAt: memberName ifAbsent: aBlock [
+	elements do: [ :element |
+		element name = memberName ifTrue: [ ^ element ]
+	].
+
+	^ aBlock value
+]
+
+{ #category : #accessing }
 DASLShaderSignature >> name [
 	^ name
 ]

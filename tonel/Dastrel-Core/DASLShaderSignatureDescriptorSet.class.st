@@ -19,6 +19,15 @@ DASLShaderSignatureDescriptorSet >> isShaderSignatureDescriptorSet [
 ]
 
 { #category : #accessing }
+DASLShaderSignatureDescriptorSet >> memberAt: memberName ifAbsent: aBlock [
+	slots do: [ :slot |
+		slot name = memberName ifTrue: [ ^ slot ]
+	].
+	
+	^ aBlock value
+]
+
+{ #category : #accessing }
 DASLShaderSignatureDescriptorSet >> properties [
 	^ properties
 ]

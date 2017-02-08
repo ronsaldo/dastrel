@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'currentFunction',
 		'samplerBuiltIns',
-		'loopLevel'
+		'loopLevel',
+		'propertyEvaluator'
 	],
 	#classVars : [
 		'SwizzleComponentIndices'
@@ -129,6 +130,7 @@ DASLBlockSemanticVisitor >> visitBreakStatement: statement [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitBufferBlock: interface [
+	propertyEvaluator validateBufferBlockProperties: interface
 ]
 
 { #category : #visitor }
@@ -442,18 +444,21 @@ DASLBlockSemanticVisitor >> visitSubscriptExpression: subscriptAccess [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitTranslationUnit: translationUnit [
+	propertyEvaluator := DASLPropertyEvaluator new compilationContext: compilationContext.
 	self withScope: translationUnit package do: [
 		translationUnit modules do: [ :module | module accept: self ]
 	].
+
 ]
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitUniformBlock: interface [
+	propertyEvaluator validateUniformBlockProperties: interface
 ]
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitUniformGlobal: uniformGlobal [
-	"Nothing to do"
+	propertyEvaluator validateUniformGlobalProperties: uniformGlobal
 ]
 
 { #category : #visitor }

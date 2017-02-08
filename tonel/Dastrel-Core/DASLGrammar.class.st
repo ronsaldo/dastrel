@@ -188,7 +188,7 @@ DASLGrammar >> assignmentOperator [
 
 { #category : #grammar }
 DASLGrammar >> attributeKeyAndValue [
-	^ identifier , (equalAssign , literalExpression) optional
+	^ identifier , (equalAssign , expression) optional
 ]
 
 { #category : #grammar }

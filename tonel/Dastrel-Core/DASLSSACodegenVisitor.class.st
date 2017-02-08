@@ -115,6 +115,13 @@ DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 		arguments: expandedArguments asArray
 ]
 
+{ #category : #visitor }
+DASLSSACodegenVisitor >> convertProperties: properties for: globalVar [
+	properties
+		keysAndValuesDo:
+			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
+]
+
 { #category : #coercing }
 DASLSSACodegenVisitor >> extractImplicitVectorElements: vectorOrScalar typeElement: typeElement into: expandedArguments [
 	| vectorOrScalarTypeNoRef loadedVector |
@@ -500,9 +507,7 @@ DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 		name: uniformBlock name
 		valueType: (blockType asSlovimType: compilationTarget)
 		storage: storage.
-	uniformBlock attributes
-		keysAndValuesDo:
-			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
+	self convertProperties: uniformBlock attributes for: globalVar.
 	ssaModule add: globalVar.
 	uniformBlock codegenValue: globalVar.
 	uniformBlock body
@@ -528,9 +533,7 @@ DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
 		valueType: (uniformGlobal type asSlovimType: compilationTarget)
 		storage: DASLType uniformConstantStorage.
 	uniformGlobal codegenValue: globalVar.
-	uniformGlobal attributes
-		keysAndValuesDo:
-			[ :key :value | globalVar propertyAt: key value asSymbol put: value value ].
+	self convertProperties: uniformGlobal attributes for: globalVar.
 	ssaModule add: globalVar
 ]
 

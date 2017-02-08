@@ -19,7 +19,7 @@ Class {
 DASLShaderSignatureDescriptorSlot >> + offset [
 	^ self copy
 		binding: binding + offset;
-		metalBinding: binding + offset
+		metalBinding: metalBinding + offset
 ]
 
 { #category : #visitor }

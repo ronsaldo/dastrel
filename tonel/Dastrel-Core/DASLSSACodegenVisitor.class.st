@@ -551,7 +551,7 @@ DASLSSACodegenVisitor >> initialize [
 
 { #category : #compilation }
 DASLSSACodegenVisitor >> passOn: ast [
-	ssaModule := SLVMModule new.
+	ssaModule := SLVMModule new compilationTarget: compilationTarget.
 	ast accept: self.
 	^ ssaModule
 ]

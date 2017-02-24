@@ -451,7 +451,7 @@ DASLGrammar >> ifStatement [
 
 { #category : #ignorables }
 DASLGrammar >> ignorable [
-	^ singleLineComment / #space asParser
+	^ singleLineComment / multiLineComment / #space asParser
 ]
 
 { #category : #grammar }
@@ -696,7 +696,11 @@ DASLGrammar >> memberExpression [
 
 { #category : #ignorables }
 DASLGrammar >> multiLineComment [
-	^ '/*' asParser , '*/' asParser negate star , '*/' asParser
+	^ '/*' asParser ,
+		( ($* asParser negate) /
+			($* asParser , $/ asParser negate)
+		) star ,
+	'*/' asParser
 ]
 
 { #category : #tokens }

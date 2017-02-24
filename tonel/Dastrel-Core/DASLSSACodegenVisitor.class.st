@@ -901,10 +901,11 @@ DASLSSACodegenVisitor >> visitUsingStatement: anUsingStatement [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitWhileStatement: statement [
-	| conditionValue  loopHeader loopBody loopMerge branchInstruction |
+	| conditionValue  loopHeader loopBody loopMerge branchInstruction loopContinue |
 	loopHeader := builder newBasicBlock: 'whileCondition'.
 	loopBody := builder newBasicBlock: 'whileBody'.
 	loopMerge := builder newBasicBlock: 'whileMerge'.
+	loopContinue := builder newBasicBlock: 'whileContinue'.
 	
 	builder
 		jump: loopHeader;
@@ -914,13 +915,21 @@ DASLSSACodegenVisitor >> visitWhileStatement: statement [
 	branchInstruction := builder branch: conditionValue ifTrue: loopBody ifFalse: loopMerge.
 	branchInstruction
 		mergeBlock: loopMerge;
-		continueBlock: loopHeader.
+		continueBlock: loopContinue.
 		
-	self withBreak: loopMerge continue: loopHeader do: [
+	self withBreak: loopMerge continue: loopContinue do: [
 		"Emit the loop body".
 		builder currentBlock: loopBody.
 		statement body accept: self.
-		builder isLastTerminator ifFalse: [ builder jump: loopHeader ]
+		builder isLastTerminator ifFalse: [ builder jump: loopContinue ]
+	].
+
+	builder currentBlock: loopContinue.
+	loopContinue predecessors ifEmpty: [ 
+		builder unreachable.
+		branchInstruction addUnreachableSuccessors
+	] ifNotEmpty: [ 
+		builder jump: loopHeader.
 	].
 
 	builder currentBlock: loopMerge.

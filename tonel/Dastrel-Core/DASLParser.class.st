@@ -1,16 +1,12 @@
 Class {
 	#name : #DASLParser,
 	#superclass : #DASLGrammar,
-	#instVars : [
-		'compilationContext',
-		'fileName'
-	],
 	#category : #'Dastrel-Core-Parser'
 }
 
-{ #category : #accessing }
-DASLParser class >> ignoredNames [
-	^ super ignoredNames , DASLParser instVarNames
+{ #category : #parsing }
+DASLParser class >> parseFromFileNamed: aFileName [
+	^ self new parseFromFileNamed: aFileName
 ]
 
 { #category : #grammar }
@@ -113,16 +109,6 @@ DASLParser >> codeBlock [
 			yourself ]
 ]
 
-{ #category : #accessing }
-DASLParser >> compilationContext [
-	^ compilationContext
-]
-
-{ #category : #accessing }
-DASLParser >> compilationContext: anObject [
-	compilationContext := anObject
-]
-
 { #category : #grammar }
 DASLParser >> conditionalExpression [
 	^ super conditionalExpression ==> [ :expr | expr second ifNil: [ expr first ] ifNotNil: [ 
@@ -176,16 +162,6 @@ DASLParser >> expressionStatement [
 			position: expr first position;
 			expression: expr first;
 			yourself]
-]
-
-{ #category : #accessing }
-DASLParser >> fileName [
-	^ fileName
-]
-
-{ #category : #accessing }
-DASLParser >> fileName: anObject [
-	fileName := anObject
 ]
 
 { #category : #tokens }
@@ -264,7 +240,7 @@ DASLParser >> ifStatement [
 DASLParser >> import [
 	^ super import ==> [ :importExpr |
 		DASLImportStatement new
-			position: importExpr;
+			position: importExpr first;
 			packageName: importExpr second value ]
 ]
 
@@ -356,9 +332,23 @@ DASLParser >> parentExpression [
 	^ super parentExpression ==> [ :expr | expr second ]
 ]
 
+{ #category : #parsing }
+DASLParser >> parse: aCollection [
+	^ super parse: aCollection asDastrelCollectionWithContext
+]
+
+{ #category : #parsing }
+DASLParser >> parseFromFileNamed: aFileName [
+	| fileRef contents |
+	fileRef := aFileName asFileReference.
+	contents := fileRef contents asDastrelCollectionWithContext.
+	contents name: fileRef fullName.
+	^ self parse: contents
+]
+
 { #category : #utility }
 DASLParser >> positionFromToken: aPPToken [
-	^ compilationContext positionFromToken: aPPToken fileName: fileName
+	^ aPPToken
 ]
 
 { #category : #grammar }

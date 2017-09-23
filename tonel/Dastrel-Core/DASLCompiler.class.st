@@ -128,10 +128,7 @@ DASLCompiler >> optimizationLevel: anObject [
 
 { #category : #parsing }
 DASLCompiler >> parse [
-	ast := parser
-		compilationContext: compilationContext;
-		fileName: currentFileName;
-		parse: sourceCode.
+	ast := parser parse: sourceCode.
 	ast isPetitFailure ifTrue: [ compilationContext parseError: ast fileName: currentFileName ].
 	ast fullPath: currentFileName.
 	compilationContext addTranslationUnit: ast.
@@ -156,8 +153,12 @@ DASLCompiler >> sourceCode: anObject [
 
 { #category : #accessing }
 DASLCompiler >> sourceFromFileNamed: aFileName [
-	self fileName: aFileName asFileReference asAbsolute fullName;
-		sourceCode: aFileName asFileReference contents
+	| fileRef |
+	fileRef := aFileName asFileReference.
+	self fileName: fileRef asAbsolute fullName.
+	sourceCode := fileRef contents asDastrelCollectionWithContext.
+	sourceCode name: currentFileName.
+
 ]
 
 { #category : #targets }

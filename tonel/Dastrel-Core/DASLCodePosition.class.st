@@ -2,10 +2,13 @@ Class {
 	#name : #DASLCodePosition,
 	#superclass : #Object,
 	#instVars : [
-		'fileName',
-		'offset',
+		'collection',
+		'start',
+		'stop',
 		'line',
-		'column'
+		'column',
+		'endLine',
+		'endColumn'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -15,64 +18,93 @@ DASLCodePosition class >> default [
 	^ self new
 ]
 
+{ #category : #converting }
+DASLCodePosition >> asDASLCodePosition [
+	^ self
+]
+
 { #category : #accessing }
+DASLCodePosition >> collection [
+	^ collection
+]
+
+{ #category : #accessing }
+DASLCodePosition >> collection: anObject [
+	collection := anObject
+]
+
+{ #category : #converting }
 DASLCodePosition >> column [
+	column ifNil: [ self fetchLineAndColumn ].
 	^ column
 ]
 
 { #category : #accessing }
-DASLCodePosition >> column: anObject [
-	column := anObject
+DASLCodePosition >> endLine [
+	endLine ifNil: [ self fetchEndLineAndColumn ].
+	^ endLine
+]
+
+{ #category : #'as yet unclassified' }
+DASLCodePosition >> fetchEndLineAndColumn [
+	| lineColumn |
+	collection ifNil: [
+		endLine := 0.
+		endColumn := 0.
+		^ self
+	].
+
+	lineColumn := collection lineColumnAt: stop.
+	endLine := lineColumn first.
+	endColumn := lineColumn second.
+]
+
+{ #category : #'as yet unclassified' }
+DASLCodePosition >> fetchLineAndColumn [
+	| lineColumn |
+	collection ifNil: [
+		line := 0.
+		column := 0.
+		^ self
+	].
+
+	lineColumn := collection lineColumnAt: start.
+	line := lineColumn first.
+	column := lineColumn second.
 ]
 
 { #category : #accessing }
 DASLCodePosition >> fileName [
-	^ fileName
+	^ collection ifNil: ['generated'] ifNotNil: [collection name]
 ]
 
-{ #category : #accessing }
-DASLCodePosition >> fileName: anObject [
-	fileName := anObject
-]
-
-{ #category : #'as yet unclassified' }
-DASLCodePosition >> initialize [
-	super initialize.
-	fileName := 'unknown'.
-	line := -1.
-	column := -1.
-]
-
-{ #category : #accessing }
+{ #category : #converting }
 DASLCodePosition >> line [
+	line ifNil: [ self fetchLineAndColumn ].
 	^ line
 ]
 
-{ #category : #accessing }
-DASLCodePosition >> line: anObject [
-	line := anObject
-]
-
-{ #category : #accessing }
-DASLCodePosition >> offset [
-	^ offset
-]
-
-{ #category : #accessing }
-DASLCodePosition >> offset: anObject [
-	offset := anObject
-]
-
-{ #category : #accessing }
-DASLCodePosition >> position [
-	^ self
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 DASLCodePosition >> printOn: aStream [
-	aStream nextPutAll: fileName asString.
-	aStream nextPut: $:.
-	line printOn: aStream.
-	aStream nextPut: $:.
-	column printOn: aStream.
+	aStream nextPutAll: self fileName; nextPut: $:; print: self line; nextPut: $:; print: self column 
+]
+
+{ #category : #accessing }
+DASLCodePosition >> start [
+	^ start
+]
+
+{ #category : #accessing }
+DASLCodePosition >> start: anObject [
+	start := anObject
+]
+
+{ #category : #accessing }
+DASLCodePosition >> stop [
+	^ stop
+]
+
+{ #category : #accessing }
+DASLCodePosition >> stop: anObject [
+	stop := anObject
 ]

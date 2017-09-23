@@ -12,6 +12,11 @@ DASLAstNode >> accept: aVisitor [
 	self subclassResponsibility
 ]
 
+{ #category : #converting }
+DASLAstNode >> asDASLCodePosition [
+	^ position
+]
+
 { #category : #initialization }
 DASLAstNode >> initialize [
 	super initialize.
@@ -95,7 +100,7 @@ DASLAstNode >> position [
 
 { #category : #accessing }
 DASLAstNode >> position: anObject [
-	position := anObject
+	position := anObject asDASLCodePosition
 ]
 
 { #category : #printing }

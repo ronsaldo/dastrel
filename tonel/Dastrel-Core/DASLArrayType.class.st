@@ -28,13 +28,6 @@ DASLArrayType >> alignment [
 	^ baseType alignment
 ]
 
-{ #category : #converting }
-DASLArrayType >> asSlovimType: compilationTarget [
-	^ SLVMArrayType
-		baseType: (baseType asSlovimType: compilationTarget)
-		elements: elements
-]
-
 { #category : #accessing }
 DASLArrayType >> baseType [
 	^ baseType
@@ -43,6 +36,13 @@ DASLArrayType >> baseType [
 { #category : #accessing }
 DASLArrayType >> baseType: anObject [
 	baseType := anObject
+]
+
+{ #category : #converting }
+DASLArrayType >> createSlovimTypeFor: compilationTarget [
+	^ SLVMArrayType
+		baseType: (baseType asSlovimType: compilationTarget)
+		elements: elements
 ]
 
 { #category : #accessing }

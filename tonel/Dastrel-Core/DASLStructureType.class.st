@@ -48,11 +48,6 @@ DASLStructureType >> alignment [
 	^ alignment
 ]
 
-{ #category : #converting }
-DASLStructureType >> asSlovimType: compilationTarget [
-	^ SLVMStructureType name: name types: (types collect: [ :arg | arg asSlovimType: compilationTarget ]) kind: kind names: names
-]
-
 { #category : #private }
 DASLStructureType >> computeLayout [
 	| currentOffset offset |
@@ -66,6 +61,11 @@ DASLStructureType >> computeLayout [
 		offset.
 	].
 	size := currentOffset alignedTo: alignment.
+]
+
+{ #category : #converting }
+DASLStructureType >> createSlovimTypeFor: compilationTarget [
+	^ SLVMStructureType name: name types: (types collect: [ :arg | arg asSlovimType: compilationTarget ]) kind: kind names: names
 ]
 
 { #category : #comparing }

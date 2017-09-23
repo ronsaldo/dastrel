@@ -38,7 +38,7 @@ DASLTextureType >> array: anObject [
 ]
 
 { #category : #converting }
-DASLTextureType >> asSlovimType: compilationTarget [
+DASLTextureType >> createSlovimTypeFor: compilationTarget [
 	^ SLVMTextureType new
 		name: name;
 		sampledType: (sampledType asSlovimType: compilationTarget);

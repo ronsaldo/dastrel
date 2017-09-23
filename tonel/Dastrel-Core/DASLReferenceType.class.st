@@ -43,14 +43,6 @@ DASLReferenceType >> accept: aVisitor [
 	^ aVisitor visitReferenceType: self
 ]
 
-{ #category : #converting }
-DASLReferenceType >> asSlovimType: compilationTarget [
-	^ SLVMPointerType
-		size: compilationTarget pointerSize
-		baseType: (baseType asSlovimType: compilationTarget)
-		storage: storage
-]
-
 { #category : #accessing }
 DASLReferenceType >> baseType [
 	^ baseType
@@ -59,6 +51,14 @@ DASLReferenceType >> baseType [
 { #category : #accessing }
 DASLReferenceType >> baseType: anObject [
 	baseType := anObject
+]
+
+{ #category : #converting }
+DASLReferenceType >> createSlovimTypeFor: compilationTarget [
+	^ SLVMPointerType
+		size: compilationTarget pointerSize
+		baseType: (baseType asSlovimType: compilationTarget)
+		storage: storage
 ]
 
 { #category : #comparing }

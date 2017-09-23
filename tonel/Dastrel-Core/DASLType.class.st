@@ -1,6 +1,9 @@
 Class {
 	#name : #DASLType,
 	#superclass : #DASLObject,
+	#instVars : [
+		'slovimType'
+	],
 	#classVars : [
 		'AtomicCounterStorage',
 		'AutoType',
@@ -337,6 +340,11 @@ DASLType >> alignment [
 
 { #category : #converting }
 DASLType >> asSlovimType: compilationTarget [
+	^ slovimType ifNil: [ slovimType := self createSlovimTypeFor: compilationTarget ]
+]
+
+{ #category : #converting }
+DASLType >> createSlovimTypeFor: compilationTarget [
 	self subclassResponsibility
 ]
 

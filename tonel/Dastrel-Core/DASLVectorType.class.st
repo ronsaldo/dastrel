@@ -51,14 +51,6 @@ DASLVectorType >> alignment: anObject [
 	alignment := anObject
 ]
 
-{ #category : #converting }
-DASLVectorType >> asSlovimType: compilationTarget [
-	^ SLVMVectorType
-		baseType: (baseType asSlovimType: compilationTarget)
-		elements: elements
-		alignment: alignment
-]
-
 { #category : #accessing }
 DASLVectorType >> baseType [
 	^ baseType
@@ -67,6 +59,14 @@ DASLVectorType >> baseType [
 { #category : #accessing }
 DASLVectorType >> baseType: anObject [
 	baseType := anObject
+]
+
+{ #category : #converting }
+DASLVectorType >> createSlovimTypeFor: compilationTarget [
+	^ SLVMVectorType
+		baseType: (baseType asSlovimType: compilationTarget)
+		elements: elements
+		alignment: alignment
 ]
 
 { #category : #accessing }

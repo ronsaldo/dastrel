@@ -38,7 +38,7 @@ DASLTranslationUnit >> importedUnits [
 { #category : #initialization }
 DASLTranslationUnit >> initialize [
 	super initialize.
-	importedUnits := Set new.
+	importedUnits := SLVMOrderedInsertionSet new.
 ]
 
 { #category : #accessing }

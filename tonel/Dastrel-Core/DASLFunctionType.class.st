@@ -34,7 +34,7 @@ DASLFunctionType >> arguments: anObject [
 ]
 
 { #category : #converting }
-DASLFunctionType >> asSlovimType: compilationTarget [
+DASLFunctionType >> createSlovimTypeFor: compilationTarget [
 	^ SLVMFunctionType
 		arguments: (arguments collect: [:arg | arg asSlovimType: compilationTarget])
 		returnType: (returnType asSlovimType: compilationTarget)

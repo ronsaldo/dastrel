@@ -10,7 +10,7 @@ DASLBoolType >> accept: aVisitor [
 ]
 
 { #category : #converting }
-DASLBoolType >> asSlovimType: compilationTarget [
+DASLBoolType >> createSlovimTypeFor: compilationTarget [
 	^ SLVMType boolType
 ]
 

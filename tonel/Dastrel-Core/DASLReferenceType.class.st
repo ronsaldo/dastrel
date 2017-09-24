@@ -94,3 +94,8 @@ DASLReferenceType >> storage: aSymbol [
 	self assert: aSymbol isSymbol.
 	storage := aSymbol
 ]
+
+{ #category : #converting }
+DASLReferenceType >> withoutReference [
+	^ baseType
+]

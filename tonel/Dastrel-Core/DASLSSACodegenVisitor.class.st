@@ -73,6 +73,21 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 			^ builder
 				makeVector: targetType
 				arguments: ((1 to: targetType elements) collect: [ :i | coercedScalar ]) ].
+			
+	"Conversion between scalars"
+	(valueType isFloatType and: [ targetType isIntegerType ]) ifTrue: [ 
+		^ builder floatToIntCast: value target: targetType
+	].
+	(valueType isIntegerType and: [ targetType isFloatType ]) ifTrue: [ 
+		^ builder intToFloatCast: value target: targetType
+	].
+	(valueType isIntegerType and: [ targetType isIntegerType ]) ifTrue: [
+		^ builder intCast: valueType target: targetType
+	].
+	(valueType isFloatType and: [ targetType isFloatType ]) ifTrue: [
+		^ builder floatingPointCast: valueType target: targetType
+	].
+
 	self halt
 ]
 
@@ -231,6 +246,9 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 DASLSSACodegenVisitor >> generateCastOrConstructionOf: type arguments: argumentValues [
 	type isVectorType ifTrue: [ ^ self constructVector: type arguments: argumentValues ].
 	type isMatrixType ifTrue: [ ^ self constructMatrix: type arguments: argumentValues ].
+	(type isPrimitiveType and: [argumentValues size = 1]) ifTrue: [
+		^ self coerce: argumentValues first into: type 
+	].
 	self halt.
 ]
 
@@ -668,6 +686,44 @@ DASLSSACodegenVisitor >> visitCallExpression: callExpression [
 	].
 
 	^ builder call: function arguments: coercedArguments
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitConditionalExpression: expression [
+	| conditionValue thenBlock mergeBlock elseBlock branchInstruction coercionType trueValue falseValue phi |
+	conditionValue := self coerce: (self visitNode: expression condition) into: DASLType boolType.
+	thenBlock := builder newBasicBlock: 'ifThen'.
+	mergeBlock := builder newBasicBlock: 'ifMerge'.
+	elseBlock := builder newBasicBlock: 'ifElse'.
+	coercionType := expression type asSlovimType: compilationTarget.
+
+	branchInstruction := builder branch: conditionValue ifTrue: thenBlock ifFalse: elseBlock.
+	branchInstruction mergeBlock: mergeBlock.
+
+	"True value"
+	builder currentBlock: thenBlock.
+	trueValue := self coerce: (self visitNode: expression trueValue) into: coercionType.
+	thenBlock := builder currentBlock.
+	builder jump: mergeBlock.
+
+	"False value"
+	builder currentBlock: elseBlock.
+	falseValue := self coerce: (self visitNode: expression falseValue) into: coercionType.
+	elseBlock := builder currentBlock.
+	builder jump: mergeBlock.
+	
+	builder currentBlock: mergeBlock.
+	mergeBlock predecessors ifEmpty: [
+		builder unreachable.
+		branchInstruction addUnreachableSuccessors.
+		^ self
+	].
+
+	phi := builder phi: coercionType.
+	phi
+		addValue: trueValue from: thenBlock;
+		addValue: falseValue from: elseBlock.
+	^ phi
 ]
 
 { #category : #visitor }

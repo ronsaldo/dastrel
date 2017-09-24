@@ -193,6 +193,27 @@ DASLBlockSemanticVisitor >> visitCodeBlock: codeBlock [
 	]
 ]
 
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitConditionalExpression: expression [
+	| condition trueValue falseValue |
+	condition := expression condition.
+	trueValue := expression trueValue.
+	falseValue := expression falseValue.
+	
+	self
+		visitNode: condition;
+		visitNode: trueValue;
+		visitNode: falseValue.
+		
+	self checkImplicitCoercion: condition type to: DASLType boolType on: expression.
+
+	expression type: trueValue type withoutReference.
+	(expression type = falseValue type withoutReference) ifFalse: [ 
+		self error: 'Cannot determine the return type of a conditional expression' at: expression
+	].
+
+]
+
 { #category : #'as yet unclassified' }
 DASLBlockSemanticVisitor >> visitContinueStatement: statement [
 	loopLevel = 0 ifTrue: [

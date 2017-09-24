@@ -477,3 +477,8 @@ DASLType >> size [
 DASLType >> useScope [
 	^ nil
 ]
+
+{ #category : #converting }
+DASLType >> withoutReference [
+	^ self
+]

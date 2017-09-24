@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'condition',
 		'trueValue',
-		'falseValue'
+		'falseValue',
+		'type'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -42,4 +43,14 @@ DASLConditionalExpression >> trueValue [
 { #category : #accessing }
 DASLConditionalExpression >> trueValue: anObject [
 	trueValue := anObject
+]
+
+{ #category : #accessing }
+DASLConditionalExpression >> type [
+	^ type
+]
+
+{ #category : #accessing }
+DASLConditionalExpression >> type: anObject [
+	type := anObject
 ]

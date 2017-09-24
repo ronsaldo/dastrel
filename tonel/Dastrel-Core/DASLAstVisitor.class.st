@@ -136,6 +136,11 @@ DASLAstVisitor >> visitMemberAccessExpression: memberAccessExpression [
 	self subclassResponsibility
 ]
 
+{ #category : #visiting }
+DASLAstVisitor >> visitNode: aNode [
+	^ aNode accept: self
+]
+
 { #category : #visitor }
 DASLAstVisitor >> visitPostfixUnaryOperation: postfixUnaryOperation [
 	self subclassResponsibility

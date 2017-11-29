@@ -190,7 +190,7 @@ ConfigurationOfDastrel >> baseline03: spec [
 					repository: 'http://smalltalkhub.com/mc/ronsaldo/Slovim/main/' ].
 		spec 
 			package: 'Dastrel-BuildTool' with: [
-				spec requires: #('NeoJSON' ). ];
+				spec requires: #('NeoJSON' 'Dastrel-Core'). ];
 			package: 'Dastrel-Core' with: [
 				spec requires: #('PetitParser' 'Slovim' ). ];
 			package: 'Dastrel-IDE' with: [

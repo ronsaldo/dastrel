@@ -255,12 +255,6 @@ DASLParser >> inOutVariable [
 			yourself]
 ]
 
-{ #category : #initialization }
-DASLParser >> initialize [
-	super initialize.
-	fileName := 'unknown'.
-]
-
 { #category : #tokens }
 DASLParser >> integer [
 	^ super integer ==> [ :token | DASLInteger position: (self positionFromToken: token) token: token inputValue ]

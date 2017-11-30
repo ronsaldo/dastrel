@@ -207,47 +207,47 @@ DASLGrammar >> binaryExpression [
 	
 	binExpr
 		group: [ :g |
-			g postfix: ('++' asParser token trim: ignorable) do: postfixOpDo.
-			g postfix: ('--' asParser token trim: ignorable) do: postfixOpDo.
+			g postfix: (self operator: '++') do: postfixOpDo.
+			g postfix: (self operator: '--') do: postfixOpDo.
 			];
 		group: [ :g |
-			g prefix: ('++' asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ('--' asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($+ asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($- asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($! asParser token trim: ignorable) do: prefixOpDo.
-			g prefix: ($~ asParser token trim: ignorable) do: prefixOpDo.
+			g prefix: (self operator: '++') do: prefixOpDo.
+			g prefix: (self operator: '--') do: prefixOpDo.
+			g prefix: (self operator: $+) do: prefixOpDo.
+			g prefix: (self operator: $-) do: prefixOpDo.
+			g prefix: (self operator: $!) do: prefixOpDo.
+			g prefix: (self operator: $~) do: prefixOpDo.
 			g prefix: kwSizeOf do: prefixOpDo.
 			g prefix: kwAlignOf do: prefixOpDo.
 			];
 		group: [ :g |
-			g left: ($* asParser token trim: ignorable) do: binOpDo. 
-			g left: ($/ asParser token trim: ignorable) do: binOpDo. 
-			g left: ($% asParser token trim: ignorable) do: binOpDo.];
+			g left: (self operator: $*) do: binOpDo. 
+			g left: (self operator: $/) do: binOpDo. 
+			g left: (self operator: $%) do: binOpDo.];
 		group: [ :g |
-			g left: ($+ asParser token trim: ignorable) do: binOpDo.
-			g left: ($- asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: $+) do: binOpDo.
+			g left: (self operator: $-) do: binOpDo. ];
 		group: [ :g |
-			g left: ('<<' asParser token trim: ignorable) do: binOpDo.
-			g left: ('>>' asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: '<<') do: binOpDo.
+			g left: (self operator: '>>') do: binOpDo. ];
 		group: [ :g |
-			g left: ('<=' asParser token trim: ignorable) do: binOpDo.
-			g left: ('>=' asParser token trim: ignorable) do: binOpDo.
-			g left: ($< asParser token trim: ignorable) do: binOpDo.
-			g left: ($> asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: '<=') do: binOpDo.
+			g left: (self operator: '>=') do: binOpDo.
+			g left: (self operator: $<) do: binOpDo.
+			g left: (self operator: $>) do: binOpDo. ];
 		group: [ :g |
-			g left: ('==' asParser token trim: ignorable) do: binOpDo.
-			g left: ('!=' asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: '==') do: binOpDo.
+			g left: (self operator: '!=') do: binOpDo. ];
 		group: [ :g |
-			g left: ($& asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: $&) do: binOpDo. ];
 		group: [ :g |
-			g left: ($^ asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: $^) do: binOpDo. ];
 		group: [ :g |
-			g left: ($| asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: $|) do: binOpDo. ];
 		group: [ :g |
-			g left: ('&&' asParser token trim: ignorable) do: binOpDo. ];
+			g left: (self operator: '&&') do: binOpDo. ];
 		group: [ :g |
-			g left: ('||' asParser token trim: ignorable) do: binOpDo. ].
+			g left: (self operator: '||') do: binOpDo. ].
 	^ binExpr
 ]
 
@@ -731,6 +731,11 @@ DASLGrammar >> numberSign [
 { #category : #grammar }
 DASLGrammar >> operate: left with: right do: operation [
 	^ { operation . left . right }
+]
+
+{ #category : #tokens }
+DASLGrammar >> operator: operatorValue [
+	^ operatorValue asParser token trim: ignorable
 ]
 
 { #category : #accessing }

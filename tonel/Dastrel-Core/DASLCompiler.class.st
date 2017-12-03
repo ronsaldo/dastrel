@@ -134,6 +134,11 @@ DASLCompiler >> parse [
 	compilationContext addTranslationUnit: ast.
 ]
 
+{ #category : #accessing }
+DASLCompiler >> processedDependencies [
+	^ compilationContext processedDependencies
+]
+
 { #category : #'public access' }
 DASLCompiler >> semanticAnalysis [
 	DASLModuleSemanticVisitor for: compilationContext passOn: ast.

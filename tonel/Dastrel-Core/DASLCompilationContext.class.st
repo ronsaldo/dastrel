@@ -96,6 +96,11 @@ DASLCompilationContext >> positionFromToken: token fileName: fileName [
 	^ self positionFromOffset: token start fileName: fileName
 ]
 
+{ #category : #accessing }
+DASLCompilationContext >> processedDependencies [
+	^ translationUnits keys
+]
+
 { #category : #'as yet unclassified' }
 DASLCompilationContext >> shaderSignatures [
 	^ shaderSignatures

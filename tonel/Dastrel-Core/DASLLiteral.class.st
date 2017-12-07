@@ -18,7 +18,12 @@ DASLLiteral class >> initialize [
 	self initialize
 	"
 	LiteralSuffixTable := Dictionary newFromPairs: #(
+		u uint
+		us ushort
+		ul ulong
+		
 		s short
+		l long
 		f float
 		l long
 	).

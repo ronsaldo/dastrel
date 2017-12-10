@@ -473,6 +473,9 @@ DASLSSACodegenVisitor >> generateSampler: sampler operation: operation argument:
 	operation = #sample ifTrue: [ 
 		^ builder sample: combinedSampler implicitLodAtCoord: texcoord
 	].
+	operation = #sampleWithDepthReference ifTrue: [ 
+		^ builder sample: combinedSampler implicitLodAtCoord: texcoord depthReference: arguments third.
+	].
 	self halt.
 	
 ]

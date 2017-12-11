@@ -488,6 +488,15 @@ DASLBlockSemanticVisitor >> visitUsingStatement: usingStatement [
 	usingStatement expression accept: self.
 	identifier := usingStatement identifier.
 	identifier ifNotNil: [
+		usedType := usingStatement expression type.
+		usedType isReferenceType ifTrue: [
+			usingStatement type: usedType.
+			currentScope at: identifier value put: usingStatement ifPresent: [ 
+				self error: 'alias overrides an existing variable in the same lexical scope.' at: usingStatement.
+	].
+			^ self
+		].
+
 		"TODO: Implement this"
 		self halt.
 	].

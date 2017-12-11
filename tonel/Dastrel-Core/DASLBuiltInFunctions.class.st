@@ -256,10 +256,10 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 			(textureCube float3 => float4)
 			(textureCubeArray float4 => float4)
 
-			(depthTexture2D float2 => float4)
-			(depthTexture2DArray float3 => float4)
-			(depthTextureCube float3 => float4)
-			(depthTextureCubeArray float4 => float4)
+			(depthTexture2D float2 => float)
+			(depthTexture2DArray float3 => float)
+			(depthTextureCube float3 => float)
+			(depthTextureCubeArray float4 => float)
 		)
 		
 		

@@ -73,7 +73,7 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 			^ builder
 				makeVector: targetType
 				arguments: ((1 to: targetType elements) collect: [ :i | coercedScalar ]) ].
-			
+
 	"Conversion between scalars"
 	(valueType isFloatType and: [ targetType isIntegerType ]) ifTrue: [ 
 		^ builder floatToIntCast: value target: targetType
@@ -471,7 +471,11 @@ DASLSSACodegenVisitor >> generateSampler: sampler operation: operation argument:
 	loadedSampler := builder load: sampler.
 	combinedSampler := builder combineSampler: loadedSampler with: texture.
 	operation = #sample ifTrue: [ 
-		^ builder sample: combinedSampler implicitLodAtCoord: texcoord
+		texture type depth ifTrue: [ 
+			^ builder sampleDepth: combinedSampler implicitLodAtCoord: texcoord
+		] ifFalse: [ 
+			^ builder sample: combinedSampler implicitLodAtCoord: texcoord
+		]
 	].
 	operation = #sampleWithDepthReference ifTrue: [ 
 		^ builder sample: combinedSampler implicitLodAtCoord: texcoord depthReference: arguments third.
@@ -955,7 +959,12 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitUsingStatement: anUsingStatement [
-	"Nothing to do, for now"
+	| usedValue |
+	anUsingStatement identifier ifNotNil: [
+		usedValue := anUsingStatement expression accept: self.
+		anUsingStatement codegenValue: usedValue
+	].
+
 ]
 
 { #category : #visitor }

@@ -10,8 +10,8 @@ DASLParser class >> parseFromFileNamed: aFileName [
 ]
 
 { #category : #grammar }
-DASLParser >> asignmentExpression [
-	^ super asignmentExpression ==> [ :expr | expr second ifNil: [ expr first ] ifNotNil: [ 
+DASLParser >> assignmentExpression [
+	^ super assignmentExpression ==> [ :expr | expr second ifNil: [ expr first ] ifNotNil: [ 
 				DASLAssignmentExpression new
 					position: (self positionFromToken: expr second first);
 					operation: expr second first inputValue asSymbol;

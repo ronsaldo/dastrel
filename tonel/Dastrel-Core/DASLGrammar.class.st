@@ -53,7 +53,6 @@ Class {
 		'parentExpression',
 		'expression',
 		'expressionStatement',
-		'asignmentExpression',
 		'assignmentOperator',
 		'conditionalExpression',
 		'questionMark',
@@ -138,7 +137,8 @@ Class {
 		'kwTrue',
 		'kwFalse',
 		'trueLiteral',
-		'falseLiteral'
+		'falseLiteral',
+		'assignmentExpression'
 	],
 	#classVars : [
 		'Keywords'
@@ -179,9 +179,9 @@ DASLGrammar >> arrow [
 	^ '->' asParser token trim: ignorable
 ]
 
-{ #category : #grammar }
-DASLGrammar >> asignmentExpression [
-	^ conditionalExpression , (assignmentOperator , asignmentExpression) optional
+{ #category : #accessing }
+DASLGrammar >> assignmentExpression [
+	^ conditionalExpression , (assignmentOperator , assignmentExpression) optional
 ]
 
 { #category : #tokens }
@@ -369,7 +369,7 @@ DASLGrammar >> equalAssign [
 
 { #category : #grammar }
 DASLGrammar >> expression [
-	^ asignmentExpression
+	^ assignmentExpression
 ]
 
 { #category : #grammar }
@@ -741,7 +741,7 @@ DASLGrammar >> newline [
 
 { #category : #grammar }
 DASLGrammar >> nullaryExpression [
-	^ identifier / literalExpression / parentExpression 
+	^ literalExpression / identifier / parentExpression 
 ]
 
 { #category : #grammar }

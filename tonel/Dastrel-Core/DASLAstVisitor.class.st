@@ -25,6 +25,11 @@ DASLAstVisitor >> visitBinaryOperation: binaryOperation [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitBoolean: character [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitBuiltInFunction: builtInFunction [
 	self subclassResponsibility
 ]
@@ -116,9 +121,7 @@ DASLAstVisitor >> visitImportStatement: usingStatement [
 
 { #category : #visitor }
 DASLAstVisitor >> visitInteger: integer [
-	^ SLVMConstant
-		type: (integer type asSlovimType: self compilationTarget)
-		value: integer value
+	self subclassResponsibility
 ]
 
 { #category : #visitor }

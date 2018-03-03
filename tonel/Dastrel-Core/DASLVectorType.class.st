@@ -23,7 +23,7 @@ DASLVectorType class >> baseType: aBaseType elements: numElements alignment: anA
 		baseType: aBaseType;
 		elements: numElements;
 		alignment: anAlignment;
-		size: (aBaseType size * numElements alignedTo: anAlignment);
+		size: aBaseType size * numElements;
 		yourself
 ]
 

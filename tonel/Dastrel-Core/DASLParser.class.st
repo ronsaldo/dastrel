@@ -164,6 +164,16 @@ DASLParser >> expressionStatement [
 			yourself]
 ]
 
+{ #category : #accessing }
+DASLParser >> falseLiteral [
+	^ super falseLiteral ==> [ :token |
+		DASLBoolean new
+			position: (self positionFromToken: token);
+			value: false;
+			yourself
+		]
+]
+
 { #category : #tokens }
 DASLParser >> float [
 	^ super float ==> [ :token | DASLFloat position: (self positionFromToken: token) token: token inputValue ]
@@ -437,6 +447,16 @@ DASLParser >> termExpression [
 			access reference: currentLeft.
 			currentLeft := access. ].
 		currentLeft ]
+]
+
+{ #category : #accessing }
+DASLParser >> trueLiteral [
+	^ super trueLiteral ==> [ :token |
+		DASLBoolean new
+			position: (self positionFromToken: token);
+			value: true;
+			yourself
+	]
 ]
 
 { #category : #grammar }

@@ -616,6 +616,13 @@ DASLSSACodegenVisitor >> visitBlockStatement: block [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitBoolean: literal [
+	^ SLVMConstantValue
+		type: (literal type asSlovimType: compilationTarget)
+		value: literal value
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitBreakStatement: statement [
 	self assert: breakBlock isNotNil.
 	builder jump: breakBlock
@@ -848,6 +855,13 @@ DASLSSACodegenVisitor >> visitIfStatement: statement [
 		builder unreachable.
 		branchInstruction addUnreachableSuccessors.
 	]
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> visitInteger: integer [
+	^ SLVMConstant
+		type: (integer type asSlovimType: self compilationTarget)
+		value: integer value
 ]
 
 { #category : #visitor }

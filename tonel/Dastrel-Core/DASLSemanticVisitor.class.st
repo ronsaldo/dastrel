@@ -189,6 +189,10 @@ DASLSemanticVisitor >> resolveTypeOf: node inferWith: inferenceExpression [
 ]
 
 { #category : #visitor }
+DASLSemanticVisitor >> visitBoolean: booleanLiteral [
+]
+
+{ #category : #visitor }
 DASLSemanticVisitor >> visitCharacter: characterLiteral [
 ]
 

@@ -133,7 +133,12 @@ Class {
 		'shaderSignatureElementKeywordType',
 		'multiply',
 		'pushConstantSignature',
-		'kwPushConstant'
+		'kwPushConstant',
+		'boolean',
+		'kwTrue',
+		'kwFalse',
+		'trueLiteral',
+		'falseLiteral'
 	],
 	#classVars : [
 		'Keywords'
@@ -160,6 +165,7 @@ DASLGrammar class >> initialize [
 		case
 		if else for do while switch break continue
 		shader_signature descriptor_set
+		#true #false
 	).
 ]
 
@@ -267,6 +273,11 @@ DASLGrammar >> blockVariable [
 ]
 
 { #category : #grammar }
+DASLGrammar >> boolean [
+	^ trueLiteral / falseLiteral
+]
+
+{ #category : #grammar }
 DASLGrammar >> breakStatement [
 	^ kwBreak , semicolon
 ]
@@ -364,6 +375,11 @@ DASLGrammar >> expression [
 { #category : #grammar }
 DASLGrammar >> expressionStatement [
 	^ expression , semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> falseLiteral [
+	^ kwFalse
 ]
 
 { #category : #tokens }
@@ -555,6 +571,11 @@ DASLGrammar >> kwElse [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwFalse [
+	^ self keywordParser: 'false'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwFor [
 	^ self keywordParser: 'for'
 ]
@@ -645,6 +666,11 @@ DASLGrammar >> kwSwitch [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwTrue [
+	^ self keywordParser: 'true'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwUniform [
 	^ self keywordParser: 'uniform'
 ]
@@ -681,7 +707,7 @@ DASLGrammar >> leftParent [
 
 { #category : #grammar }
 DASLGrammar >> literalExpression [
-	^ number
+	^ number / boolean
 ]
 
 { #category : #grammar }
@@ -866,6 +892,11 @@ DASLGrammar >> switchStatement [
 { #category : #grammar }
 DASLGrammar >> termExpression [
 	^ nullaryExpression , accessExpression star
+]
+
+{ #category : #grammar }
+DASLGrammar >> trueLiteral [
+	^ kwTrue
 ]
 
 { #category : #grammar }

@@ -125,6 +125,13 @@ DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 				extractImplicitVectorElements: arg
 				typeElement: baseType
 				into: expandedArguments ].
+	expandedArguments size = 1 ifTrue: [ 
+		(expandedArguments first type = (type asSlovimType: compilationTarget)) ifFalse: [ 
+			self error: 'Code generation error.'
+		].
+	
+		^ expandedArguments first
+	].
 	^ builder
 		makeVector: (type asSlovimType: compilationTarget)
 		arguments: expandedArguments asArray

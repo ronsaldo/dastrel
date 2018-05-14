@@ -112,6 +112,7 @@ DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 		self builtInMathFunctions,
 		self builtInVectorFunctions,
 		self builtInMatrixFunctions,
+		self builtInTextureFunctions,
 		self builtInCommon
 ]
 
@@ -270,6 +271,50 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 			(depthTextureCube float3 float => float)
 			(depthTextureCubeArray float4 float => float)
 		)
+	)
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInTextureFunctions [
+	^ #(
+		(
+			((getTextureSize #'texture.query.size')) ()
+			(texture1D => int)
+			(texture1DArray => int2)
+			(texture2D => int2)
+			(texture2DArray => int3)
+			(texture3D => int3)
+			(textureCube => int2)
+			(textureCubeArray => int3)
+
+			(depthTexture2D => int2)
+			(depthTexture2DArray => int3)
+			(depthTextureCube => int2)
+			(depthTextureCubeArray  => int3)
+		)
+		
+	)
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInTexturePrototypes [
+	^ #(
+		(
+			(getTextureSize #'texture.query.size') ()
+			(texture1D => int)
+			(texture1DArray => int2)
+			(texture2D => int2)
+			(texture2DArray => int3)
+			(texture3D => int3)
+			(textureCube => int2)
+			(textureCubeArray => int3)
+
+			(depthTexture2D => int2)
+			(depthTexture2DArray => int3)
+			(depthTextureCube => int2)
+			(depthTextureCubeArray  => int3)
+		)
+		
 	)
 ]
 

@@ -116,7 +116,7 @@ DASLSSACodegenVisitor >> constructMatrix: type arguments: arguments [
 
 { #category : #coercing }
 DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
-	| baseType expandedArguments |
+	| baseType expandedArguments targetType sourceType |
 	baseType := type baseType.
 	expandedArguments := OrderedCollection new.
 	arguments
@@ -125,15 +125,22 @@ DASLSSACodegenVisitor >> constructVector: type arguments: arguments [
 				extractImplicitVectorElements: arg
 				typeElement: baseType
 				into: expandedArguments ].
+
+	targetType := (type asSlovimType: compilationTarget).
 	expandedArguments size = 1 ifTrue: [ 
-		(expandedArguments first type = (type asSlovimType: compilationTarget)) ifFalse: [ 
-			self error: 'Code generation error.'
+		sourceType := expandedArguments first type.
+		(sourceType = targetType) ifTrue: [ 
+			^ expandedArguments first
 		].
 	
-		^ expandedArguments first
+		(sourceType isVectorType and: [targetType isVectorType and: [ sourceType elements = targetType elements ]] ) ifTrue: [
+			^ builder vectorCastFrom: expandedArguments first into: targetType
+		].
+		
+		self error: 'Cannot generate vector conversion'
 	].
 	^ builder
-		makeVector: (type asSlovimType: compilationTarget)
+		makeVector: targetType
 		arguments: expandedArguments asArray
 ]
 

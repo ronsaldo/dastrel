@@ -265,6 +265,22 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 		
 		
 		(
+			(sampleLod) (member)
+			(texture1D float float => float4)
+			(texture1DArray float2 float => float4)
+			(texture2D float2 float => float4)
+			(texture2DArray float3 float => float4)
+			(texture3D float3 float => float4)
+			(textureCube float3 float => float4)
+			(textureCubeArray float4 float => float4)
+
+			(depthTexture2D float2 float => float)
+			(depthTexture2DArray float3 float => float)
+			(depthTextureCube float3 float => float)
+			(depthTextureCubeArray float4 float => float)
+		)
+		
+		(
 			(sampleWithDepthReference) (member)
 			(depthTexture2D float2 float => float)
 			(depthTexture2DArray float3 float => float)

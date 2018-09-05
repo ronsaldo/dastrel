@@ -770,6 +770,11 @@ DASLSSACodegenVisitor >> visitContinueStatement: statement [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitDiscardStatement: discardStatement [
+	^ builder discardFragment
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitExpressionStatement: expressionStatement [
 	expressionStatement expression accept: self
 ]

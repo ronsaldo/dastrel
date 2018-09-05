@@ -222,6 +222,11 @@ DASLBlockSemanticVisitor >> visitContinueStatement: statement [
 ]
 
 { #category : #visitor }
+DASLBlockSemanticVisitor >> visitDiscardStatement: discardStatement [
+	self flag: 'TODO: Make sure this runs in a fragment shader.'
+]
+
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitDoWhileStatement: statement [
 	statement condition accept: self.
 	self withLoop: [ 

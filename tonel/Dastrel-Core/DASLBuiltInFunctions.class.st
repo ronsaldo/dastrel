@@ -104,12 +104,51 @@ DASLBuiltInFunctions class >> builtInCommon [
 ]
 
 { #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInDerivativeFunctions [
+	^ #(
+		(
+			((dFdx #'fragment.derivative.dx')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+		(
+			((dFdy #'fragment.derivative.dy')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+
+		(
+			((dFdxFine #'fragment.derivative.dx.fine')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+		(
+			((dFdyFine #'fragment.derivative.dy.fine')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+		
+		(
+			((dFdxCoarse #'fragment.derivative.dx.coarse')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+		(
+			((dFdyCoarse #'fragment.derivative.dy.coarse')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+	)
+]
+
+{ #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 	^
 		self builtInArithmeticFunctions,
 		self builtInLogicalFunctions,
 		self builtInMatrixMultiplicationFunctions,
 		self builtInMathFunctions,
+		self builtInDerivativeFunctions,
 		self builtInVectorFunctions,
 		self builtInMatrixFunctions,
 		self builtInTextureFunctions,

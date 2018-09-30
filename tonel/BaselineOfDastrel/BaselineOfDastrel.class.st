@@ -10,7 +10,6 @@ BaselineOfDastrel >> baseline: spec [
 
 	spec for: #'common' do: [
 		spec blessing: #'baseline'.
-		spec repository: 'http://smalltalkhub.com/mc/ronsaldo/Dastrel/main/'.
 		spec 
 			project: 'NeoJSON' with: [
 				spec
@@ -25,9 +24,7 @@ BaselineOfDastrel >> baseline: spec [
 					repository: 'http://smalltalkhub.com/mc/Moose/PetitParser/main/' ];
 			project: 'Slovim' with: [
 				spec
-					className: #ConfigurationOfSlovim;
-					versionString: #'bleedingEdge';
-					repository: 'http://smalltalkhub.com/mc/ronsaldo/Slovim/main/' ].
+					repository: 'github://ronsaldo/slovim/tonel' ].
 		spec 
 			package: 'Dastrel-BuildTool' with: [
 				spec requires: #('NeoJSON' 'Dastrel-Core'). ];

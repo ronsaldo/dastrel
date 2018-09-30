@@ -7,7 +7,7 @@
 
 ```smalltalk
 Metacello new
-	baseline: 'GitMigration';
+	baseline: 'Dastrel';
 	repository: 'github://ronsaldo/dastrel/tonel';
 	load
 ```

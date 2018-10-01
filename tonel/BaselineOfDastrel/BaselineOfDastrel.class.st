@@ -22,17 +22,22 @@ BaselineOfDastrel >> baseline: spec [
 					versionString: #'stable';
 					loads: #('Core' );
 					repository: 'http://smalltalkhub.com/mc/Moose/PetitParser/main/' ];
-			project: 'Slovim' with: [
+			baseline: #'Slovim' with: [
 				spec
-					repository: 'github://ronsaldo/slovim/tonel' ].
+					repository: 'github://ronsaldo/slovim/tonel' ];
+			baseline: #'Phanide' with: [
+				spec
+					repository: 'github://ronsaldo/phanide/tonel' ].
 		spec 
-			package: 'Dastrel-BuildTool' with: [
-				spec requires: #('NeoJSON' 'Dastrel-Core'). ];
-			package: 'Dastrel-Core' with: [
-				spec requires: #('PetitParser' 'Slovim' ). ];
-			package: 'Dastrel-IDE' with: [
-				spec requires: #('Dastrel-Core' ). ];
-			package: 'Dastrel-Tests' with: [
-				spec requires: #('Dastrel-Core' 'Dastrel-BuildTool' ). ]. ].
+			package: #'Dastrel-BuildTool' with: [
+				spec requires: #(#'NeoJSON' #'Dastrel-Core'). ];
+			package: #'Dastrel-Core' with: [
+				spec requires: #(#'PetitParser' #'Slovim' ). ];
+			package: #'Dastrel-IDE' with: [
+				spec requires: #(#'Dastrel-Core' ). ];
+			package: #'Dastrel-Tests' with: [
+				spec requires: #(#'Dastrel-Core' #'Dastrel-BuildTool' ). ];
+			package: #'Dastrel-Phanide' with: [
+				spec requires: #(#'Dastrel-Core' #'Phanide' ). ] ].
 
 ]

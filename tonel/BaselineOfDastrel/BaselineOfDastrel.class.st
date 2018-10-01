@@ -33,8 +33,6 @@ BaselineOfDastrel >> baseline: spec [
 				spec requires: #(#'NeoJSON' #'Dastrel-Core'). ];
 			package: #'Dastrel-Core' with: [
 				spec requires: #(#'PetitParser' #'Slovim' ). ];
-			package: #'Dastrel-IDE' with: [
-				spec requires: #(#'Dastrel-Core' ). ];
 			package: #'Dastrel-Tests' with: [
 				spec requires: #(#'Dastrel-Core' #'Dastrel-BuildTool' ). ];
 			package: #'Dastrel-Phanide' with: [

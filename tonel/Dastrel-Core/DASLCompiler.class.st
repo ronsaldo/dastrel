@@ -10,7 +10,8 @@ Class {
 		'generatedCode',
 		'currentFileName',
 		'optimizationLevel',
-		'ssaModule'
+		'ssaModule',
+		'astNodesToInject'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -109,6 +110,7 @@ DASLCompiler >> initialize [
 	parser := DASLParser new.
 	compilationContext := DASLCompilationContext new.
 	optimizationLevel := 0.
+	astNodesToInject := #().
 ]
 
 { #category : #targets }
@@ -130,6 +132,12 @@ DASLCompiler >> optimizationLevel: anObject [
 DASLCompiler >> parse [
 	ast := parser parse: sourceCode.
 	ast isPetitFailure ifTrue: [ compilationContext parseError: ast fileName: currentFileName ].
+
+	astNodesToInject ifNotEmpty: [ 
+		ast modules: ast modules , astNodesToInject.
+		astNodesToInject := #().
+	].
+
 	ast fullPath: currentFileName.
 	compilationContext addTranslationUnit: ast.
 ]
@@ -164,6 +172,16 @@ DASLCompiler >> sourceFromFileNamed: aFileName [
 	sourceCode := fileRef contents asDastrelCollectionWithContext.
 	sourceCode name: currentFileName.
 
+]
+
+{ #category : #accessing }
+DASLCompiler >> sourceFromFileNamed: aFileName injectingNodes: theASTNodesToInject [
+	| fileRef |
+	fileRef := aFileName asFileReference.
+	self fileName: fileRef asAbsolute fullName.
+	sourceCode := fileRef contents asDastrelCollectionWithContext.
+	sourceCode name: currentFileName.
+	astNodesToInject := theASTNodesToInject.
 ]
 
 { #category : #targets }

@@ -22,6 +22,11 @@ DASLExpressionStatement >> expression: anObject [
 	expression := anObject
 ]
 
+{ #category : #testing }
+DASLExpressionStatement >> isExpressionStatement [
+	^ true
+]
+
 { #category : #printing }
 DASLExpressionStatement >> printOn: aStream [
 	expression printOn: aStream.

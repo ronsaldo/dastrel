@@ -28,6 +28,11 @@ DASLIdentifier >> binding: anObject [
 	binding := anObject
 ]
 
+{ #category : #accessing }
+DASLIdentifier >> isIdentifierReference [
+	^ true
+]
+
 { #category : #printing }
 DASLIdentifier >> printOn: aStream [
 	value printOn: aStream

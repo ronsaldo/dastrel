@@ -4,6 +4,14 @@ Class {
 	#category : #'Dastrel-Core-AST'
 }
 
+{ #category : #converting }
+DASLExpression >> asStatement [
+	^ DASLExpressionStatement new
+		position: position;
+		expression: self;
+		yourself
+]
+
 { #category : #testing }
 DASLExpression >> evaluateConstant [
 	self subclassResponsibility

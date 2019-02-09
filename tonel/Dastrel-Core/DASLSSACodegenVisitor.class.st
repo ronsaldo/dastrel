@@ -616,6 +616,7 @@ DASLSSACodegenVisitor >> visitAssignment: assignment [
 
 	coercedValued := self coerce: value into: variable type baseType.
 	builder store: coercedValued in: variable.
+	^ coercedValued
 ]
 
 { #category : #visitor }

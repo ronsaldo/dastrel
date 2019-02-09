@@ -59,6 +59,11 @@ DASLAstNode >> isGraphBlock [
 ]
 
 { #category : #testing }
+DASLAstNode >> isIdentifierReference [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isInterface [
 	^ false
 ]

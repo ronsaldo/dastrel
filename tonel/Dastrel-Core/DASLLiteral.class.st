@@ -91,6 +91,11 @@ DASLLiteral >> type [
 ]
 
 { #category : #accessing }
+DASLLiteral >> type: aType [
+	type := aType
+]
+
+{ #category : #accessing }
 DASLLiteral >> value [
 	^ value
 ]

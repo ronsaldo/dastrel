@@ -11,11 +11,9 @@ BaselineOfDastrel >> baseline: spec [
 	spec for: #'common' do: [
 		spec blessing: #'baseline'.
 		spec 
-			project: 'NeoJSON' with: [
+			baseline: 'NeoJSON' with: [
 				spec
-					className: #ConfigurationOfNeoJSON;
-					versionString: #'stable';
-					repository: 'http://mc.stfx.eu/Neo' ];
+				repository: 'github://svenvc/NeoJSON/repository' ];
 			project: 'PetitParser' with: [
 				spec
 					className: #ConfigurationOfPetitParser;

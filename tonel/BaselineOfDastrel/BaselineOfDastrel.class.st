@@ -22,7 +22,8 @@ BaselineOfDastrel >> baseline: spec [
 					repository: 'http://smalltalkhub.com/mc/Moose/PetitParser/main/' ];
 			baseline: #'Slovim' with: [
 				spec
-					repository: 'github://ronsaldo/slovim/tonel' ];
+					repository: 'github://ronsaldo/slovim/tonel';
+					loads: #(#'ShaderCompilation') ];
 			baseline: #'Phanide' with: [
 				spec
 					repository: 'github://ronsaldo/phanide/tonel' ].

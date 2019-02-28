@@ -251,7 +251,14 @@ DASLParser >> import [
 	^ super import ==> [ :importExpr |
 		DASLImportStatement new
 			position: importExpr first;
-			packageName: importExpr second value ]
+			packageName: importExpr second ]
+]
+
+{ #category : #grammar }
+DASLParser >> importModuleLocation [
+	^ super importModuleLocation ==> [ :moduleSpec |
+		{moduleSpec first value} , (moduleSpec second collect: [:el | el second value])
+	]
 ]
 
 { #category : #grammar }

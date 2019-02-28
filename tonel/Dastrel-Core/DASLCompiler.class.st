@@ -17,6 +17,16 @@ Class {
 }
 
 { #category : #accessing }
+DASLCompiler >> addIncludeDirectories: aCollectionOfDirectories [
+	compilationContext addIncludeDirectories: aCollectionOfDirectories
+]
+
+{ #category : #accessing }
+DASLCompiler >> addIncludeDirectory: aDirectory [
+	compilationContext addIncludeDirectory: aDirectory asFileReference
+]
+
+{ #category : #accessing }
 DASLCompiler >> ast [
 	^ ast
 ]
@@ -103,6 +113,11 @@ DASLCompiler >> importCompilation [
 	^ ast
 ]
 
+{ #category : #accessing }
+DASLCompiler >> includeDirectories [
+	^ compilationContext includeDirectories
+]
+
 { #category : #initialization }
 DASLCompiler >> initialize [
 	super initialize.
@@ -131,7 +146,7 @@ DASLCompiler >> optimizationLevel: anObject [
 { #category : #parsing }
 DASLCompiler >> parse [
 	ast := parser parse: sourceCode.
-	ast isPetitFailure ifTrue: [ compilationContext parseError: ast fileName: currentFileName ].
+	ast isPetitFailure ifTrue: [ compilationContext parseError: ast sourceCode: sourceCode ].
 
 	astNodesToInject ifNotEmpty: [ 
 		ast modules: ast modules , astNodesToInject.

@@ -15,6 +15,7 @@ Class {
 	],
 	#classVars : [
 		'BinaryOperationMap',
+		'ImageFormatWhiteList',
 		'UnaryOperationMap'
 	],
 	#category : #'Dastrel-Core-Codegen'
@@ -50,7 +51,11 @@ DASLSSACodegenVisitor class >> initialize [
 	UnaryOperationMap := Dictionary newFromPairs: #(
 		#'pre-' (neg fneg)
 		#'pre~' (not invalid)
-	)
+	).
+	
+	ImageFormatWhiteList := Set newFrom: #(
+		rgba8
+	).
 ]
 
 { #category : #coercing }
@@ -66,6 +71,8 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 		ifTrue: [ self error: 'invalid implicit conversion between reference types.' ].
 	valueType isPointerType
 		ifTrue: [ ^ self coerce: (builder load: value) into: targetType ].
+	(valueType isTextureType and: [ targetType isTextureType and: [valueType isSameButDiffersInFormatWith: targetType]])
+		ifTrue: [ ^ value ].
 
 	"Scalar to vector"
 	(targetType isVectorType and: [ valueType isVectorType not ])
@@ -574,11 +581,18 @@ DASLSSACodegenVisitor >> generateUniformBlocks: translationUnit [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformGlobal: uniformGlobal [
-	| globalVar |
+	| globalVar typeWithoutFormat globalType |
+	typeWithoutFormat := uniformGlobal type asSlovimType: compilationTarget.
+	globalType := typeWithoutFormat.
+	
+	(typeWithoutFormat isTextureType and: [uniformGlobal attributes includesKey: #format]) ifTrue: [
+		globalType := compilationTarget textureType: typeWithoutFormat versionWithFormat: (uniformGlobal attributes at: #format)
+	].
+	
 	globalVar := SLVMGlobalVariable
 		pointerSize: compilationTarget pointerSize
 		name: uniformGlobal name
-		valueType: (uniformGlobal type asSlovimType: compilationTarget)
+		valueType: globalType
 		storage: DASLType uniformConstantStorage.
 	uniformGlobal codegenValue: globalVar.
 	self convertProperties: uniformGlobal attributes for: globalVar.

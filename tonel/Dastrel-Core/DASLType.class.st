@@ -19,6 +19,14 @@ Class {
 		'FloatType',
 		'FunctionStorage',
 		'GenericStorage',
+		'Image1DArrayType',
+		'Image1DType',
+		'Image2DArrayType',
+		'Image2DType',
+		'Image3DArrayType',
+		'Image3DType',
+		'ImageCubeArrayType',
+		'ImageCubeType',
 		'ImageStorage',
 		'InputStorage',
 		'IntType',
@@ -246,9 +254,19 @@ DASLType class >> textureAndSamplerTypes [
 	DepthTexture2DArrayType := DASLTextureType new name: #depthTexture2DArray; sampledType: FloatType; dimensions: 2; array: true; depth: true; multisample: false; sampled: true.
 	DepthTextureCubeType := DASLTextureType new name: #depthTextureCube; dimensions: 4; sampledType: FloatType; array: false; depth: true; multisample: false; sampled: true.
 	DepthTextureCubeArrayType := DASLTextureType new name: #depthTextureCubeArray; sampledType: FloatType; dimensions: 4; array: true; depth: true; multisample: false; sampled: true.
+
+	Image1DType := DASLTextureType new name: #image1D; sampledType: FloatType; dimensions: 1; array: false; depth: false; multisample: false; sampled: false.	
+	Image1DArrayType := DASLTextureType new name: #image1DArray; sampledType: FloatType; dimensions: 1; array: true; depth: false; multisample: false; sampled: false.
+	Image2DType := DASLTextureType new name: #image2D; dimensions: 2; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: false.
+	Image2DArrayType := DASLTextureType new name: #image2DArray; sampledType: FloatType; dimensions: 2; array: true; depth: false; multisample: false; sampled: false.
+	Image3DType := DASLTextureType new name: #image3D; dimensions: 3; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: false.
+	Image3DArrayType := DASLTextureType new name: #image3DArray; sampledType: FloatType; dimensions: 3; array: true; depth: false; multisample: false; sampled: false.
+	ImageCubeType := DASLTextureType new name: #imageCube; dimensions: 4; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: false.
+	ImageCubeArrayType := DASLTextureType new name: #imageCubeArray; sampledType: FloatType; dimensions: 4; array: true; depth: false; multisample: false; sampled: false.
 	
 	^ {
 		SamplerType .
+		
 		Texture1DType .
 		Texture1DArrayType .
 		Texture2DType .
@@ -262,6 +280,15 @@ DASLType class >> textureAndSamplerTypes [
 		DepthTexture2DArrayType.
 		DepthTextureCubeType.
 		DepthTextureCubeArrayType.
+		
+		Image1DType .
+		Image1DArrayType .
+		Image2DType .
+		Image2DArrayType .
+		Image3DType .
+		Image3DArrayType .
+		ImageCubeType .
+		ImageCubeArrayType .
 	}
 ]
 

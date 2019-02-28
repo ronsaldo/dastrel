@@ -8,6 +8,13 @@ Class {
 }
 
 { #category : #'instance creation' }
+DASLBuiltInScope class >> reset [
+	<script>
+	BuiltInScope := nil.
+
+]
+
+{ #category : #'instance creation' }
 DASLBuiltInScope class >> uniqueInstance [
 	"
 	This singleton is for performance reasons.

@@ -20,8 +20,8 @@ DASLPharoBlockConverterVisitor class >> arithmetic [
 	self
 		mapVectorScalarMessage: #+ toBinaryOperator: #+;
 		mapVectorScalarMessage: #- toBinaryOperator: #-;
-		mapVectorScalarMessage: #* toBinaryOperator: #/;
-		mapVectorScalarMessage: #/ toBinaryOperator: #*;
+		mapVectorScalarMessage: #* toBinaryOperator: #*;
+		mapVectorScalarMessage: #/ toBinaryOperator: #/;
 		yourself
 
 ]
@@ -30,18 +30,11 @@ DASLPharoBlockConverterVisitor class >> arithmetic [
 DASLPharoBlockConverterVisitor class >> commonMath [
 	<messageMaps>
 	self
+		mapVectorMessage: #floor toFunction: #floor;
+		mapVectorMessage: #floorFract toFunction: #fract;
+		mapVectorMessage: #ceil toFunction: #ceil;
 		mapVectorMessage: #min: toFunction: #min;
 		mapVectorMessage: #max: toFunction: #max;
-		yourself
-
-]
-
-{ #category : #'class initialization' }
-DASLPharoBlockConverterVisitor class >> fbm [
-	<messageMaps>
-	self
-		mapMessage: #fbmWorleyNoiseOctaves:lacunarity:initialAmplitude:tiledWith: toFunction: #fbmWorleyNoiseOctaves returnType: #float;
-		mapMessage: #fbmSignedGradientNoiseOctaves:lacunarity:initialAmplitude:tiledWith: toFunction: #fbmGradientNoiseOctaves returnType: #float;
 		yourself
 
 ]
@@ -124,6 +117,17 @@ DASLPharoBlockConverterVisitor class >> mapVectorMessage: selector toFunction: f
 { #category : #'class initialization' }
 DASLPharoBlockConverterVisitor class >> mapVectorScalarMessage: selector toBinaryOperator: functionName [
 	^ self mapMessage: selector toBinaryOperator: functionName returnType: self vectorScalarFunctionTypeInference
+]
+
+{ #category : #notifications }
+DASLPharoBlockConverterVisitor class >> noteCompilationOf: aSelector meta: isMeta [
+	isMeta ifTrue: [
+		self class methodDict at: aSelector ifPresent: [:cm |
+			(cm hasPragmaNamed: #messageMaps) ifTrue: [
+				self initializeMessageMaps
+			]
+		]
+	]
 ]
 
 { #category : #'class initialization' }

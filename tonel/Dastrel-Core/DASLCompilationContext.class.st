@@ -4,10 +4,21 @@ Class {
 	#instVars : [
 		'translationUnits',
 		'lineInfoCache',
-		'shaderSignatures'
+		'shaderSignatures',
+		'includeDirectories'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
+
+{ #category : #adding }
+DASLCompilationContext >> addIncludeDirectories: aCollectionOfDirectories [
+	aCollectionOfDirectories do: [ :dir | self addIncludeDirectory: dir ]
+]
+
+{ #category : #adding }
+DASLCompilationContext >> addIncludeDirectory: directory [
+	includeDirectories add: directory asFileReference
+]
 
 { #category : #adding }
 DASLCompilationContext >> addTranslationUnit: aTranslationUnit [
@@ -52,12 +63,23 @@ DASLCompilationContext >> importTranslationUnit: fileReference [
 	
 ]
 
+{ #category : #'as yet unclassified' }
+DASLCompilationContext >> importTranslationUnit: fileReference fromDirectory: currentDirectory [
+	^ self importTranslationUnit: (self solveImportPath: fileReference fromDirectory: currentDirectory)
+]
+
+{ #category : #accessing }
+DASLCompilationContext >> includeDirectories [
+	^ includeDirectories
+]
+
 { #category : #initialization }
 DASLCompilationContext >> initialize [
 	super initialize.
 	translationUnits := Dictionary new.
 	lineInfoCache := Dictionary new.
 	shaderSignatures := Dictionary new.
+	includeDirectories := OrderedCollection new.
 ]
 
 { #category : #initialization }
@@ -66,9 +88,13 @@ DASLCompilationContext >> lineColumnInfoFor: aFileName [
 ]
 
 { #category : #initialization }
-DASLCompilationContext >> parseError: ppFailure fileName: fileName [
+DASLCompilationContext >> parseError: ppFailure sourceCode: sourceCode [
 	| position |
-	position := self positionFromOffset: ppFailure position fileName: fileName.
+	position := DASLCodePosition new
+		start: ppFailure position;
+		stop: ppFailure position;
+		collection: sourceCode;
+		yourself.
 	DASLParsingError new
 		position: position;
 		messageText: ppFailure message;
@@ -84,16 +110,12 @@ DASLCompilationContext >> positionFromOffset: fileOffset fileName: fileName [
 	line := lowerBound second.
 	column := fileOffset - lowerBound first + 1.
 	^ DASLCodePosition new
-		offset: fileOffset;
+		start: fileOffset;
+		stop: fileOffset;
 		line: line;
 		column: column;
 		fileName: fileName;
 		yourself
-]
-
-{ #category : #initialization }
-DASLCompilationContext >> positionFromToken: token fileName: fileName [
-	^ self positionFromOffset: token start fileName: fileName
 ]
 
 { #category : #accessing }
@@ -104,4 +126,20 @@ DASLCompilationContext >> processedDependencies [
 { #category : #'as yet unclassified' }
 DASLCompilationContext >> shaderSignatures [
 	^ shaderSignatures
+]
+
+{ #category : #'as yet unclassified' }
+DASLCompilationContext >> solveImportPath: fileReference fromDirectory: currentDirectory [
+	| solvedPath |
+	fileReference isAbsolute ifTrue: [ ^ fileReference ].
+	
+	solvedPath := currentDirectory resolve: fileReference.
+	solvedPath exists ifTrue: [ ^ solvedPath ].
+	
+	includeDirectories do: [ :includeDir |
+		solvedPath := includeDir resolve: fileReference.
+		solvedPath exists ifTrue: [ ^ solvedPath ].
+	].
+	
+	^ fileReference
 ]

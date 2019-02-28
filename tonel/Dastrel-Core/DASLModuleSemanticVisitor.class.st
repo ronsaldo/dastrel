@@ -19,32 +19,8 @@ DASLModuleSemanticVisitor class >> initialize [
 		buffer buffer
 		texture texture
 		sampler sampler
+		image texture
 	).
-]
-
-{ #category : #visitor }
-DASLModuleSemanticVisitor >> computeMetalShaderSignatureBindings: shaderSignature [
-	| perTypeBindings metalType bindingCount |
-	perTypeBindings := Dictionary new.
-	shaderSignature elements do: [ :signatureElement |
-		signatureElement isShaderSignatureDescriptorSet ifTrue: [
-			signatureElement slots do: [ :slot |
-				metalType := MetalBindingTypeMap at: slot type value.
-				bindingCount := perTypeBindings at: metalType ifAbsent: [ 0 ].
-				slot
-					metalType: metalType;
-					metalBinding: bindingCount.
-				perTypeBindings at: metalType put: bindingCount + (slot repetitionCount max: 1)
-			]
-		].
-	
-		signatureElement isShaderSignaturePushConstant ifTrue: [
-			self flag: 'Make sure this is the last element'.
-			signatureElement
-				metalType: #buffer;
-				metalBinding: (perTypeBindings at: #buffer)
-		]
-	].
 ]
 
 { #category : #visitor }
@@ -86,9 +62,18 @@ DASLModuleSemanticVisitor >> visitGraphBlock: graphBlock [
 
 { #category : #visitor }
 DASLModuleSemanticVisitor >> visitImportStatement: importStatement [
-	| importedFileName |
-	importedFileName := currentDirectory / (importStatement packageName , '.dastrel').
-	importStatement importedUnit: (compilationContext importTranslationUnit: importedFileName).
+	| importedFileName importedRelativePath |
+	
+	importedRelativePath := ByteString streamContents: [ :out |
+		importStatement packageName doWithIndex: [ :path :index |
+			index > 1 ifTrue: [ out nextPut: $/ ].
+			out nextPutAll: path
+		].		
+		out nextPutAll: '.dastrel'
+	].
+
+
+	importStatement importedUnit: (compilationContext importTranslationUnit: importedRelativePath asFileReference fromDirectory: currentDirectory).
 	currentScope addImportScope: importStatement importedUnit package.
 	currentTranslationUnit addImportedUnit: importStatement importedUnit.
 ]
@@ -140,7 +125,6 @@ DASLModuleSemanticVisitor >> visitShaderSignature: shaderSignature [
 		].
 	].
 
-	self computeMetalShaderSignatureBindings: shaderSignature
 ]
 
 { #category : #visitor }

@@ -8,9 +8,7 @@ Class {
 		'set',
 		'binding',
 		'linearBinding',
-		'typeLinearBinding',
-		'metalBinding',
-		'metalType'
+		'typeLinearBinding'
 	],
 	#category : #'Dastrel-Core-AST'
 }
@@ -18,8 +16,7 @@ Class {
 { #category : #arithmetic }
 DASLShaderSignatureDescriptorSlot >> + offset [
 	^ self copy
-		binding: binding + offset;
-		metalBinding: metalBinding + offset
+		binding: binding + offset
 ]
 
 { #category : #visitor }
@@ -65,29 +62,7 @@ DASLShaderSignatureDescriptorSlot >> lowerProperty: property for: global on: pro
 
 	properties
 		at: #binding put: binding;
-		at: #set put: set;
-		at: #metalBinding put: metalBinding;
-		at: #metalType put: metalType
-]
-
-{ #category : #accessing }
-DASLShaderSignatureDescriptorSlot >> metalBinding [
-	^ metalBinding
-]
-
-{ #category : #accessing }
-DASLShaderSignatureDescriptorSlot >> metalBinding: anObject [
-	metalBinding := anObject
-]
-
-{ #category : #accessing }
-DASLShaderSignatureDescriptorSlot >> metalType [
-	^ metalType
-]
-
-{ #category : #accessing }
-DASLShaderSignatureDescriptorSlot >> metalType: anObject [
-	metalType := anObject
+		at: #set put: set
 ]
 
 { #category : #'as yet unclassified' }

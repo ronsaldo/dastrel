@@ -152,12 +152,41 @@ DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 		self builtInVectorFunctions,
 		self builtInMatrixFunctions,
 		self builtInTextureFunctions,
+		self builtInImageFunctions,
 		self builtInCommon
 ]
 
 { #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInFunctions [
 	^ DASLBuiltInFunctionPrototypeParser new parsePrototypes: self builtInFunctionPrototypes
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInImageFunctions [
+	^ #(
+		(
+			((getImageSize #'texture.query.size')) ()
+			(image1D => int)
+			(image1DArray => int2)
+			(image2D => int2)
+			(image2DArray => int3)
+			(image3D => int3)
+			(imageCube => int2)
+			(imageCubeArray => int3)
+		)
+		
+		(
+			((imageRead #'texture.image.read')) ()
+			(image2D uint2 => float4)
+		)
+
+		(
+			((imageWrite #'texture.image.write')) ()
+			(image2D uint2 float4 => void)
+			(image2D int2 float4 => void)
+		)
+		
+	)
 ]
 
 { #category : #'builtin functions' }
@@ -346,6 +375,20 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			(depthTexture2DArray => int3)
 			(depthTextureCube => int2)
 			(depthTextureCubeArray  => int3)
+		)
+		
+		(
+			((imageRead #'texture.image.read')) ()
+			(texture2D uint2 => float4)
+			(depthTexture2D uint2 => float)
+		)
+
+		(
+			((imageWrite #'texture.image.write')) ()
+			(texture2D uint2 float4 => void)
+			(texture2D int2 float4 => void)
+			(depthTexture2D uint2 float => void)
+			(depthTexture2D int2 float => void)
 		)
 		
 	)

@@ -137,14 +137,6 @@ DASLSyntaxHighlighter >> identifier [
 	]
 ]
 
-{ #category : #accessing }
-DASLSyntaxHighlighter >> import [
-	^ super import ==> [ :tokens |
-		self commands add: (PhanideHighlightCommandStyle classStyle token: tokens second).
-		tokens
-	]
-]
-
 { #category : #keywords }
 DASLSyntaxHighlighter >> integer [
 	^ super integer ==> [ :token |

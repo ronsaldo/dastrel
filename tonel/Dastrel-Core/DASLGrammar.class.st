@@ -138,7 +138,8 @@ Class {
 		'kwFalse',
 		'trueLiteral',
 		'falseLiteral',
-		'assignmentExpression'
+		'assignmentExpression',
+		'importModuleLocation'
 	],
 	#classVars : [
 		'Keywords'
@@ -472,7 +473,12 @@ DASLGrammar >> ignorable [
 
 { #category : #grammar }
 DASLGrammar >> import [
-	^ kwImport , identifier , semicolon
+	^ kwImport , importModuleLocation , semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> importModuleLocation [
+	^ identifier , (dot , identifier) star
 ]
 
 { #category : #grammar }

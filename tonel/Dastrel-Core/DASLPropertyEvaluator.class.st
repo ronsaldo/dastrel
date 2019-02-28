@@ -2,7 +2,8 @@ Class {
 	#name : #DASLPropertyEvaluator,
 	#superclass : #DASLAstVisitor,
 	#instVars : [
-		'compilationContext'
+		'compilationContext',
+		'evaluatingShaderSignatureBindingProperty'
 	],
 	#category : #'Dastrel-Core-Semantic'
 }
@@ -22,6 +23,7 @@ DASLPropertyEvaluator >> evaluateProperties: properties [
 	| result |
 	result := Dictionary new.
 	properties keysAndValuesDo: [ :key :value |
+		evaluatingShaderSignatureBindingProperty := #binding = key value.
 		result at: key value put: (value ifNotNil: [value accept: self])
 	].
 	^ result
@@ -70,6 +72,10 @@ DASLPropertyEvaluator >> visitBinaryOperation: operation [
 { #category : #visiting }
 DASLPropertyEvaluator >> visitIdentifier: identifier [
 	| shaderSignature |
+	evaluatingShaderSignatureBindingProperty ifFalse: [ 
+		^ identifier value asSymbol
+	].
+
 	self flag: 'Support multiple shader signatures.'.
 	shaderSignature := compilationContext shaderSignatures anyOne.
 	^ shaderSignature memberAt: identifier value ifAbsent: [

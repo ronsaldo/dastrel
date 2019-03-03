@@ -30,6 +30,14 @@ DASLPrimitiveType >> alignment: anObject [
 	alignment := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLPrimitiveType >> generateSSAConstant: literalExpression withGenerator: codeGenerator [
+	| ssaConstant |
+	ssaConstant := literalExpression accept: codeGenerator.
+	self assert: (ssaConstant type == (self asSlovimType: codeGenerator compilationTarget)).
+	^ ssaConstant
+]
+
 { #category : #comparing }
 DASLPrimitiveType >> hash [
 	^ (self class hash bitXor: size hash) bitXor: alignment hash

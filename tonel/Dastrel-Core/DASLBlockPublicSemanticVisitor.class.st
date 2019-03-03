@@ -65,6 +65,11 @@ DASLBlockPublicSemanticVisitor >> visitCodeBlock: codeBlock [
 ]
 
 { #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitConstantGlobal: uniformGlobal [
+	self resolveTypeOf: uniformGlobal.
+]
+
+{ #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitFieldDefinition: fieldDefinition [
 	self resolveTypeOf: fieldDefinition.
 

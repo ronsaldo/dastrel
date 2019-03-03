@@ -139,7 +139,12 @@ Class {
 		'trueLiteral',
 		'falseLiteral',
 		'assignmentExpression',
-		'importModuleLocation'
+		'importModuleLocation',
+		'constantGlobal',
+		'kwConstant',
+		'initializationLiteral',
+		'blockInitializationLiteral',
+		'blockInitializationLiteralContent'
 	],
 	#classVars : [
 		'Keywords'
@@ -156,7 +161,7 @@ DASLGrammar class >> initialize [
 	
 	Keywords := Set newFrom: #(
 		in out inout
-		let const
+		let constant
 		uniform buffer
 		interface semantic implements struct
 		sizeof alignof
@@ -264,6 +269,16 @@ DASLGrammar >> blockAttributes [
 ]
 
 { #category : #grammar }
+DASLGrammar >> blockInitializationLiteral [
+	^ leftCBracket , blockInitializationLiteralContent optional , rightCBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> blockInitializationLiteralContent [
+	^ initializationLiteral , (comma , initializationLiteral) star , comma optional
+]
+
+{ #category : #grammar }
 DASLGrammar >> blockStatement [
 	^ leftCBracket , codeStatement star , rightCBracket
 ]
@@ -331,6 +346,11 @@ DASLGrammar >> comma [
 { #category : #grammar }
 DASLGrammar >> conditionalExpression [
 	^ binaryExpression , (questionMark , binaryExpression , colon , binaryExpression ) optional
+]
+
+{ #category : #grammar }
+DASLGrammar >> constantGlobal [
+	^ kwConstant , identifier , colon , type, equalAssign , initializationLiteral,  semicolon
 ]
 
 { #category : #grammar }
@@ -435,7 +455,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / shaderSignature / interface / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
+	^ import / shaderSignature / interface / constantGlobal / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
 ]
 
 { #category : #tokens }
@@ -484,6 +504,11 @@ DASLGrammar >> importModuleLocation [
 { #category : #grammar }
 DASLGrammar >> inOutVariable [
 	^ varFlowDirection , identifier , optionalType , varInitialValue optional, semicolon
+]
+
+{ #category : #grammar }
+DASLGrammar >> initializationLiteral [
+	^ literalExpression / blockInitializationLiteral
 ]
 
 { #category : #tokens }
@@ -549,6 +574,11 @@ DASLGrammar >> kwCase [
 { #category : #keywords }
 DASLGrammar >> kwCodeBlock [
 	^ self keywordParser: 'code_block'
+]
+
+{ #category : #keywords }
+DASLGrammar >> kwConstant [
+	^ self keywordParser: 'constant'
 ]
 
 { #category : #keywords }

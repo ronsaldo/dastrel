@@ -38,6 +38,13 @@ DASLModuleSemanticVisitor >> visitCodeBlock: codeBlock [
 ]
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitConstantGlobal: uniformGlobal [
+	currentScope at: uniformGlobal name put: uniformGlobal ifPresent: [
+		self error: 'uniform global overrides a previously defined symbol' at: uniformGlobal
+	].
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitFunction: function [
 	| functionGroup |
 	functionGroup := currentScope lookSymbol: function name.

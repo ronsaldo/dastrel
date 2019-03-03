@@ -275,18 +275,23 @@ DASLSSACodegenVisitor >> generateCastOrConstructionOf: type arguments: argumentV
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
-	| contentBlock |
+	| contentBlock initBlock |
 	currentFunction := aCodeBlock codegenValue.
 	currentFunctionType := aCodeBlock functionType.
 	aCodeBlock attributes keysAndValuesDo: [ :key :value |
 		currentFunction propertyAt: key value asSymbol put: value value
 	].
 
-	builder := SLVMBuilder on: currentFunction.
+	builder := DASLSLVMBuilder on: currentFunction.
 
 	entryBlock := builder newBasicBlock: #entry.
 	allocaBuilder := SLVMBuilder on: currentFunction.
+	builder allocaBuilder: allocaBuilder.
 	allocaBuilder currentBlock: entryBlock.
+
+	initBlock := builder newBasicBlock: #initBlock.
+	builder initializationBuilder: (SLVMBuilder on: currentFunction).
+	builder initializationBuilder currentBlock: initBlock.
 
 	contentBlock := builder newBasicBlock: #content.
 	builder withBasicBlock: contentBlock do: [
@@ -297,7 +302,8 @@ DASLSSACodegenVisitor >> generateCodeBlock: aCodeBlock [
 		builder isLastTerminator ifFalse: [ builder returnVoid ]
 	].
 
-	allocaBuilder jump: contentBlock
+	allocaBuilder jump: initBlock.
+	builder initializationBuilder jump: contentBlock
 
 ]
 
@@ -342,11 +348,41 @@ DASLSSACodegenVisitor >> generateCodeBlocks: translationUnit [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> generateConstantGlobal: constantGlobal [
+	| globalType initializationConstant |
+	globalType := constantGlobal type asSlovimType: compilationTarget.
+	initializationConstant := constantGlobal type generateSSAConstant: constantGlobal initializationLiteral withGenerator: self.
+	
+	globalType isArrayType ifTrue: [ 
+		constantGlobal codegenValue: [ :functionBuilder |
+			functionBuilder generateReferenceToConstant: initializationConstant
+		]
+	] ifFalse: [
+		constantGlobal codegenValue: initializationConstant
+	].
+
+	"globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: constantGlobal name
+		valueType: globalType
+		storage: DASLType uniformConstantStorage.
+	globalVar initialValue: initializationConstant.
+	constantGlobal codegenValue: globalVar.
+	
+	ssaModule add: globalVar"
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateConstantGlobals: translationUnit [
+	translationUnit modules select: #isConstantGlobal thenDo: [ :block | self generateConstantGlobal: block ]
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
-	| contentBlock argumentValues |
+	| contentBlock argumentValues initBlock |
 	currentFunction := ssaModule globalNamed: aFunctionNode mangledName.
 	currentFunctionType := aFunctionNode prototype functionType.
-	builder := SLVMBuilder on: currentFunction.
+	builder := DASLSLVMBuilder on: currentFunction.
 	argumentValues := currentFunction arguments.
 	aFunctionNode prototype arguments doWithIndex: [ :protoArg :index |
 		protoArg codegenValue: (argumentValues at: index)
@@ -354,7 +390,12 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 
 	entryBlock := builder newBasicBlock: #entry.
 	allocaBuilder := SLVMBuilder on: currentFunction.
+	builder allocaBuilder: allocaBuilder.
 	allocaBuilder currentBlock: entryBlock.
+
+	initBlock := builder newBasicBlock: #initBlock.
+	builder initializationBuilder: (SLVMBuilder on: currentFunction).
+	builder initializationBuilder currentBlock: initBlock.
 
 	contentBlock := builder newBasicBlock: #content.
 	builder withBasicBlock: contentBlock do: [
@@ -371,7 +412,8 @@ DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 		]	
 	].
 
-	allocaBuilder jump: contentBlock
+	allocaBuilder jump: initBlock.
+	builder initializationBuilder jump: contentBlock
 ]
 
 { #category : #visitor }
@@ -1002,6 +1044,7 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 	self
 		generateUniformBlocks: translationUnit;
 		generateBufferBlocks: translationUnit;
+		generateConstantGlobals: translationUnit;
 		generateUniformGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;

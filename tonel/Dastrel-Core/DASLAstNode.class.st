@@ -39,6 +39,11 @@ DASLAstNode >> isCodeBlock [
 ]
 
 { #category : #testing }
+DASLAstNode >> isConstantGlobal [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isFunction [
 	^ false
 ]

@@ -27,6 +27,11 @@ DASLIntegerType >> createSlovimTypeFor: compilationTarget [
 	^ SLVMIntegerType name: name size: size alignment: alignment signed: signed
 ]
 
+{ #category : #'as yet unclassified' }
+DASLIntegerType >> generateSSAConstant: literalValue [
+	self halt
+]
+
 { #category : #comparing }
 DASLIntegerType >> hash [
 	^ super hash bitXor: signed hash

@@ -79,6 +79,18 @@ DASLVectorType >> elements: anObject [
 	elements := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLVectorType >> generateSSAConstant: literalExpression withGenerator: codeGenerator [
+	| slvmType |
+	self assert: literalExpression isBlockListLiteral.
+	self assert: literalExpression elements size = elements.
+
+	slvmType := self asSlovimType: codeGenerator compilationTarget.
+	^ SLVMConstant vector: slvmType elements: (literalExpression elements collect: [:el |
+		baseType generateSSAConstant: el withGenerator: codeGenerator
+	])
+]
+
 { #category : #comparing }
 DASLVectorType >> hash [
 	^ ((self class hash bitXor: baseType hash) bitXor: elements hash) bitXor: alignment hash

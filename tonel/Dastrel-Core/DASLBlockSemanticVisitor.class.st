@@ -214,6 +214,11 @@ DASLBlockSemanticVisitor >> visitConditionalExpression: expression [
 
 ]
 
+{ #category : #visitor }
+DASLBlockSemanticVisitor >> visitConstantGlobal: uniformGlobal [
+
+]
+
 { #category : #'as yet unclassified' }
 DASLBlockSemanticVisitor >> visitContinueStatement: statement [
 	loopLevel = 0 ifTrue: [

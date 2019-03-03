@@ -38,6 +38,22 @@ DASLParser >> blockAttributes [
 ]
 
 { #category : #grammar }
+DASLParser >> blockInitializationLiteral [
+	^ super blockInitializationLiteral ==> [ :tokens |
+		DASLBlockListLiteral new
+			position: (self positionFromToken: tokens first);
+			elements: (tokens second ifNil: [#()])
+	]
+]
+
+{ #category : #grammar }
+DASLParser >> blockInitializationLiteralContent [
+	^ super blockInitializationLiteralContent ==> [ :tokens |
+		{tokens first} , (tokens second collect: #second)
+	]
+]
+
+{ #category : #grammar }
 DASLParser >> blockStatement [
 	^ super blockStatement ==> [ :statement |
 		DASLBlockStatement new
@@ -119,6 +135,16 @@ DASLParser >> conditionalExpression [
 				falseValue: expr second fourth;
 				yourself
 			] ]
+]
+
+{ #category : #grammar }
+DASLParser >> constantGlobal [
+	^ super constantGlobal ==> [ :global | DASLConstantGlobal new
+			position: (self positionFromToken: global first);
+			name: global second value;
+			type: global fourth;
+			initializationLiteral: global sixth;
+			yourself ]
 ]
 
 { #category : #grammar }

@@ -18,6 +18,11 @@ DASLExpression >> evaluateConstant [
 ]
 
 { #category : #testing }
+DASLExpression >> isBlockListLiteral [
+	^ false
+]
+
+{ #category : #testing }
 DASLExpression >> isConstantExpression [
 	^ false
 ]

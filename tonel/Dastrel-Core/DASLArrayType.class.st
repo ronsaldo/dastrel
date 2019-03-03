@@ -55,6 +55,18 @@ DASLArrayType >> elements: anObject [
 	elements := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+DASLArrayType >> generateSSAConstant: literalExpression withGenerator: codeGenerator [
+	| slvmType |
+	self assert: literalExpression isBlockListLiteral.
+	self assert: literalExpression elements size = elements.
+
+	slvmType := self asSlovimType: codeGenerator compilationTarget.
+	^ SLVMConstant array: slvmType slots: (literalExpression elements collect: [:el |
+		baseType generateSSAConstant: el withGenerator: codeGenerator
+	])
+]
+
 { #category : #comparing }
 DASLArrayType >> hash [
 	^ (self class hash bitXor: baseType hash) bitXor: elements hash

@@ -362,57 +362,20 @@ DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 DASLBuiltInFunctions class >> builtInTextureFunctions [
 	^ #(
 		(
-			((getTextureSize #'texture.query.size')) ()
-			(texture1D => int)
-			(texture1DArray => int2)
-			(texture2D => int2)
-			(texture2DArray => int3)
-			(texture3D => int3)
-			(textureCube => int2)
-			(textureCubeArray => int3)
+			((getTextureSize #'texture.query.lod.size')) ()
+			(texture1D int => int)
+			(texture1DArray int => int2)
+			(texture2D int => int2)
+			(texture2DArray int => int3)
+			(texture3D int => int3)
+			(textureCube int => int2)
+			(textureCubeArray int => int3)
 
-			(depthTexture2D => int2)
-			(depthTexture2DArray => int3)
-			(depthTextureCube => int2)
-			(depthTextureCubeArray  => int3)
-		)
-		
-		(
-			((imageRead #'texture.image.read')) ()
-			(texture2D uint2 => float4)
-			(depthTexture2D uint2 => float)
-		)
-
-		(
-			((imageWrite #'texture.image.write')) ()
-			(texture2D uint2 float4 => void)
-			(texture2D int2 float4 => void)
-			(depthTexture2D uint2 float => void)
-			(depthTexture2D int2 float => void)
-		)
-		
-	)
-]
-
-{ #category : #'builtin functions' }
-DASLBuiltInFunctions class >> builtInTexturePrototypes [
-	^ #(
-		(
-			(getTextureSize #'texture.query.size') ()
-			(texture1D => int)
-			(texture1DArray => int2)
-			(texture2D => int2)
-			(texture2DArray => int3)
-			(texture3D => int3)
-			(textureCube => int2)
-			(textureCubeArray => int3)
-
-			(depthTexture2D => int2)
-			(depthTexture2DArray => int3)
-			(depthTextureCube => int2)
-			(depthTextureCubeArray  => int3)
-		)
-		
+			(depthTexture2D int => int2)
+			(depthTexture2DArray int => int3)
+			(depthTextureCube int => int2)
+			(depthTextureCubeArray int => int3)
+		)	
 	)
 ]
 

@@ -84,6 +84,11 @@ DASLAstNode >> isSemanticBlock [
 ]
 
 { #category : #testing }
+DASLAstNode >> isSharedGlobal [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isStructureBlock [
 	^ false
 ]

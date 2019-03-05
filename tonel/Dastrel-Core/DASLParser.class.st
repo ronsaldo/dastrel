@@ -449,6 +449,15 @@ DASLParser >> shaderSignatureElementKeywordType [
 ]
 
 { #category : #grammar }
+DASLParser >> sharedGlobal [
+	^ super sharedGlobal ==> [ :global | DASLSharedGlobal new
+			position: (self positionFromToken: global first);
+			name: global second value;
+			type: global fourth;
+			yourself ]
+]
+
+{ #category : #grammar }
 DASLParser >> start [
 	^ super start ==> [ :modules | DASLTranslationUnit new modules: modules ]
 ]

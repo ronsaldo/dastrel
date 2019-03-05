@@ -144,7 +144,8 @@ Class {
 		'kwConstant',
 		'initializationLiteral',
 		'blockInitializationLiteral',
-		'blockInitializationLiteralContent'
+		'blockInitializationLiteralContent',
+		'kwShared'
 	],
 	#classVars : [
 		'Keywords'
@@ -162,7 +163,7 @@ DASLGrammar class >> initialize [
 	Keywords := Set newFrom: #(
 		in out inout
 		let constant
-		uniform buffer
+		uniform buffer shared
 		interface semantic implements struct
 		sizeof alignof
 		function code_block graph_block
@@ -682,6 +683,11 @@ DASLGrammar >> kwShaderSignature [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwShared [
+	^ self keywordParser: 'shared'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwSizeOf [
 	^ self keywordParser: 'sizeof'
 ]
@@ -883,6 +889,11 @@ DASLGrammar >> shaderSignatureElementKeywordType [
 { #category : #grammar }
 DASLGrammar >> shaderSignatureElementType [
 	^ shaderSignatureElementKeywordType  / identifier
+]
+
+{ #category : #grammar }
+DASLGrammar >> sharedGlobal [
+	^ kwShared , identifier , colon , type, semicolon
 ]
 
 { #category : #ignorables }

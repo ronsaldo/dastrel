@@ -89,10 +89,10 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 		^ builder intToFloatCast: value target: targetType
 	].
 	(valueType isIntegerType and: [ targetType isIntegerType ]) ifTrue: [
-		^ builder intCast: valueType target: targetType
+		^ builder intCast: value target: targetType
 	].
 	(valueType isFloatType and: [ targetType isFloatType ]) ifTrue: [
-		^ builder floatingPointCast: valueType target: targetType
+		^ builder floatingPointCast: value target: targetType
 	].
 
 	self halt
@@ -583,6 +583,25 @@ DASLSSACodegenVisitor >> generateSemanticVar: aVariable prefix: namePrefix [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> generateSharedGlobal: sharedGlobal [
+	| globalVar globalType |
+	globalType := sharedGlobal type asSlovimType: compilationTarget.
+	
+	globalVar := SLVMGlobalVariable
+		pointerSize: compilationTarget pointerSize
+		name: sharedGlobal name
+		valueType: globalType
+		storage: DASLType workgroupStorage.
+	sharedGlobal codegenValue: globalVar.
+	ssaModule add: globalVar
+]
+
+{ #category : #visitor }
+DASLSSACodegenVisitor >> generateSharedGlobals: translationUnit [
+	translationUnit modules select: #isSharedGlobal thenDo: [ :block | self generateSharedGlobal: block ]
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> generateUniformBlock: uniformBlock [
 	| elementTypes blockType globalVar fieldNames storage isPushConstant |
 	elementTypes := uniformBlock body collect: #type.
@@ -1046,6 +1065,7 @@ DASLSSACodegenVisitor >> visitTranslationUnit: translationUnit [
 		generateBufferBlocks: translationUnit;
 		generateConstantGlobals: translationUnit;
 		generateUniformGlobals: translationUnit;
+		generateSharedGlobals: translationUnit;
 		generateSemanticBlocks: translationUnit;
 		generateFunctionsPrototypes: translationUnit;
 		generateCodeBlockPrototypes: translationUnit;

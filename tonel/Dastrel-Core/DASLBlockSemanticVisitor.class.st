@@ -426,6 +426,11 @@ DASLBlockSemanticVisitor >> visitSemanticBlock: interface [
 ]
 
 { #category : #visitor }
+DASLBlockSemanticVisitor >> visitSharedGlobal: sharedGlobal [
+
+]
+
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitStructureBlock: interface [
 ]
 

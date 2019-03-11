@@ -145,7 +145,8 @@ Class {
 		'initializationLiteral',
 		'blockInitializationLiteral',
 		'blockInitializationLiteralContent',
-		'kwShared'
+		'kwShared',
+		'sharedGlobal'
 	],
 	#classVars : [
 		'Keywords'
@@ -456,7 +457,7 @@ DASLGrammar >> functionReturnTypes [
 
 { #category : #grammar }
 DASLGrammar >> globalBlock [
-	^ import / shaderSignature / interface / constantGlobal / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
+	^ import / shaderSignature / interface / constantGlobal / sharedGlobal / uniformGlobal / struct / uniform / buffer / semantic / codeBlock / function
 ]
 
 { #category : #tokens }

@@ -78,6 +78,47 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 ]
 
 { #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInBarrierFunctions [
+	^ #(
+		(
+			((barrier #'shader.barrier.execution')) ()
+			( => void)
+		)
+
+		(
+			((memoryBarrier #'shader.barrier.memory.all')) ()
+			( => void)
+		)
+
+		(
+			((memoryBarrierAtomicCounter #'shader.barrier.memory.atomic_counter')) ()
+			( => void)
+		)
+
+		(
+			((memoryBarrierImage #'shader.barrier.memory.image')) ()
+			( => void)
+		)
+
+		(
+			((memoryBarrierBuffer #'shader.barrier.memory.buffer')) ()
+			( => void)
+		)
+
+		(
+			((memoryBarrierShared #'shader.barrier.memory.shared')) ()
+			( => void)
+		)
+
+		(
+			((groupMemoryBarrier #'shader.barrier.memory.group')) ()
+			( => void)
+		)
+
+	)
+]
+
+{ #category : #'builtin functions' }
 DASLBuiltInFunctions class >> builtInCommon [
 	^ #(
 		(
@@ -145,6 +186,7 @@ DASLBuiltInFunctions class >> builtInDerivativeFunctions [
 DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 	^
 		self builtInArithmeticFunctions,
+		self builtInBarrierFunctions,
 		self builtInLogicalFunctions,
 		self builtInMatrixMultiplicationFunctions,
 		self builtInMathFunctions,
@@ -178,6 +220,7 @@ DASLBuiltInFunctions class >> builtInImageFunctions [
 		(
 			((imageRead #'texture.image.read')) ()
 			(image2D uint2 => float4)
+			(image2D int2 => float4)
 		)
 
 		(

@@ -135,6 +135,13 @@ DASLModuleSemanticVisitor >> visitShaderSignature: shaderSignature [
 ]
 
 { #category : #visitor }
+DASLModuleSemanticVisitor >> visitSharedGlobal: sharedGlobal [
+	currentScope at: sharedGlobal name put: sharedGlobal ifPresent: [
+		self error: 'shared global overrides a previously defined symbol' at: sharedGlobal
+	].
+]
+
+{ #category : #visitor }
 DASLModuleSemanticVisitor >> visitStructureBlock: structureBlock [
 	currentScope at: structureBlock name put: structureBlock ifPresent: [
 		self error: 'uniform block overrides a previously defined symbol' at: structureBlock

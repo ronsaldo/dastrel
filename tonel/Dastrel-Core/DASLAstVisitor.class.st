@@ -177,6 +177,11 @@ DASLAstVisitor >> visitShaderSignatureDescriptorSlot: descriptorSlot [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitSharedGlobal: uniformGlobal [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitString: string [
 	self subclassResponsibility
 ]

@@ -172,6 +172,11 @@ DASLBlockPublicSemanticVisitor >> visitSemanticBlock: semanticBlock [
 ]
 
 { #category : #visitor }
+DASLBlockPublicSemanticVisitor >> visitSharedGlobal: sharedGlobal [
+	self resolveTypeOf: sharedGlobal.
+]
+
+{ #category : #visitor }
 DASLBlockPublicSemanticVisitor >> visitStructureBlock: structureBlock [
 	| fieldTypes fieldNames |
 	structureBlock type ifNotNil: [ ^ self ].

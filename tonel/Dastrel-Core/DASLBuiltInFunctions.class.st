@@ -38,6 +38,14 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 			(integer float => float)
 			(integer double => double)
 		)
+
+		(
+			(& ^ ~ << >>) (ignoreOrder expandToVector operation)
+			(smallInt smallInt => int)
+			(smallUInt smallUInt => uint)
+			(long long => long)
+			(ulong ulong => ulong)
+		)
 	
 		(
 			(-) (ignoreOrder expandToVector operation)

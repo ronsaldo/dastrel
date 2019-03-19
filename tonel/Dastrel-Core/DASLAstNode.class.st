@@ -17,6 +17,11 @@ DASLAstNode >> asDASLCodePosition [
 	^ position
 ]
 
+{ #category : #testing }
+DASLAstNode >> hasPragmaNamed: selector [
+	^ false
+]
+
 { #category : #initialization }
 DASLAstNode >> initialize [
 	super initialize.

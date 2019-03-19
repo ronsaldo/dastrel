@@ -328,6 +328,12 @@ DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 		name: aCodeBlock name
 		functionType: (functionType asSlovimType: compilationTarget).
 	function compilationTarget: compilationTarget.
+
+	function inlineMode: (aCodeBlock hasPragmaNamed: #inline).
+	(aCodeBlock hasPragmaNamed: #alwaysInline) ifTrue: [ 
+		function inlineMode: #always.
+	].
+
 	function arguments
 		doWithIndex: [ :arg :index | 
 			argDecl := argumentDecls at: index.
@@ -426,6 +432,11 @@ DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 		functionType: (functionType asSlovimType: compilationTarget).
 	function compilationTarget: compilationTarget.
 	function unmangledName: aFunctionNode name.
+	function inlineMode: (aFunctionNode hasPragmaNamed: #inline).
+	(aFunctionNode hasPragmaNamed: #alwaysInline) ifTrue: [ 
+		function inlineMode: #always.
+	].
+	
 	aFunctionNode codegenValue: function.
 	ssaModule add: function
 ]

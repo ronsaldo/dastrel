@@ -278,6 +278,12 @@ DASLBuiltInFunctions class >> builtInMathFunctions [
 		)
 		
 		(
+			((mod #'math.fmod')) (expandToVector)
+			(float float => float)
+			(double double => double)
+		)
+		
+		(
 			((pow #'math.pow')
 			 (atan2 #'math.atan2')) (expandToVector)
 			(float float => float)

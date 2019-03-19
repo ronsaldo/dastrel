@@ -58,7 +58,8 @@ DASLParser >> blockStatement [
 	^ super blockStatement ==> [ :statement |
 		DASLBlockStatement new
 			position: (self positionFromToken: statement first);
-			statements: statement second
+			pragmas: statement second;
+			statements: statement third
 	]
 ]
 
@@ -223,7 +224,8 @@ DASLParser >> function [
 			position: tokens first position;
 			prototype: tokens first;
 			name: tokens first name;
-			body: tokens third;
+			pragmas: tokens third;
+			body: tokens fourth;
 			yourself]
 ]
 
@@ -395,6 +397,16 @@ DASLParser >> postfix: operation operate: operand [
 		operation: operation inputValue asSymbol;
 		operand: operand;
 		yourself
+]
+
+{ #category : #grammar }
+DASLParser >> pragma [
+	^ super pragma ==> [ :tok |
+		DASLPragma new
+			position: (self positionFromToken: tok first);
+			selector: tok third value;
+			yourself
+	]
 ]
 
 { #category : #grammar }

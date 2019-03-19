@@ -2,6 +2,7 @@ Class {
 	#name : #DASLFunction,
 	#superclass : #DASLModule,
 	#instVars : [
+		'pragmas',
 		'prototype',
 		'body'
 	],
@@ -39,6 +40,11 @@ DASLFunction >> functionType [
 ]
 
 { #category : #testing }
+DASLFunction >> hasPragmaNamed: selector [
+	^ pragmas anySatisfy: [ :p | p selector = selector ]
+]
+
+{ #category : #testing }
 DASLFunction >> isFunction [
 	^ true
 ]
@@ -46,6 +52,16 @@ DASLFunction >> isFunction [
 { #category : #accessing }
 DASLFunction >> mangledName [
 	^ prototype mangledName
+]
+
+{ #category : #accessing }
+DASLFunction >> pragmas [
+	^ pragmas
+]
+
+{ #category : #accessing }
+DASLFunction >> pragmas: anObject [
+	pragmas := anObject
 ]
 
 { #category : #accessing }

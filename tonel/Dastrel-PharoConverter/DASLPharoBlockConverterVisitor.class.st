@@ -238,6 +238,7 @@ DASLPharoBlockConverterVisitor >> convertBlock: aBlockNode [
 		^ DASLFunction new
 			name: context functionName;
 			prototype: prototype;
+			pragmas: #();
 			body: {self convertFunctionBlockBody: aBlockNode body};
 			yourself
 	].

@@ -146,7 +146,9 @@ Class {
 		'blockInitializationLiteral',
 		'blockInitializationLiteralContent',
 		'kwShared',
-		'sharedGlobal'
+		'sharedGlobal',
+		'pragma',
+		'pragmas'
 	],
 	#classVars : [
 		'Keywords'
@@ -282,7 +284,7 @@ DASLGrammar >> blockInitializationLiteralContent [
 
 { #category : #grammar }
 DASLGrammar >> blockStatement [
-	^ leftCBracket , codeStatement star , rightCBracket
+	^ leftCBracket , pragmas, codeStatement star , rightCBracket
 ]
 
 { #category : #grammar }
@@ -432,7 +434,7 @@ DASLGrammar >> forStatement [
 
 { #category : #grammar }
 DASLGrammar >> function [
-	^ functionPrototype , leftCBracket , codeBody  , rightCBracket
+	^ functionPrototype , leftCBracket , pragmas, codeBody  , rightCBracket
 ]
 
 { #category : #grammar }
@@ -820,6 +822,16 @@ DASLGrammar >> parentExpression [
 { #category : #grammar }
 DASLGrammar >> postfix: operation operate: operand [
 	^ { operation . operand }
+]
+
+{ #category : #grammar }
+DASLGrammar >> pragma [
+	^ leftBracket, leftBracket, identifier , rightBracket , rightBracket
+]
+
+{ #category : #grammar }
+DASLGrammar >> pragmas [
+	^ pragma star
 ]
 
 { #category : #grammar }

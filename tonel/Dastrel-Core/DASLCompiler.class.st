@@ -11,7 +11,8 @@ Class {
 		'currentFileName',
 		'optimizationLevel',
 		'ssaModule',
-		'astNodesToInject'
+		'astNodesToInject',
+		'compilationTarget'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -87,7 +88,7 @@ DASLCompiler >> generateCode [
 
 { #category : #'public access' }
 DASLCompiler >> generateSSAModule [
-	ssaModule := DASLSSACodegenVisitor new passOn: ast
+	ssaModule := DASLSSACodegenVisitor new compilationTarget: compilationContext compilationTarget; passOn: ast
 
 ]
 
@@ -217,4 +218,9 @@ DASLCompiler >> ssaTarget [
 { #category : #targets }
 DASLCompiler >> target: target [
 	codeGenerator := SLVMCodeGenerator generatorNamed: target.
+]
+
+{ #category : #initialization }
+DASLCompiler >> withDebugInformation [
+	compilationContext compilationTarget withDebugInformation
 ]

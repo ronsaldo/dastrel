@@ -5,7 +5,8 @@ Class {
 		'translationUnits',
 		'lineInfoCache',
 		'shaderSignatures',
-		'includeDirectories'
+		'includeDirectories',
+		'compilationTarget'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -23,6 +24,16 @@ DASLCompilationContext >> addIncludeDirectory: directory [
 { #category : #adding }
 DASLCompilationContext >> addTranslationUnit: aTranslationUnit [
 	translationUnits at: aTranslationUnit fullPath put: aTranslationUnit
+]
+
+{ #category : #accessing }
+DASLCompilationContext >> compilationTarget [
+	^ compilationTarget
+]
+
+{ #category : #accessing }
+DASLCompilationContext >> compilationTarget: anObject [
+	compilationTarget := anObject
 ]
 
 { #category : #initialization }
@@ -80,6 +91,7 @@ DASLCompilationContext >> initialize [
 	lineInfoCache := Dictionary new.
 	shaderSignatures := Dictionary new.
 	includeDirectories := OrderedCollection new.
+	compilationTarget := SLVM32BitsPointerCompilationTarget new.
 ]
 
 { #category : #initialization }

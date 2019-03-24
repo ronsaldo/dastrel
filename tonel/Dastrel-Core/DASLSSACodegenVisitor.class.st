@@ -98,12 +98,12 @@ DASLSSACodegenVisitor >> coerce: value into: targetType [
 	self halt
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 DASLSSACodegenVisitor >> compilationTarget [
 	^ compilationTarget
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 DASLSSACodegenVisitor >> compilationTarget: aCompilationTarget [
 	compilationTarget := aCompilationTarget
 ]
@@ -471,7 +471,7 @@ DASLSSACodegenVisitor >> generateLogicalAnd: operation [
 	conditionValue := self coerce: (operation left accept: self) into: DASLType boolType.
 	leftBlock := builder currentBlock.
 	branchInstruction := builder branch: conditionValue ifTrue: logicalContinueBlock ifFalse: resultBlock.
-	branchInstruction mergeBlock: resultBlock.
+	branchInstruction block mergeBlock: resultBlock.
 	
 	"Test the second operand"
 	builder currentBlock: logicalContinueBlock.
@@ -497,7 +497,7 @@ DASLSSACodegenVisitor >> generateLogicalOr: operation [
 	conditionValue := self coerce: (operation left accept: self) into: DASLType boolType.
 	leftBlock := builder currentBlock.
 	branchInstruction := builder branch: conditionValue ifTrue: resultBlock ifFalse: logicalContinueBlock.
-	branchInstruction mergeBlock: resultBlock.
+	branchInstruction block mergeBlock: resultBlock.
 	
 	"Test the second operand"
 	builder currentBlock: logicalContinueBlock.
@@ -822,7 +822,7 @@ DASLSSACodegenVisitor >> visitConditionalExpression: expression [
 	coercionType := expression type asSlovimType: compilationTarget.
 
 	branchInstruction := builder branch: conditionValue ifTrue: thenBlock ifFalse: elseBlock.
-	branchInstruction mergeBlock: mergeBlock.
+	branchInstruction block mergeBlock: mergeBlock.
 
 	"True value"
 	builder currentBlock: thenBlock.
@@ -839,7 +839,7 @@ DASLSSACodegenVisitor >> visitConditionalExpression: expression [
 	builder currentBlock: mergeBlock.
 	mergeBlock predecessors ifEmpty: [
 		builder unreachable.
-		branchInstruction addUnreachableSuccessors.
+		branchInstruction block addUnreachableStructuredSuccessors.
 		^ self
 	].
 
@@ -902,7 +902,7 @@ DASLSSACodegenVisitor >> visitForStatement: statement [
 		branchInstruction := builder jump: loopBody
 	].
 
-	branchInstruction
+	loopHeader
 		mergeBlock: loopMerge;
 		continueBlock: loopContinue.
 			
@@ -920,14 +920,14 @@ DASLSSACodegenVisitor >> visitForStatement: statement [
 			builder jump: loopHeader
 		] ifEmpty: [
 			builder unreachable.
-			branchInstruction addUnreachableSuccessors
+			loopHeader addUnreachableStructuredSuccessors
 		]
 	].
 	
 	builder currentBlock: loopMerge.
 	loopMerge predecessors ifEmpty: [
 		builder unreachable.
-		branchInstruction addUnreachableSuccessors
+		loopHeader addUnreachableStructuredSuccessors
 	].
 
 ]
@@ -954,7 +954,7 @@ DASLSSACodegenVisitor >> visitIfStatement: statement [
 	].
 
 	branchInstruction := builder branch: conditionValue ifTrue: thenBlock ifFalse: elseBlock.
-	branchInstruction mergeBlock: mergeBlock.
+	branchInstruction block mergeBlock: mergeBlock.
 	builder currentBlock: thenBlock.
 	statement thenStatement accept: self.
 	builder isLastTerminator ifFalse: [ builder jump: mergeBlock ].
@@ -968,7 +968,7 @@ DASLSSACodegenVisitor >> visitIfStatement: statement [
 	builder currentBlock: mergeBlock.
 	mergeBlock predecessors ifEmpty: [
 		builder unreachable.
-		branchInstruction addUnreachableSuccessors.
+		branchInstruction block addUnreachableStructuredSuccessors.
 	]
 ]
 
@@ -1112,7 +1112,7 @@ DASLSSACodegenVisitor >> visitWhileStatement: statement [
 		
 	conditionValue := self coerce: (statement condition accept: self) into: DASLType boolType.
 	branchInstruction := builder branch: conditionValue ifTrue: loopBody ifFalse: loopMerge.
-	branchInstruction
+	loopHeader
 		mergeBlock: loopMerge;
 		continueBlock: loopContinue.
 		
@@ -1126,7 +1126,7 @@ DASLSSACodegenVisitor >> visitWhileStatement: statement [
 	builder currentBlock: loopContinue.
 	loopContinue predecessors ifEmpty: [ 
 		builder unreachable.
-		branchInstruction addUnreachableSuccessors
+		loopHeader addUnreachableStructuredSuccessors
 	] ifNotEmpty: [ 
 		builder jump: loopHeader.
 	].
@@ -1134,7 +1134,7 @@ DASLSSACodegenVisitor >> visitWhileStatement: statement [
 	builder currentBlock: loopMerge.
 	loopMerge predecessors ifEmpty: [
 		builder unreachable.
-		branchInstruction addUnreachableSuccessors
+		loopHeader addUnreachableStructuredSuccessors
 	].
 ]
 

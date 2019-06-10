@@ -40,7 +40,7 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 		)
 
 		(
-			(& ^ ~ << >>) (ignoreOrder expandToVector operation)
+			(& | ^ ~ << >>) (ignoreOrder expandToVector operation)
 			(smallInt smallInt => int)
 			(smallUInt smallUInt => uint)
 			(long long => long)

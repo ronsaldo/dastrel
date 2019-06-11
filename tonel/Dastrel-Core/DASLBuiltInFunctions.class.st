@@ -373,6 +373,18 @@ DASLBuiltInFunctions class >> builtInSamplerFunctions [
 DASLBuiltInFunctions class >> builtInSamplerPrototypes [
 	^ #(
 		(
+			(fetchTexelLod) (member)
+			(texture1D int int => float4)
+			(texture1DArray int2 int => float4)
+			(texture2D int2 int => float4)
+			(texture2DArray int3 int => float4)
+			(texture3D int3 int => float4)
+			(textureCube int3 int => float4)
+			(textureCubeArray int4 int => float4)
+		)
+
+		
+		(
 			(sample) (member)
 			(texture1D float => float4)
 			(texture1DArray float2 => float4)
@@ -433,6 +445,12 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			(depthTextureCube int => int2)
 			(depthTextureCubeArray int => int3)
 		)	
+			
+		(
+			((texelFetch #'texture.image.fetch')) ()
+			(texture2D uint2 => float4)
+			(texture2D int2 => float4)
+		)
 	)
 ]
 

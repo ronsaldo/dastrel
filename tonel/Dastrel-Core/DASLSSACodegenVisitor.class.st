@@ -552,7 +552,7 @@ DASLSSACodegenVisitor >> generateSampler: sampler operation: operation argument:
 		]
 	].
 
-	operation = #sampleLod ifTrue: [ 
+	(#(sampleLod fetchTexelLod) includes: operation) ifTrue: [ 
 		texture type depth ifTrue: [ 
 			^ builder sampleDepth: combinedSampler explicitLod: arguments third AtCoord: texcoord
 		] ifFalse: [ 

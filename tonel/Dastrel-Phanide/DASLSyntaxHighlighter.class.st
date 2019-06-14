@@ -249,7 +249,7 @@ DASLSyntaxHighlighter >> struct [
 { #category : #keywords }
 DASLSyntaxHighlighter >> type [
 	^ super type ==> [ :tokens |
-		self commands add: (PhanideHighlightCommandStyle typeExpression token: tokens first).
+		self commands add: (PhanideHighlightCommandStyle typeExpression token: tokens second).
 		tokens
 	]
 ]

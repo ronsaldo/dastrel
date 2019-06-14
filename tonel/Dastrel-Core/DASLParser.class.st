@@ -517,15 +517,22 @@ DASLParser >> trueLiteral [
 DASLParser >> type [
 	| typeNode |
 	^ super type ==> [ :typeExpr |
-		typeNode := typeExpr first.
-		typeExpr second do: [ :memberAccess |
+		typeNode := typeExpr second.
+		typeExpr third do: [ :memberAccess |
 			memberAccess reference: typeNode.
 			typeNode := memberAccess
 		].
 	
-		typeExpr third do: [ :arraySubscript |
+		typeExpr fourth do: [ :arraySubscript |
 			arraySubscript reference: typeNode.
 			typeNode := arraySubscript
+		].
+	
+		typeExpr first ifNotNil: [ :token |
+			typeNode := DASLMakeReferenceType new
+				position: (self positionFromToken: token);
+				baseType: typeNode;
+				yourself
 		].
 	
 		typeNode.

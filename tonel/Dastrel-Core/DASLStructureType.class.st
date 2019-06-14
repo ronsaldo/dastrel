@@ -120,6 +120,14 @@ DASLStructureType >> offsets [
 ]
 
 { #category : #printing }
+DASLStructureType >> printMangledOn: aStream [
+	aStream
+		nextPut: $S;
+		print: name size asString;
+		nextPutAll: name
+]
+
+{ #category : #printing }
 DASLStructureType >> printOn: aStream [
 	aStream nextPutAll: 'struct {'.
 	types doWithIndex: [ :type :index |

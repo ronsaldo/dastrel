@@ -45,7 +45,7 @@ DASLSSACodegenVisitor class >> initialize [
 		>= (ige ofge)
 		>  (igt ofgt)
 		== (ieq ofeq)
-		!= (ieq ofne)
+		!= (ine ofne)
 	).
 	
 	UnaryOperationMap := Dictionary newFromPairs: #(

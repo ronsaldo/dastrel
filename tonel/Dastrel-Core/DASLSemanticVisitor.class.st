@@ -216,6 +216,13 @@ DASLSemanticVisitor >> visitLiteralType: stringLiteral [
 ]
 
 { #category : #visitor }
+DASLSemanticVisitor >> visitMakeReferenceType: expression [
+	| baseType |
+	baseType := self resolveType: expression baseType inferWith: nil.
+	expression type: (DASLTypeWrapper new wrapped: (DASLReferenceType baseType: baseType storage: DASLType functionStorage)).
+]
+
+{ #category : #visitor }
 DASLSemanticVisitor >> visitString: stringLiteral [
 ]
 

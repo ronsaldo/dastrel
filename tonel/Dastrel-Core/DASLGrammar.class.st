@@ -148,7 +148,8 @@ Class {
 		'kwShared',
 		'sharedGlobal',
 		'pragma',
-		'pragmas'
+		'pragmas',
+		'kwRef'
 	],
 	#classVars : [
 		'Keywords'
@@ -671,6 +672,11 @@ DASLGrammar >> kwPushConstant [
 ]
 
 { #category : #keywords }
+DASLGrammar >> kwRef [
+	^ self keywordParser: 'ref'
+]
+
+{ #category : #keywords }
 DASLGrammar >> kwReturn [
 	^ self keywordParser: 'return'
 ]
@@ -961,7 +967,7 @@ DASLGrammar >> trueLiteral [
 
 { #category : #grammar }
 DASLGrammar >> type [
-	^ identifier , memberExpression star , typeArraySubscript star
+	^ kwRef optional , identifier , memberExpression star , typeArraySubscript star
 ]
 
 { #category : #grammar }

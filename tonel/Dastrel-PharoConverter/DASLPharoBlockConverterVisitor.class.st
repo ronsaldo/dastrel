@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'context',
 		'currentScope',
-		'typeAnnotations'
+		'typeAnnotations',
+		'codeConverter'
 	],
 	#classVars : [
 		'MessageMaps',
@@ -22,6 +23,9 @@ DASLPharoBlockConverterVisitor class >> arithmetic [
 		mapVectorScalarMessage: #- toBinaryOperator: #-;
 		mapVectorScalarMessage: #* toBinaryOperator: #*;
 		mapVectorScalarMessage: #/ toBinaryOperator: #/;
+		
+		mapMessage: #= toBinaryOperator: #== returnType: #bool;
+		mapMessage: #<= toBinaryOperator: #<= returnType: #bool;
 		yourself
 
 ]
@@ -30,6 +34,14 @@ DASLPharoBlockConverterVisitor class >> arithmetic [
 DASLPharoBlockConverterVisitor class >> commonMath [
 	<messageMaps>
 	self
+		mapVectorMessage: #sqrt toFunction: #sqrt;
+		mapVectorMessage: #exp toFunction: #exp;
+		mapVectorMessage: #cos toFunction: #cos;
+		mapVectorMessage: #sin toFunction: #sin;
+		mapVectorMessage: #tan toFunction: #tan;
+		mapVectorMessage: #abs toFunction: #abs;
+		mapVectorMessage: #raisedTo: toFunction: #pow;
+
 		mapVectorMessage: #floor toFunction: #floor;
 		mapVectorMessage: #floorFract toFunction: #fract;
 		mapVectorMessage: #ceil toFunction: #ceil;
@@ -180,6 +192,16 @@ DASLPharoBlockConverterVisitor >> annotatedNodeType: aNode [
 ]
 
 { #category : #accessing }
+DASLPharoBlockConverterVisitor >> codeConverter [
+	^ codeConverter
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverterVisitor >> codeConverter: anObject [
+	codeConverter := anObject
+]
+
+{ #category : #accessing }
 DASLPharoBlockConverterVisitor >> context [
 	^ context
 ]
@@ -205,7 +227,7 @@ DASLPharoBlockConverterVisitor >> convertArgument: argument withIndex: index [
 	^ DASLFunctionArgument new
 		position: position;
 		name: argument name;
-		type: (context argumentTypes at: index);
+		type: (context argumentTypeNodes at: index);
 		yourself
 ]
 
@@ -318,12 +340,27 @@ DASLPharoBlockConverterVisitor >> emitConstructVector: vectorNode [
 ]
 
 { #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> emitIfTrue: messageNode [
+	| condition trueBranch |
+	condition := self visitNode: messageNode receiver.
+	trueBranch := self inlineBlock: messageNode arguments first withArguments: #().
+	^ DASLIfStatement new
+		position: (self convertNodePosition: messageNode);
+		thenStatement: trueBranch;
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> emitMessage: messageNode [
+	| receiver receiverType |
 	MessageMaps at: messageNode selector ifPresent: [ :map |
 		^ self emitMessage: messageNode withMap: map
 	].
 
-	self halt
+	receiver := self visitNode: messageNode receiver.
+	receiverType := self annotatedNodeType: receiver.
+	receiverType isReferenceType ifTrue: [ receiverType := receiverType baseType ].
+	^ receiverType emitMessage: messageNode receiver: receiver with: self
 ]
 
 { #category : #'as yet unclassified' }
@@ -337,6 +374,7 @@ DASLPharoBlockConverterVisitor >> emitMessage: messageNode withMap: map [
 
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> evaluateType: aType [
+	| valueType |
 	aType isSymbol ifTrue: [
 		^ self evaluateTypeNamed: aType
 	].
@@ -354,7 +392,9 @@ DASLPharoBlockConverterVisitor >> evaluateType: aType [
 
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> evaluateTypeNamed: typeName [
-	^ DASLType builtInTypes at: typeName
+	DASLType builtInTypes at: typeName ifPresent: [ :found | ^ found ].
+	
+	^ (Smalltalk globals at: typeName) asDastrelConversionTypeWith: codeConverter
 ]
 
 { #category : #'as yet unclassified' }
@@ -375,6 +415,19 @@ DASLPharoBlockConverterVisitor >> initialize [
 	super initialize.
 	typeAnnotations := IdentityDictionary new.
 	
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> inlineBlock: blockOrValueNode withArguments: arguments [
+	blockOrValueNode isBlock ifTrue: [
+		self assert: blockOrValueNode arguments size = arguments size.
+		blockOrValueNode arguments ifNotEmpty: [ 
+			self halt
+		].
+	
+		^ self visitNode: blockOrValueNode body
+	].
+	^ self visitNode: blockOrValueNode
 ]
 
 { #category : #'as yet unclassified' }
@@ -414,6 +467,23 @@ DASLPharoBlockConverterVisitor >> visitBlockNode: node [
 ]
 
 { #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> visitCascadeNode: aCascadeNode [
+	| convertedStatement actions |
+	actions := Array streamContents: [:out |
+		aCascadeNode messages do: [:each |
+			convertedStatement := self visitNode: each.
+			convertedStatement isArray ifTrue: [
+				out nextPutAll: (convertedStatement collect: #asStatement)
+			] ifFalse: [
+				out nextPut: convertedStatement asStatement
+			]
+		]
+	].
+
+	^ actions
+]
+
+{ #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> visitLiteralNode: aLiteralNode [
 	| value literalClass literalType |
 	value := aLiteralNode value.
@@ -425,6 +495,10 @@ DASLPharoBlockConverterVisitor >> visitLiteralNode: aLiteralNode [
 	value isFloat ifTrue: [ 
 		literalClass := DASLFloat.
 		literalType := #float.
+	].
+	(#(true false) includes: value) ifTrue: [ 
+		literalClass := DASLBoolean.
+		literalType := #bool.
 	].
 
 	literalClass ifNil: [
@@ -499,6 +573,10 @@ DASLPharoBlockConverterVisitor >> visitTemporaryNode: temporaryNode [
 DASLPharoBlockConverterVisitor >> visitVariableNode: variableNode [
 	| symbolDefinition |
 	symbolDefinition := currentScope lookSymbolRecursively: variableNode name ifAbsent: [
+		Smalltalk globals at: variableNode name ifPresent: [ :value |
+			^ self annotateNode: (value asDastrelLiteralAt: (self convertNodePosition: variableNode) inContext: context for: nil)
+				withType: (DASLPharoCodeWrapperMetaType new wrappedClass: value class)
+		].
 		self error: 'Failed to lookup symbol {1}.' format: {variableNode name} at: variableNode
 	].
 

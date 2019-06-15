@@ -2,14 +2,26 @@ Class {
 	#name : #DASLPharoBlockConverter,
 	#superclass : #Object,
 	#instVars : [
+		'codeConverter',
 		'argumentTypes',
 		'functionName',
 		'returnType',
 		'sourceCollection',
-		'capturedVariables'
+		'capturedVariables',
+		'argumentTypeNodes'
 	],
 	#category : #'Dastrel-PharoConverter'
 }
+
+{ #category : #accessing }
+DASLPharoBlockConverter >> argumentTypeNodes [
+	^ argumentTypeNodes
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverter >> argumentTypeNodes: anObject [
+	argumentTypeNodes := anObject
+]
 
 { #category : #accessing }
 DASLPharoBlockConverter >> argumentTypes [
@@ -31,6 +43,16 @@ DASLPharoBlockConverter >> capturedVariables: anObject [
 	capturedVariables := anObject
 ]
 
+{ #category : #accessing }
+DASLPharoBlockConverter >> codeConverter [
+	^ codeConverter
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverter >> codeConverter: anObject [
+	codeConverter := anObject
+]
+
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNames returnType: returnTypeName [
 	| closureNode closurePosition copiedVariables |
@@ -48,10 +70,16 @@ DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNa
 			yourself
 	].
 	
-	argumentTypes := argumentTypeNames collect: [ :name | DASLIdentifier new value: name; position: closurePosition; yourself ] as: Array.
+	argumentTypes := argumentTypeNames collect: [ :argumentTypeDesc |
+		codeConverter evaluateTypeSpecification: argumentTypeDesc
+	] as: Array.
+	argumentTypeNodes := argumentTypes collect: [:argType | (argType asDastrelTypeNode) position: closurePosition].
+	
 	returnType := DASLIdentifier new value: returnTypeName; position: closurePosition; yourself.
 	
-	^ DASLPharoBlockConverterVisitor new context: self;
+	^ DASLPharoBlockConverterVisitor new
+		codeConverter: codeConverter;
+		context: self;
 		convertBlock: closureNode
 ]
 
@@ -78,4 +106,9 @@ DASLPharoBlockConverter >> returnType: anObject [
 { #category : #accessing }
 DASLPharoBlockConverter >> sourceCollection [
 	^ sourceCollection
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverter >> sourceCollection: anObject [
+	sourceCollection := anObject
 ]

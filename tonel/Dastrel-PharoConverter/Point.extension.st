@@ -6,10 +6,8 @@ Point >> asDastrelLiteralAt: aPosition inContext: context for: variable [
 	type := self inferDastrelTypeIn: context for: nil.
 	^ DASLCallExpression new
 		position: aPosition;
-		reference: (DASLIdentifier new
-			position: aPosition;
-			value: type;
-			yourself);
+		reference: (type asDastrelTypeNode
+			position: aPosition);
 		arguments: {
 			x asDastrelLiteralAt: aPosition inContext: context for: variable.
 			y asDastrelLiteralAt: aPosition inContext: context for: variable.
@@ -20,10 +18,10 @@ Point >> asDastrelLiteralAt: aPosition inContext: context for: variable [
 { #category : #'*Dastrel-PharoConverter' }
 Point >> inferDastrelTypeIn: context for: variable [
 	(x isInteger and: [ y isInteger ]) ifTrue: [ 
-		^ #int2
+		^ context codeConverter evaluateTypeSpecification: #int2
 	].
 	(x isFloat and: [ y isFloat ]) ifTrue: [ 
-		^ #float2
+		^ context codeConverter evaluateTypeSpecification: #float2
 	].
 
 	^ super inferDastrelTypeIn: context for: variable

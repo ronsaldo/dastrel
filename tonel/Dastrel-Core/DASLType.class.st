@@ -380,6 +380,16 @@ DASLType >> alignment [
 ]
 
 { #category : #converting }
+DASLType >> asDastrelTypeNode [
+	^ DASLLiteralType type: self
+]
+
+{ #category : #converting }
+DASLType >> asFunctionReferenceType [
+	^ DASLReferenceType baseType: self storage: DASLType functionStorage
+]
+
+{ #category : #converting }
 DASLType >> asSlovimType: compilationTarget [
 	^ slovimType ifNil: [ slovimType := self createSlovimTypeFor: compilationTarget ]
 ]

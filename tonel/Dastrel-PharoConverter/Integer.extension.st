@@ -11,5 +11,5 @@ Integer >> asDastrelLiteralAt: aPosition inContext: context for: variable [
 
 { #category : #'*Dastrel-PharoConverter' }
 Integer >> inferDastrelTypeIn: context for: variable [
-	^ #int
+	^ context codeConverter evaluateTypeSpecification: #int
 ]

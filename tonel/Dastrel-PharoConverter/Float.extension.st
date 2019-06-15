@@ -11,5 +11,5 @@ Float >> asDastrelLiteralAt: aPosition inContext: context for: variable [
 
 { #category : #'*Dastrel-PharoConverter' }
 Float >> inferDastrelTypeIn: context for: variable [
-	^ #float
+	^ context codeConverter evaluateTypeSpecification: #float
 ]

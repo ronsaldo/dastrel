@@ -28,6 +28,14 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 		)
 		
 		(
+			(#'pre~') (expandToVector operation)
+			(smallInt => int)
+			(smallUInt => uint)
+			(long => long)
+			(ulong => ulong)
+		)
+		
+		(
 			(+ * / %) (ignoreOrder expandToVector operation)
 			(smallInt smallInt => int)
 			(smallUInt smallUInt => uint)

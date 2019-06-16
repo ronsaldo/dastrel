@@ -21,7 +21,7 @@ DASLPharoCodeClassWrapperStructureType >> emitMessage: messageNode receiver: rec
 		
 		^ visitor annotateNode: (DASLCallExpression new
 			reference: (DASLIdentifier new value: pragma arguments first);
-			arguments: arguments;
+			arguments: {receiverValue} , arguments;
 			yourself
 		) withType: returnType
 	].

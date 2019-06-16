@@ -980,6 +980,11 @@ DASLSSACodegenVisitor >> visitInteger: integer [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitLiteralType: node [
+	^ node value wrapped
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 	| valueType variable initialValue coercedInitialValue |
 	localDeclaration flow ifNotNil: [ ^ self ].

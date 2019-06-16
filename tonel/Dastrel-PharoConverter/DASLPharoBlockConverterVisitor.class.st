@@ -346,6 +346,7 @@ DASLPharoBlockConverterVisitor >> emitIfTrue: messageNode [
 	trueBranch := self inlineBlock: messageNode arguments first withArguments: #().
 	^ DASLIfStatement new
 		position: (self convertNodePosition: messageNode);
+		condition: condition;
 		thenStatement: trueBranch;
 		yourself
 ]

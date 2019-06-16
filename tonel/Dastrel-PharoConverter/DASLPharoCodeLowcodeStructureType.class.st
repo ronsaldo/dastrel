@@ -20,10 +20,12 @@ DASLPharoCodeLowcodeStructureType >> emitMessage: messageNode receiver: receiver
 		slvmType := (wrappedClass classLayout slotsDictionary at: memberName) type.
 		dastrelType := slvmType asDastrelConversionTypeWith: visitor codeConverter.
 	
-		memberAccess := DASLMemberAccessExpression new reference: receiverValue.
+		memberAccess := DASLMemberAccessExpression new
+			reference: receiverValue;
+			memberName: memberName asSymbol.
 		visitor annotateNode: memberAccess withType: dastrelType.
 
-		^ memberName := messageNode arguments size = 1 ifTrue: [
+		^ messageNode arguments size = 1 ifTrue: [
 			DASLAssignmentExpression new
 				operation: #=;
 				reference: memberAccess;

@@ -19,7 +19,11 @@ DASLVectorType >> emitPharoToDastrelConstructionMessage: messageNode receiver: r
 		components := components , { argValue }.
 		nextComponentIndex := ('xyzw' indexOf: argName last) + 1.
 	].
-		
+	
+	nextComponentIndex to: elements do: [ :i |
+		components := components , { 0.0 asDastrelLiteralAt: position inContext: visitor for: nil   }
+	].
+
 	^ visitor annotateNode: (DASLCallExpression new
 		position: position;
 		reference: self asDastrelTypeNode;

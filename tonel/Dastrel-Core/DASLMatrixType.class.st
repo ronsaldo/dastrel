@@ -89,6 +89,18 @@ DASLMatrixType >> createSlovimTypeFor: compilationTarget [
 		alignment: alignment
 ]
 
+{ #category : #'as yet unclassified' }
+DASLMatrixType >> generateSSAConstant: literalExpression withGenerator: codeGenerator [
+	| slvmType |
+	self assert: literalExpression isBlockListLiteral.
+	self assert: literalExpression elements size = columns.
+
+	slvmType := self asSlovimType: codeGenerator compilationTarget.
+	^ SLVMConstant matrix: slvmType columns: (literalExpression elements collect: [:el |
+		self columnType generateSSAConstant: el withGenerator: codeGenerator
+	])
+]
+
 { #category : #comparing }
 DASLMatrixType >> hash [
 	^ (((self class hash bitXor: baseType hash) bitXor: rows hash) bitXor: columns hash) bitXor: alignment hash

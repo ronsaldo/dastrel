@@ -25,7 +25,13 @@ DASLPharoBlockConverterVisitor class >> arithmetic [
 		mapVectorScalarMessage: #/ toBinaryOperator: #/;
 		
 		mapMessage: #= toBinaryOperator: #== returnType: #bool;
+		mapMessage: #== toBinaryOperator: #== returnType: #bool;
+		mapMessage: #~= toBinaryOperator: #!= returnType: #bool;
+		mapMessage: #~~ toBinaryOperator: #!= returnType: #bool;
+		mapMessage: #< toBinaryOperator: #< returnType: #bool;
 		mapMessage: #<= toBinaryOperator: #<= returnType: #bool;
+		mapMessage: #> toBinaryOperator: #> returnType: #bool;
+		mapMessage: #>= toBinaryOperator: #>= returnType: #bool;
 		yourself
 
 ]
@@ -47,6 +53,14 @@ DASLPharoBlockConverterVisitor class >> commonMath [
 		mapVectorMessage: #ceil toFunction: #ceil;
 		mapVectorMessage: #min: toFunction: #min;
 		mapVectorMessage: #max: toFunction: #max;
+		mapVectorMessage: #interpolateTo:at: toFunction: #mix;
+		mapVectorMessage: #stepEdge: toFunction: #step arguments: #(2 1);
+		mapVectorMessage: #smoothStepFrom:to: toFunction: #smoothstep arguments: #(2 3 1);
+
+		mapVectorMessage: #normalized toFunction: #normalize;
+		mapMessage: #dot: toFunction: #dot returnType: #float;
+		mapMessage: #cross: toFunction: #cross returnType: #float3;
+
 		yourself
 
 ]
@@ -107,6 +121,17 @@ DASLPharoBlockConverterVisitor class >> mapMessage: selector toBinaryOperator: o
 ]
 
 { #category : #'class initialization' }
+DASLPharoBlockConverterVisitor class >> mapMessage: selector toFunction: functionName arguments: arguments returnType: returnType [
+	MessageMaps at: selector
+		put: (DASLPharoBlockConverterMessageFunctionMap new
+			selector: selector;
+			functionName: functionName;
+			swizzleIndices: arguments;
+			returnType: returnType;
+			yourself)
+]
+
+{ #category : #'class initialization' }
 DASLPharoBlockConverterVisitor class >> mapMessage: selector toFunction: functionName returnType: returnType [
 	MessageMaps at: selector
 		put: (DASLPharoBlockConverterMessageFunctionMap new
@@ -124,6 +149,11 @@ DASLPharoBlockConverterVisitor class >> mapVectorMessage: selector toBinaryOpera
 { #category : #'class initialization' }
 DASLPharoBlockConverterVisitor class >> mapVectorMessage: selector toFunction: functionName [
 	^ self mapMessage: selector toFunction: functionName returnType: self vectorFunctionTypeInference
+]
+
+{ #category : #'class initialization' }
+DASLPharoBlockConverterVisitor class >> mapVectorMessage: selector toFunction: functionName arguments: arguments [
+	^ self mapMessage: selector toFunction: functionName arguments: arguments returnType: self vectorFunctionTypeInference
 ]
 
 { #category : #'class initialization' }
@@ -148,7 +178,7 @@ DASLPharoBlockConverterVisitor class >> vectorFunctionTypeInference [
 		| expectedArgumentType |
 		expectedArgumentType := arguments first.
 		arguments do: [ :arg |
-			arg ~~ expectedArgumentType ifTrue: [
+			(arg ~~ expectedArgumentType and: [ (expectedArgumentType isVectorType and: [arg == expectedArgumentType baseType]) not ]) ifTrue: [
 				self halt.
 			]
 		].
@@ -159,6 +189,7 @@ DASLPharoBlockConverterVisitor class >> vectorFunctionTypeInference [
 
 { #category : #'class initialization' }
 DASLPharoBlockConverterVisitor class >> vectorScalarFunctionTypeInference [
+	| expectedArgumentType |
 	^ [ :arguments :position |
 		| scalarType vectorType |
 		arguments do: [ :arg |
@@ -168,7 +199,9 @@ DASLPharoBlockConverterVisitor class >> vectorScalarFunctionTypeInference [
 				arg isVectorType ifTrue: [
 					vectorType := arg
 				] ifFalse: [
-					self halt
+					(arg ~~ expectedArgumentType and: [ (expectedArgumentType isVectorType and: [arg == expectedArgumentType baseType]) not ]) ifTrue: [
+				self halt.
+			]
 				]
 			]
 		].
@@ -361,7 +394,7 @@ DASLPharoBlockConverterVisitor >> emitMessage: messageNode [
 	receiver := self visitNode: messageNode receiver.
 	receiverType := self annotatedNodeType: receiver.
 	receiverType isReferenceType ifTrue: [ receiverType := receiverType baseType ].
-	^ receiverType emitMessage: messageNode receiver: receiver with: self
+	^ receiverType emitPharoToDastrelMessage: messageNode receiver: receiver with: self
 ]
 
 { #category : #'as yet unclassified' }

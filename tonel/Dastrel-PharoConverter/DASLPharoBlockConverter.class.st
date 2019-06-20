@@ -8,7 +8,8 @@ Class {
 		'returnType',
 		'sourceCollection',
 		'capturedVariables',
-		'argumentTypeNodes'
+		'argumentTypeNodes',
+		'astBuilder'
 	],
 	#category : #'Dastrel-PharoConverter'
 }
@@ -31,6 +32,11 @@ DASLPharoBlockConverter >> argumentTypes [
 { #category : #accessing }
 DASLPharoBlockConverter >> argumentTypes: anObject [
 	argumentTypes := anObject
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverter >> astBuilder [
+	^ astBuilder ifNil: [ astBuilder := DASLAstBuilder new ]
 ]
 
 { #category : #accessing }
@@ -61,6 +67,7 @@ DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNa
 	closurePosition := closureNode asDASLCodePositionWithCollection: sourceCollection.
 	
 	copiedVariables := closureNode scope copiedVars asArray.
+
 	capturedVariables := copiedVariables collectWithIndex: [ :variable :index|
 		DASLPharoBlockConverterCapturedVariable new
 			position: closurePosition;

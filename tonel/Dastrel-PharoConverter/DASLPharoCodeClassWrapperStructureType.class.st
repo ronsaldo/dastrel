@@ -8,7 +8,12 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLPharoCodeClassWrapperStructureType >> emitMessage: messageNode receiver: receiverValue with: visitor [
+DASLPharoCodeClassWrapperStructureType >> emitPharoToDastrelConstructionMessage: messageNode receiver: receiverValue with: visitor [
+	self error: 'Unsupported construction message'
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoCodeClassWrapperStructureType >> emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor [
 	| compiledMethod arguments returnType |
 	compiledMethod := wrappedClass lookupSelector: messageNode selector.
 	compiledMethod ifNil: [

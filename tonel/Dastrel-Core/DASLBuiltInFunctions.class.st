@@ -453,7 +453,23 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			(depthTextureCube int => int2)
 			(depthTextureCubeArray int => int3)
 		)	
-			
+
+		(
+			((getTextureLevelCount #'texture.query.lod.count')) ()
+			(texture1D => int)
+			(texture1DArray => int)
+			(texture2D => int)
+			(texture2DArray => int)
+			(texture3D => int)
+			(textureCube => int)
+			(textureCubeArray => int)
+
+			(depthTexture2D => int)
+			(depthTexture2DArray => int)
+			(depthTextureCube => int)
+			(depthTextureCubeArray => int)
+		)	
+
 		(
 			((texelFetch #'texture.image.fetch')) ()
 			(texture2D uint2 => float4)

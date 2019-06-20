@@ -26,3 +26,15 @@ DASLAstBuilder >> literalFloat: value [
 		type: DASLType floatType;
 		yourself
 ]
+
+{ #category : #'as yet unclassified' }
+DASLAstBuilder >> literalVector: type values: values [
+	| actualType |
+	actualType := type.
+	actualType isSymbol ifTrue: [ actualType := DASLType builtInTypes at: type ].
+	
+	^ DASLCallExpression new
+			reference: actualType asDastrelTypeNode;
+			arguments: values;
+			yourself
+]

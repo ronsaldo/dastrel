@@ -399,6 +399,11 @@ DASLType >> createSlovimTypeFor: compilationTarget [
 	self subclassResponsibility
 ]
 
+{ #category : #'as yet unclassified' }
+DASLType >> emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor [
+	self error: 'Cannot convert message send {1}.' format: { messageNode selector printString } at: messageNode
+]
+
 { #category : #testing }
 DASLType >> isArrayType [
 	^ false

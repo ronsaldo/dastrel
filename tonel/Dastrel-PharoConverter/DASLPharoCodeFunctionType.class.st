@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLPharoCodeFunctionType >> emitMessage: messageNode receiver: receiverValue with: visitor [
+DASLPharoCodeFunctionType >> emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor [
 	| selector arguments |
 	selector := messageNode selector.
 	(#(value value: value:value value:value:value:
@@ -23,7 +23,7 @@ DASLPharoCodeFunctionType >> emitMessage: messageNode receiver: receiverValue wi
 			) withType: returnType
 	].
 
-	^ super emitMessage: messageNode receiver: receiverValue with: visitor
+	^ super emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor
 ]
 
 { #category : #accessing }

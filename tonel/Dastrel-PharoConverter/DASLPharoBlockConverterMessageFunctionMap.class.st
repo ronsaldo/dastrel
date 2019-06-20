@@ -2,7 +2,8 @@ Class {
 	#name : #DASLPharoBlockConverterMessageFunctionMap,
 	#superclass : #DASLPharoBlockConverterMessageMap,
 	#instVars : [
-		'functionName'
+		'functionName',
+		'swizzleIndices'
 	],
 	#category : #'Dastrel-PharoConverter'
 }
@@ -25,7 +26,26 @@ DASLPharoBlockConverterMessageFunctionMap >> mapNode: node withArguments: allArg
 			position: (converter convertNodePosition: node);
 			value: functionName;
 			yourself);
-		arguments: allArguments;
+		arguments: (self swizzleArguments: allArguments);
 		yourself)
 	withType: (self inferNode: node typeWithArguments: allArguments with: converter )
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterMessageFunctionMap >> swizzleArguments: arguments [
+	swizzleIndices ifNotNil: [ 
+		^ swizzleIndices collect: [ :index | arguments at: index ]
+	].
+
+	^ arguments
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverterMessageFunctionMap >> swizzleIndices [
+	^ swizzleIndices
+]
+
+{ #category : #accessing }
+DASLPharoBlockConverterMessageFunctionMap >> swizzleIndices: anObject [
+	swizzleIndices := anObject
 ]

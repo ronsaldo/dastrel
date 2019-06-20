@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-DASLPharoCodeLowcodeStructureType >> emitMessage: messageNode receiver: receiverValue with: visitor [
+DASLPharoCodeLowcodeStructureType >> emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor [
 	| compiledMethod memberName memberAccess slvmType dastrelType |
 	compiledMethod := wrappedClass lookupSelector: messageNode selector.
 	compiledMethod ifNil: [
@@ -35,5 +35,5 @@ DASLPharoCodeLowcodeStructureType >> emitMessage: messageNode receiver: receiver
 		]
 	].
 
-	^ super emitMessage: messageNode receiver: receiverValue with: visitor
+	^ super emitPharoToDastrelMessage: messageNode receiver: receiverValue with: visitor
 ]

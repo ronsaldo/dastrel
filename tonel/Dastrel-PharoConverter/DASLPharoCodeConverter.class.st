@@ -13,7 +13,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 DASLPharoCodeConverter >> convertFunction: function name: requiredName argumentTypes: argumentType returnType: returnType [
-	^ convertedFunctions at: function ifAbsentPut: [
+	^ convertedFunctions at: {requiredName . function} ifAbsentPut: [
 		| result |
 		result := function generateDastrelFunctionWith: self withName: requiredName argumentTypes: argumentType returnType: returnType.
 		generatedNodes add: result

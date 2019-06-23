@@ -28,6 +28,23 @@ DASLAstBuilder >> literalFloat: value [
 ]
 
 { #category : #'as yet unclassified' }
+DASLAstBuilder >> literalInt: value [
+	^ DASLFloat new
+		value: value;
+		type: DASLType intType;
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
+DASLAstBuilder >> literalUInt: value [
+	^ DASLFloat new
+		value: value;
+		suffix: #u;
+		type: DASLType uintType;
+		yourself
+]
+
+{ #category : #'as yet unclassified' }
 DASLAstBuilder >> literalVector: type values: values [
 	| actualType |
 	actualType := type.

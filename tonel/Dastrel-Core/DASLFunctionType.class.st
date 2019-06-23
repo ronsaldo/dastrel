@@ -10,7 +10,7 @@ Class {
 
 { #category : #construction }
 DASLFunctionType class >> arguments: argumentTypes returnType: returnType [
-	^ self new arguments: argumentTypes; returnType: returnType; yourself
+	^ self new arguments: argumentTypes asArray; returnType: returnType; yourself
 ]
 
 { #category : #comparing }

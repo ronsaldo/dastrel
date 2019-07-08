@@ -245,6 +245,10 @@ DASLSSACodegenVisitor >> generateBuiltInCall: builtInFunction self: selfArgument
 				addOperation: mappedOperation
 				left: leftValue
 				right: rightValue ].
+	(arguments size = 1 and: [ builtInFunction name = #'pre!' ]) ifTrue: [ 
+		^ builder lnot: coercedArguments first
+	].
+
 	(arguments size = 1
 		and: [ UnaryOperationMap includesKey: builtInFunction name ])
 		ifTrue: [ "Give a special treatment to the multiplication"

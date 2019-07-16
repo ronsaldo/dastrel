@@ -195,6 +195,25 @@ DASLBuiltInFunctions class >> builtInDerivativeFunctions [
 			(float => float)
 			(double => double)
 		)
+		
+		(
+			((fwidth #'fragment.derivative.fwidth')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+
+		(
+			((fwidthFine #'fragment.derivative.fwidth.fine')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+
+		(
+			((fwidthCoarse #'fragment.derivative.fwidth.coarse')) (expandToVector)
+			(float => float)
+			(double => double)
+		)
+
 	)
 ]
 

@@ -9,6 +9,11 @@ DASLInteger >> accept: aVisitor [
 	^ aVisitor visitInteger: self
 ]
 
+{ #category : #testing }
+DASLInteger >> isLiteralInteger [
+	^ true
+]
+
 { #category : #parsing }
 DASLInteger >> parse: aValue [
 	| prefixSuffix |

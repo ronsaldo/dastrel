@@ -149,7 +149,10 @@ Class {
 		'sharedGlobal',
 		'pragma',
 		'pragmas',
-		'kwRef'
+		'kwRef',
+		'makeTupleExpression',
+		'simpleTypeExpression',
+		'tupleTypeExpression'
 	],
 	#classVars : [
 		'Keywords'
@@ -395,7 +398,7 @@ DASLGrammar >> equalAssign [
 
 { #category : #grammar }
 DASLGrammar >> expression [
-	^ assignmentExpression
+	^ makeTupleExpression / assignmentExpression
 ]
 
 { #category : #grammar }
@@ -767,6 +770,11 @@ DASLGrammar >> localVariable [
 ]
 
 { #category : #grammar }
+DASLGrammar >> makeTupleExpression [
+	^ leftParent , expression , (comma, expression) plus , rightParent
+]
+
+{ #category : #grammar }
 DASLGrammar >> memberExpression [
 	^ dot , identifier
 ]
@@ -857,7 +865,7 @@ DASLGrammar >> questionMark [
 
 { #category : #grammar }
 DASLGrammar >> returnStatement [
-	^ kwReturn , callArguments optional , semicolon
+	^ kwReturn , expression optional, semicolon
 ]
 
 { #category : #tokens }
@@ -915,6 +923,11 @@ DASLGrammar >> sharedGlobal [
 	^ kwShared , identifier , colon , type, semicolon
 ]
 
+{ #category : #grammar }
+DASLGrammar >> simpleTypeExpression [
+	^ kwRef optional , identifier , memberExpression star , typeArraySubscript star
+]
+
 { #category : #ignorables }
 DASLGrammar >> singleLineComment [
 	^ '//' asParser, newline negate star, newline
@@ -966,8 +979,13 @@ DASLGrammar >> trueLiteral [
 ]
 
 { #category : #grammar }
+DASLGrammar >> tupleTypeExpression [
+	^ leftParent , type , (comma , type) plus , rightParent
+]
+
+{ #category : #grammar }
 DASLGrammar >> type [
-	^ kwRef optional , identifier , memberExpression star , typeArraySubscript star
+	^ tupleTypeExpression / simpleTypeExpression
 ]
 
 { #category : #grammar }

@@ -223,6 +223,13 @@ DASLSemanticVisitor >> visitMakeReferenceType: expression [
 ]
 
 { #category : #visitor }
+DASLSemanticVisitor >> visitMakeTupleType: expression [
+	| elements |
+	elements := expression elements collect: [ :el | self resolveType: el inferWith: nil ].
+	expression type: (DASLTypeWrapper new wrapped: (DASLTupleType types: elements)).
+]
+
+{ #category : #visitor }
 DASLSemanticVisitor >> visitString: stringLiteral [
 ]
 

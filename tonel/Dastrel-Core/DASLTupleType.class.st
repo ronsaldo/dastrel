@@ -9,7 +9,7 @@ Class {
 
 { #category : #accessing }
 DASLTupleType class >> types: typeList [
-	^ self new types: typeList; yourself
+	^ self new types: typeList asArray; yourself
 ]
 
 { #category : #comparing }
@@ -20,6 +20,12 @@ DASLTupleType >> = other [
 { #category : #visitor }
 DASLTupleType >> accept: aVisitor [
 	^ aVisitor visitTupleType: self
+]
+
+{ #category : #converting }
+DASLTupleType >> createSlovimTypeFor: compilationTarget [
+	^ SLVMTupleType types: (types collect: [ :arg | arg asSlovimType: compilationTarget ])
+
 ]
 
 { #category : #comparing }

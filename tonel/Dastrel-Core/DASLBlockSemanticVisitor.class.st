@@ -320,6 +320,14 @@ DASLBlockSemanticVisitor >> visitLocalDeclaration: declaration [
 ]
 
 { #category : #visitor }
+DASLBlockSemanticVisitor >> visitMakeTupleExpression: tupleExpression [
+	| elementTypes |
+	tupleExpression elements do: [ :el | el accept: self ].
+	elementTypes := tupleExpression elements collect: [:el | self adjustTypeForInference: el type].
+	tupleExpression type: (self arrayOfTypesToTuple: elementTypes)
+]
+
+{ #category : #visitor }
 DASLBlockSemanticVisitor >> visitMemberAccessExpression: memberAccess [
 	| referencedType member baseType samplerFunction index |
 	memberAccess reference accept: self.
@@ -414,10 +422,10 @@ DASLBlockSemanticVisitor >> visitReturnStatement: returnStatement [
 		self error: 'return only can be used inside of functions' at: returnStatement
 	].
 	
-	returnStatement value do: [ :val | val accept: self ].
-	
+	returnStatement value ifNotNil: [:value | value accept: self].
+
 	expectedReturnType := currentFunction functionType returnType.
-	returnType := self arrayOfTypesToTuple: (returnStatement value collect: #type).
+	returnType := returnStatement value ifNotNil: [:value | value type].
 	expectedReturnType isVoidType ifFalse: [
 		self checkImplicitCoercion: returnType to: expectedReturnType on: returnStatement
 	].
@@ -439,13 +447,40 @@ DASLBlockSemanticVisitor >> visitStructureBlock: interface [
 
 { #category : #visitor }
 DASLBlockSemanticVisitor >> visitSubscriptExpression: subscriptAccess [
-	| referencedType baseType elementType isBounded elements |
+	| referencedType baseType elementType isBounded elements tupleElementIndex |
 	subscriptAccess reference accept: self.
 	subscriptAccess index accept: self.
 	
 	referencedType := subscriptAccess reference type.
-	referencedType isReferenceType ifFalse: [ self error: 'Expected a reference.' at: subscriptAccess ].
-	baseType := referencedType baseType.
+	referencedType isReferenceType ifTrue: [
+		baseType := referencedType baseType.
+	] ifFalse: [
+		baseType := referencedType.
+		baseType isTupleType ifFalse: [ 
+			self error: 'Expected a reference.' at: subscriptAccess
+		]
+	].
+
+	baseType isTupleType ifTrue: [
+		subscriptAccess index isLiteralInteger ifFalse: [ 
+			self error: 'Expected a literal integer for accessing a tuple element.' at: subscriptAccess.
+		].
+			
+		tupleElementIndex := subscriptAccess index value.
+			tupleElementIndex < 0 ifTrue: [ 
+			self error: 'Tuple element access index cannot be negative.' at: subscriptAccess.
+		].
+
+		tupleElementIndex >= baseType types size ifTrue: [ 
+			self error: 'Tuple element access index is out of bounds.' at: subscriptAccess.
+		].
+			
+		subscriptAccess
+			coercionType: subscriptAccess index type;
+			type: (baseType types at: tupleElementIndex + 1).
+		^ self
+	].
+	
 	(baseType isArrayType or: [ baseType isMatrixType or: [ baseType isVectorType ]]) ifFalse: [ self error: 'Expected an array.' at: subscriptAccess ].
 
 	baseType isMatrixType ifTrue: [ 

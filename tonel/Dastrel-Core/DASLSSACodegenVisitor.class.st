@@ -1004,6 +1004,20 @@ DASLSSACodegenVisitor >> visitLocalDeclaration: localDeclaration [
 ]
 
 { #category : #visitor }
+DASLSSACodegenVisitor >> visitMakeTupleExpression: tupleExpression [
+	| elements tupleStructureType tempStructure elementValue |
+	elements := tupleExpression elements collect: [ :el | el accept: self ].
+	tupleStructureType := tupleExpression type asSlovimType: compilationTarget.
+	tempStructure := allocaBuilder alloca: tupleStructureType.
+	elements doWithIndex: [ :el :index |
+		elementValue := self coerce: el into: (tupleStructureType types at: index).
+		builder store: elementValue in: (builder getReference: tempStructure element: (builder constInt: index - 1) )
+	].
+
+	^ builder load: tempStructure
+]
+
+{ #category : #visitor }
 DASLSSACodegenVisitor >> visitMemberAccessExpression: memberAccess [
 	| globalRefValue baseReference accessKind indices |
 	accessKind := memberAccess accessKind.
@@ -1050,26 +1064,25 @@ DASLSSACodegenVisitor >> visitPrefixUnaryOperation: unaryOperation [
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitReturnStatement: returnStatement [
-	| returnType returnTypes returnValues |
+	| returnType returnValue |
 	returnType := currentFunctionType returnType.
-	returnTypes := returnType isTupleType ifTrue: [ returnType types ] ifFalse: [ { returnType } ].
-	returnValues := (returnStatement value ifNil: [#()]) collect: [:value | value accept: self].
+	returnValue := returnStatement value ifNotNil:  [:value | value accept: self].
 	
 	returnType isVoidType ifTrue: [
 		^ builder returnVoid
 	].
 
-	returnTypes size = 1 ifTrue: [
-		^ builder return: (self coerce: returnValues first into: returnType)
-	].
-
-	self halt.
+	^ builder return: (self coerce: returnValue into: returnType)
 ]
 
 { #category : #visitor }
 DASLSSACodegenVisitor >> visitSubscriptExpression: subscriptAccess [
 	| reference index |
-	reference := subscriptAccess reference accept: self.
+	reference := subscriptAccess reference accept: self.	
+	subscriptAccess reference type isTupleType ifTrue: [
+		^ builder extractValue: reference indices: { subscriptAccess index value }
+	].
+
 	index := self coerce: (subscriptAccess index accept: self) into: subscriptAccess coercionType.
 	^ builder getReference: reference element: index
 ]

@@ -61,6 +61,9 @@ DASLPharoBlockConverterVisitor class >> commonMath [
 		mapMessage: #dot: toFunction: #dot returnType: #float;
 		mapMessage: #cross: toFunction: #cross returnType: #float3;
 
+		mapMessage: #radius toFunction: #vector2Radius returnType: #float;
+		mapMessage: #theta toFunction: #vector2Angle returnType: #float;
+
 		yourself
 
 ]
@@ -288,7 +291,7 @@ DASLPharoBlockConverterVisitor >> convertBlock: aBlockNode [
 		prototype := DASLFunctionPrototype new
 			name: context functionName;
 			arguments: (self convertArguments: aBlockNode arguments);
-			returnType: {context returnType};
+			returnType: context returnType;
 			yourself.
 		^ DASLFunction new
 			name: context functionName;
@@ -309,7 +312,7 @@ DASLPharoBlockConverterVisitor >> convertFunctionBlockBody: blockBody [
 			resultExpression := sequence statements last expression.
 			returnStatement := DASLReturnStatement new
 				position: resultExpression position;
-				value: {resultExpression};
+				value: resultExpression;
 				yourself.
 				
 			sequence statements: sequence statements allButLast , { returnStatement }
@@ -421,6 +424,10 @@ DASLPharoBlockConverterVisitor >> evaluateType: aType [
 		^ self evaluateTypeNamed: aType value
 	].
 
+	aType isArray ifTrue: [ 
+		self halt
+	].
+
 	^ aType
 ]
 
@@ -467,6 +474,17 @@ DASLPharoBlockConverterVisitor >> inlineBlock: blockOrValueNode withArguments: a
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> visitArgumentNode: temporaryNode [
 	^ self visitVariableNode: temporaryNode
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> visitArrayNode: anArrayNode [
+	| elements |
+	elements := anArrayNode children collect: [ :child | self visitNode: child ].
+	^ DASLMakeTupleExpression new
+			position: (self convertNodePosition: anArrayNode);
+			elements: elements;
+			yourself
+
 ]
 
 { #category : #'as yet unclassified' }

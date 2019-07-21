@@ -23,14 +23,20 @@ DASLPharoCodeConverter >> convertFunction: function name: requiredName argumentT
 
 { #category : #'as yet unclassified' }
 DASLPharoCodeConverter >> evaluateTypeSpecification: argumentTypeDesc [
+	| compositeType |
 	argumentTypeDesc isSymbol ifTrue: [
 		DASLType builtInTypes at: argumentTypeDesc ifPresent: [ :found | ^ found ].
 		^ (Smalltalk globals at: argumentTypeDesc) asDastrelConversionTypeWith: self 
 	].
 
 	argumentTypeDesc isArray ifTrue: [ 
-		self assert: argumentTypeDesc first = #ref.
-		^ (self evaluateTypeSpecification: argumentTypeDesc second) asFunctionReferenceType
+		compositeType := argumentTypeDesc first.
+		compositeType == #tuple ifTrue: [
+			^ DASLTupleType types: (argumentTypeDesc allButFirst collect: [ :elTypeSpec | self evaluateTypeSpecification: elTypeSpec ])
+		] ifFalse: [ 
+			self assert: argumentTypeDesc first = #ref.
+			^ (self evaluateTypeSpecification: argumentTypeDesc second) asFunctionReferenceType
+		]
 	].
 
 	self error: 'unsupported argument'

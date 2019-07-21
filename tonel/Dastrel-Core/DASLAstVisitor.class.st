@@ -135,6 +135,11 @@ DASLAstVisitor >> visitLocalDeclaration: localDeclaration [
 ]
 
 { #category : #visitor }
+DASLAstVisitor >> visitMakeTupleExpression: assignment [
+	self subclassResponsibility
+]
+
+{ #category : #visitor }
 DASLAstVisitor >> visitMemberAccessExpression: memberAccessExpression [
 	self subclassResponsibility
 ]

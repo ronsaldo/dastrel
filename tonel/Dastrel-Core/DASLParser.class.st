@@ -255,7 +255,7 @@ DASLParser >> functionPrototype [
 
 { #category : #grammar }
 DASLParser >> functionReturnTypes [
-	^ super functionReturnTypes ==> [ :types | {types first } , types second ]
+	^ super functionReturnTypes ==> [ :types | {types first } , (types second collect: #second)]
 ]
 
 { #category : #tokens }
@@ -338,6 +338,16 @@ DASLParser >> localVariable [
 			name:  local second value;
 			initialValue: local fourth;
 			yourself]
+]
+
+{ #category : #grammar }
+DASLParser >> makeTupleExpression [
+	^ super makeTupleExpression ==> [ :tokens |
+		DASLMakeTupleExpression new
+			position: (self positionFromToken: tokens first);
+			elements: {tokens second} , (tokens third collect: #second);
+			yourself
+	]
 ]
 
 { #category : #grammar }
@@ -470,6 +480,32 @@ DASLParser >> sharedGlobal [
 ]
 
 { #category : #grammar }
+DASLParser >> simpleTypeExpression [
+	| typeNode |
+	^ super simpleTypeExpression ==> [ :typeExpr |
+		typeNode := typeExpr second.
+		typeExpr third do: [ :memberAccess |
+			memberAccess reference: typeNode.
+			typeNode := memberAccess
+		].
+	
+		typeExpr fourth do: [ :arraySubscript |
+			arraySubscript reference: typeNode.
+			typeNode := arraySubscript
+		].
+	
+		typeExpr first ifNotNil: [ :token |
+			typeNode := DASLMakeReferenceType new
+				position: (self positionFromToken: token);
+				baseType: typeNode;
+				yourself
+		].
+	
+		typeNode.
+	]
+]
+
+{ #category : #grammar }
 DASLParser >> start [
 	^ super start ==> [ :modules | DASLTranslationUnit new modules: modules ]
 ]
@@ -514,28 +550,12 @@ DASLParser >> trueLiteral [
 ]
 
 { #category : #grammar }
-DASLParser >> type [
-	| typeNode |
-	^ super type ==> [ :typeExpr |
-		typeNode := typeExpr second.
-		typeExpr third do: [ :memberAccess |
-			memberAccess reference: typeNode.
-			typeNode := memberAccess
-		].
-	
-		typeExpr fourth do: [ :arraySubscript |
-			arraySubscript reference: typeNode.
-			typeNode := arraySubscript
-		].
-	
-		typeExpr first ifNotNil: [ :token |
-			typeNode := DASLMakeReferenceType new
-				position: (self positionFromToken: token);
-				baseType: typeNode;
+DASLParser >> tupleTypeExpression [
+	^ super tupleTypeExpression ==> [ :tokens |
+		DASLMakeTupleType new
+				position: (self positionFromToken: tokens first);
+				elements: {tokens second} , (tokens third collect: #second);
 				yourself
-		].
-	
-		typeNode.
 	]
 ]
 

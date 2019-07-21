@@ -231,6 +231,14 @@ DASLSyntaxHighlighter >> shaderSignature [
 ]
 
 { #category : #keywords }
+DASLSyntaxHighlighter >> simpleTypeExpression [
+	^ super simpleTypeExpression ==> [ :tokens |
+		self commands add: (PhanideHighlightCommandStyle typeExpression token: tokens second).
+		tokens
+	]
+]
+
+{ #category : #keywords }
 DASLSyntaxHighlighter >> singleLineComment [
 	^ super singleLineComment token ==> [ :token |
 		self commands add: (PhanideHighlightCommandStyle commentStyle token: token).
@@ -242,14 +250,6 @@ DASLSyntaxHighlighter >> singleLineComment [
 DASLSyntaxHighlighter >> struct [
 	^ super struct ==> [ :tokens |
 		self commands add: (PhanideHighlightCommandStyle classStyle token: tokens third).
-		tokens
-	]
-]
-
-{ #category : #keywords }
-DASLSyntaxHighlighter >> type [
-	^ super type ==> [ :tokens |
-		self commands add: (PhanideHighlightCommandStyle typeExpression token: tokens second).
 		tokens
 	]
 ]

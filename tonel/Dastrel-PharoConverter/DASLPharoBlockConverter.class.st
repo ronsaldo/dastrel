@@ -61,7 +61,7 @@ DASLPharoBlockConverter >> codeConverter: anObject [
 
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNames returnType: returnTypeName [
-	| closureNode closurePosition copiedVariables |
+	| closureNode closurePosition copiedVariables returnTypeConversionBlock |
 	closureNode := closure sourceNode.
 	sourceCollection := closureNode source asDastrelCollectionWithContext.
 	closurePosition := closureNode asDASLCodePositionWithCollection: sourceCollection.
@@ -82,7 +82,12 @@ DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNa
 	] as: Array.
 	argumentTypeNodes := argumentTypes collect: [:argType | (argType asDastrelTypeNode) position: closurePosition].
 	
-	returnType := DASLIdentifier new value: returnTypeName; position: closurePosition; yourself.
+	returnTypeConversionBlock := [:typeName | (codeConverter evaluateTypeSpecification: typeName)
+			asDastrelTypeNode position: closurePosition ].
+	returnType := returnTypeName isArray
+		ifTrue: [ returnTypeName collect: returnTypeConversionBlock ]
+		ifFalse: [ {returnTypeConversionBlock value: returnTypeName} ].
+	
 	
 	^ DASLPharoBlockConverterVisitor new
 		codeConverter: codeConverter;

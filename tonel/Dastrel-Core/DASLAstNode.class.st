@@ -79,6 +79,11 @@ DASLAstNode >> isInterface [
 ]
 
 { #category : #testing }
+DASLAstNode >> isLiteralInteger [
+	^ false
+]
+
+{ #category : #testing }
 DASLAstNode >> isLocalDeclaration [
 	^ false
 ]

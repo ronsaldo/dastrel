@@ -19,6 +19,12 @@ DASLAstBuilder >> identifier: value [
 ]
 
 { #category : #'as yet unclassified' }
+DASLAstBuilder >> listLiteralWith: elements [
+	^ DASLBlockListLiteral new
+		elements: elements
+]
+
+{ #category : #'as yet unclassified' }
 DASLAstBuilder >> literalFloat: value [
 	^ DASLFloat new
 		value: value;

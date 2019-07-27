@@ -36,7 +36,7 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 		)
 		
 		(
-			(+ * / %) (ignoreOrder expandToVector operation)
+			(+ - * / %) (ignoreOrder expandToVector operation)
 			(smallInt smallInt => int)
 			(smallUInt smallUInt => uint)
 			(long long => long)
@@ -53,17 +53,6 @@ DASLBuiltInFunctions class >> builtInArithmeticFunctions [
 			(smallUInt smallUInt => uint)
 			(long long => long)
 			(ulong ulong => ulong)
-		)
-	
-		(
-			(-) (ignoreOrder expandToVector operation)
-			(smallIntAnySign smallIntAnySign => int)
-			(long long => long)
-			(ulong ulong => ulong)
-			(float float => float)
-			(floatingPoint double => double)
-			(integer float => float)
-			(integer double => double)
 		)
 	
 		((<= < > >=) (ignoreOrder operation)
@@ -230,6 +219,7 @@ DASLBuiltInFunctions class >> builtInFunctionPrototypes [
 		self builtInMatrixFunctions,
 		self builtInTextureFunctions,
 		self builtInImageFunctions,
+		self builtInPackingFunctions,
 		self builtInCommon
 ]
 
@@ -388,6 +378,67 @@ DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 			(float3x3 float3 => float3)
 			(float3 float3x3 => float3)
 		)
+	)
+]
+
+{ #category : #'builtin functions' }
+DASLBuiltInFunctions class >> builtInPackingFunctions [
+	^ #(
+		(
+			((packSnorm2x16 #'pack.snorm2x16')) ()
+			(float2 => uint)
+		)
+		(
+			((packUnorm2x16 #'pack.unorm2x16')) ()
+			(float2 => uint)
+		)
+		(
+			((packSnorm4x8 #'pack.snorm4x8')) ()
+			(float4 => uint)
+		)
+		(
+			((packUnorm4x8 #'pack.unorm4x8')) ()
+			(float4 => uint)
+		)
+
+		(
+			((unpackSnorm2x16 #'unpack.snorm2x16')) ()
+			(uint => float2)
+		)
+		(
+			((unpackUnorm2x16 #'unpack.unorm2x16')) ()
+			(uint => float2)
+		)
+		
+		(
+			((unpackSnorm4x8 #'unpack.snorm4x8')) ()
+			(uint => float2)
+		)
+		(
+			((unpackUnorm4x8 #'unpack.unorm4x8')) ()
+			(uint => float4)
+		)
+
+		(
+			((packDouble2x32 #'pack.double2x32')) ()
+			(double => uint2)
+		)
+
+		(
+			((unpackDouble2x32 #'unpack.double2x32')) ()
+			(uint2 => double)
+		)
+				
+		(
+			((packHalf2x16 #'pack.half2x16')) ()
+			(float2 => uint)
+		)
+
+		(
+			((unpackHalf2x16 #'unpack.half2x16')) ()
+			(uint => float2)
+		)
+
 	)
 ]
 

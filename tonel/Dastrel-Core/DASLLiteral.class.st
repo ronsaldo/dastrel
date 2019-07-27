@@ -64,9 +64,14 @@ DASLLiteral >> printOn: aStream [
 
 { #category : #private }
 DASLLiteral >> splitLetterSuffix: aString [
-	| suffixStart extractedPrefix extractedSuffix |
+	| suffixStart extractedPrefix extractedSuffix blackList |
 	suffixStart := aString size + 1.
-	[ suffixStart - 1 >= 1 and: [ (aString at: suffixStart - 1) isLetter ] ]
+	blackList := ''.
+	(aString beginsWith: '0x') ifTrue: [ blackList := 'ABCDEFabcdef' ].
+	
+	[ suffixStart - 1 >= 1 and:
+	[ (aString at: suffixStart - 1) isLetter and:
+	[ (blackList includes: (aString at: suffixStart - 1)) not ]] ]
 		whileTrue: [ suffixStart := suffixStart - 1].
 	
 	extractedPrefix := aString copyFrom: 1 to: (aString size min: suffixStart).

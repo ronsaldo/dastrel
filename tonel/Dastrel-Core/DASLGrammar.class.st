@@ -521,7 +521,11 @@ DASLGrammar >> initializationLiteral [
 
 { #category : #tokens }
 DASLGrammar >> integer [
-	^ (numberSign optional , #digit asParser plus , #letter asParser star) token trim: ignorable
+	^ (numberSign optional ,
+	 (
+	  ('0x' asParser , (#digit asParser / ($a to: $f) asParser / ($A to: $F) asParser) plus) /
+	  ($0 asParser , ($0 to: $7) asParser plus) /
+	  #digit asParser plus) , #letter asParser star) token trim: ignorable
 ]
 
 { #category : #grammar }

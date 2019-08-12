@@ -66,7 +66,7 @@ DASLPharoBlockConverter >> convertClosure: closure argumentTypes: argumentTypeNa
 	sourceCollection := closureNode source asDastrelCollectionWithContext.
 	closurePosition := closureNode asDASLCodePositionWithCollection: sourceCollection.
 	
-	copiedVariables := closureNode scope copiedVars asArray.
+	copiedVariables := closureNode scope inComingCopiedVars asArray.
 
 	capturedVariables := copiedVariables collectWithIndex: [ :variable :index|
 		DASLPharoBlockConverterCapturedVariable new

@@ -45,7 +45,7 @@ DASLPharoBlockConverterVisitor class >> commonMath [
 		mapVectorMessage: #cos toFunction: #cos;
 		mapVectorMessage: #sin toFunction: #sin;
 		mapVectorMessage: #tan toFunction: #tan;
-		mapVectorMessage: #abs toFunction: #abs;
+		mapVectorMessage: #abs toFunction: #fabs;
 		mapVectorMessage: #raisedTo: toFunction: #pow;
 
 		mapVectorMessage: #floor toFunction: #floor;

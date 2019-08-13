@@ -340,6 +340,11 @@ DASLPharoBlockConverterVisitor >> convertTermporaryNode: temporaryNode [
 ]
 
 { #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> emitAnd: messageNode [
+	^ self emitShortCircuit: messageNode operator: #&&
+]
+
+{ #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> emitConstructVector: vectorNode [
 	| firstPart secondPart firstPartType secondPartType firstBaseTypeAndSize secondBaseTypeAndSize vectorBase vectorSize constructionPosition resultTypeName |
 	self assert: vectorNode arguments size = 1.
@@ -410,6 +415,24 @@ DASLPharoBlockConverterVisitor >> emitMessage: messageNode withMap: map [
 ]
 
 { #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> emitOr: messageNode [
+	^ self emitShortCircuit: messageNode operator: #||
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> emitShortCircuit: messageNode operator: operatorName [
+	| leftOperand rightOperand |
+	leftOperand := self visitNode: messageNode receiver.
+	rightOperand := self inlineBlockValue: messageNode arguments first.
+	^ self annotateNode: (DASLBinaryOperation new
+		position: (self convertNodePosition: messageNode);
+		operation: operatorName;
+		left: leftOperand;
+		right: rightOperand;
+		yourself) withType: #bool
+]
+
+{ #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> evaluateType: aType [
 	| valueType |
 	aType isSymbol ifTrue: [
@@ -469,6 +492,12 @@ DASLPharoBlockConverterVisitor >> inlineBlock: blockOrValueNode withArguments: a
 		^ self visitNode: blockOrValueNode body
 	].
 	^ self visitNode: blockOrValueNode
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> inlineBlockValue: blockOrValueNode [
+	blockOrValueNode isBlock ifFalse: [ ^ self visitNode: blockOrValueNode ].
+	^ self visitNode: blockOrValueNode body statements first
 ]
 
 { #category : #'as yet unclassified' }

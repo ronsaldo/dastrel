@@ -58,6 +58,7 @@ DASLPharoBlockConverterVisitor class >> commonMath [
 		mapVectorMessage: #smoothStepFrom:to: toFunction: #smoothstep arguments: #(2 3 1);
 
 		mapVectorMessage: #normalized toFunction: #normalize;
+		mapMessage: #length toFunction: #length returnType: #float;
 		mapMessage: #dot: toFunction: #dot returnType: #float;
 		mapMessage: #cross: toFunction: #cross returnType: #float3;
 

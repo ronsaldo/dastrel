@@ -369,6 +369,7 @@ DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 			(*) (operation matrixMatrix)
 			(float4x4 float4x4 => float4x4)
 			(float3x3 float3x3 => float3x3)
+			(float2x2 float2x2 => float2x2)
 		)
 		
 		(
@@ -377,6 +378,8 @@ DASLBuiltInFunctions class >> builtInMatrixMultiplicationFunctions [
 			(float4 float4x4 => float4)
 			(float3x3 float3 => float3)
 			(float3 float3x3 => float3)
+			(float2x2 float2 => float2)
+			(float2 float2x2 => float2)
 		)
 	)
 ]

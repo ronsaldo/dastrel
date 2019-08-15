@@ -122,6 +122,12 @@ DASLMatrixType >> name [
 ]
 
 { #category : #printing }
+DASLMatrixType >> printMangledOn: aStream [
+	aStream nextPut: $M; print: rows; print: columns.
+	baseType printMangledOn: aStream.
+]
+
+{ #category : #printing }
 DASLMatrixType >> printOn: aStream [
 	aStream print: baseType; print: rows; nextPut: $x; print: columns
 ]

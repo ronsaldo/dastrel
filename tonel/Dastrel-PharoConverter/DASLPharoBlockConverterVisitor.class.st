@@ -97,6 +97,7 @@ DASLPharoBlockConverterVisitor class >> initialize [
 	 } asDictionary.
 	
 	SpecialOperators := { 
+		#asFloat -> #emitAsFloat: .
 		#@ -> #emitConstructVector: .
 	} asDictionary.
 	
@@ -343,6 +344,18 @@ DASLPharoBlockConverterVisitor >> convertTermporaryNode: temporaryNode [
 { #category : #'as yet unclassified' }
 DASLPharoBlockConverterVisitor >> emitAnd: messageNode [
 	^ self emitShortCircuit: messageNode operator: #&&
+]
+
+{ #category : #'as yet unclassified' }
+DASLPharoBlockConverterVisitor >> emitAsFloat: valueNode [
+	| nonFloatValue |
+	nonFloatValue := self visitNode: valueNode receiver.
+
+	^ self annotateNode: (DASLCallExpression new
+		position: (self convertNodePosition: valueNode);
+		reference: DASLType floatType asDastrelTypeNode;
+		arguments: { nonFloatValue };
+		yourself) withType: #float
 ]
 
 { #category : #'as yet unclassified' }

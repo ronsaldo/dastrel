@@ -54,6 +54,7 @@ DASLPharoCodeConverter >> generateAnonymousFunction: function argumentTypes: arg
 	| name |
 	name := convertedAnonymousFunctions at: function ifAbsent: [
 		name := ('_anonF' , anonFunctionCount asString) asSymbol.
+		anonFunctionCount := anonFunctionCount + 1.
 		convertedAnonymousFunctions at: function put: name.
 		self convertFunction: function name: name argumentTypes: argumentTypes returnType: returnType.
 		name

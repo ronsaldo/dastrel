@@ -17,7 +17,7 @@ DASLPharoCodeLowcodeStructureType >> emitPharoToDastrelMessage: messageNode rece
 			messageNode selector allButLast asSymbol
 		] ifFalse: [ messageNode selector ].
 	
-		slvmType := (wrappedClass classLayout slotsDictionary at: memberName) type.
+		slvmType := (wrappedClass classLayout slotScope atName: memberName) type.
 		dastrelType := slvmType asDastrelConversionTypeWith: visitor codeConverter.
 	
 		memberAccess := DASLMemberAccessExpression new

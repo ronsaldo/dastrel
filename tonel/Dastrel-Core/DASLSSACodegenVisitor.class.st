@@ -328,7 +328,7 @@ DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 		returnType: DASLType voidType.
 	aCodeBlock functionType: functionType.
 	function := SLVMFunction
-		pointerSize: compilationTarget pointerSize
+		module: ssaModule
 		name: aCodeBlock name
 		functionType: (functionType asSlovimType: compilationTarget).
 	function compilationTarget: compilationTarget.
@@ -344,7 +344,6 @@ DASLSSACodegenVisitor >> generateCodeBlockPrototype: aCodeBlock [
 			argDecl codegenValue: arg.
 			arg name: argDecl name ].
 	aCodeBlock codegenValue: function.
-	ssaModule add: aCodeBlock codegenValue
 ]
 
 { #category : #visitor }
@@ -390,7 +389,7 @@ DASLSSACodegenVisitor >> generateConstantGlobals: translationUnit [
 { #category : #visitor }
 DASLSSACodegenVisitor >> generateFunction: aFunctionNode [
 	| contentBlock argumentValues initBlock |
-	currentFunction := ssaModule globalNamed: aFunctionNode mangledName.
+	currentFunction := aFunctionNode prototype codegenValue.
 	currentFunctionType := aFunctionNode prototype functionType.
 	builder := DASLSLVMBuilder on: currentFunction.
 	argumentValues := currentFunction arguments.
@@ -431,7 +430,7 @@ DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	| functionType function |
 	functionType := aFunctionNode functionType.
 	function := SLVMFunction
-		pointerSize: compilationTarget
+		module: ssaModule
 		name: aFunctionNode mangledName asSymbol
 		functionType: (functionType asSlovimType: compilationTarget).
 	function compilationTarget: compilationTarget.
@@ -442,7 +441,6 @@ DASLSSACodegenVisitor >> generateFunctionPrototype: aFunctionNode [
 	].
 	
 	aFunctionNode codegenValue: function.
-	ssaModule add: function
 ]
 
 { #category : #visitor }

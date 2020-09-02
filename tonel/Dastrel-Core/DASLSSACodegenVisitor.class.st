@@ -682,7 +682,7 @@ DASLSSACodegenVisitor >> generateUniformGlobals: translationUnit [
 DASLSSACodegenVisitor >> initialize [
 	super initialize.
 	visitedTranslationUnits := Set new.
-	compilationTarget := SLVM32BitsPointerCompilationTarget new.
+	compilationTarget := SLVMCompilationTarget spirv_logical32
 ]
 
 { #category : #compilation }

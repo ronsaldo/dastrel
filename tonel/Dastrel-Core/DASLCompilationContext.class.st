@@ -91,7 +91,7 @@ DASLCompilationContext >> initialize [
 	lineInfoCache := Dictionary new.
 	shaderSignatures := Dictionary new.
 	includeDirectories := OrderedCollection new.
-	compilationTarget := SLVM32BitsPointerCompilationTarget new.
+	compilationTarget := SLVMCompilationTarget spirv_logical32
 ]
 
 { #category : #initialization }

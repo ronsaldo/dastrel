@@ -109,3 +109,15 @@ DASLPharoCodeConverter >> lowcodeStructureWrapper: lowcodeStructure to: targetTy
 DASLPharoCodeConverter >> parseFunctionDefinition: source [
 	^ (DASLParser parse: source) modules first
 ]
+
+{ #category : #'as yet unclassified' }
+DASLPharoCodeConverter >> sysmelStructureWrapper: sysmelStructure to: targetType [
+	^ convertedStructures at: sysmelStructure ifAbsentPut: [
+		DASLType builtInTypes at: targetType ifAbsent: [
+			DASLPharoCodeSysmelStructureType new
+				name: targetType;
+				wrappedClass: sysmelStructure;
+				yourself.
+		]
+	]
+]

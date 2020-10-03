@@ -23,7 +23,7 @@ BaselineOfDastrel >> baseline: spec [
 			baseline: #'Slovim' with: [
 				spec
 					repository: 'github://ronsaldo/slovim/tonel';
-					loads: #(#'ShaderCompilation' #'Runtime') ];
+					loads: #(#'ShaderCompilation') ];
 			baseline: #'Phanide' with: [
 				spec
 					repository: 'github://ronsaldo/phanide/tonel' ].

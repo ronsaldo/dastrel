@@ -517,6 +517,8 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			(texture1DArray int => int2)
 			(texture2D int => int2)
 			(texture2DArray int => int3)
+			(texture2DMS int => int2)
+			(texture2DMSArray int => int3)
 			(texture3D int => int3)
 			(textureCube int => int2)
 			(textureCubeArray int => int3)
@@ -525,6 +527,12 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			(depthTexture2DArray int => int3)
 			(depthTextureCube int => int2)
 			(depthTextureCubeArray int => int3)
+		)	
+
+		(
+			((getTextureSize #'texture.query.size')) ()
+			(texture2DMS => int2)
+			(texture2DMSArray => int3)
 		)	
 
 		(
@@ -547,6 +555,9 @@ DASLBuiltInFunctions class >> builtInTextureFunctions [
 			((texelFetch #'texture.image.fetch')) ()
 			(texture2D uint2 => float4)
 			(texture2D int2 => float4)
+
+			(texture2DMS uint2 uint => float4)
+			(texture2DMS int2 int => float4)
 		)
 	)
 ]

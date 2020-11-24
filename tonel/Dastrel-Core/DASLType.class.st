@@ -39,6 +39,8 @@ Class {
 		'Texture1DArrayType',
 		'Texture1DType',
 		'Texture2DArrayType',
+		'Texture2DMSArrayType',
+		'Texture2DMSType',
 		'Texture2DType',
 		'Texture3DArrayType',
 		'Texture3DType',
@@ -245,6 +247,9 @@ DASLType class >> textureAndSamplerTypes [
 	Texture1DArrayType := DASLTextureType new name: #texture1DArray; sampledType: FloatType; dimensions: 1; array: true; depth: false; multisample: false; sampled: true.
 	Texture2DType := DASLTextureType new name: #texture2D; dimensions: 2; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
 	Texture2DArrayType := DASLTextureType new name: #texture2DArray; sampledType: FloatType; dimensions: 2; array: true; depth: false; multisample: false; sampled: true.
+	Texture2DMSType := DASLTextureType new name: #texture2DMS; dimensions: 2; sampledType: FloatType; array: false; depth: false; multisample: true; sampled: true.
+	Texture2DMSArrayType := DASLTextureType new name: #texture2DMSArray; sampledType: FloatType; dimensions: 2; array: true; depth: false; multisample: true; sampled: true.
+
 	Texture3DType := DASLTextureType new name: #texture3D; dimensions: 3; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
 	Texture3DArrayType := DASLTextureType new name: #texture3DArray; sampledType: FloatType; dimensions: 3; array: true; depth: false; multisample: false; sampled: true.
 	TextureCubeType := DASLTextureType new name: #textureCube; dimensions: 4; sampledType: FloatType; array: false; depth: false; multisample: false; sampled: true.
@@ -271,6 +276,8 @@ DASLType class >> textureAndSamplerTypes [
 		Texture1DArrayType .
 		Texture2DType .
 		Texture2DArrayType .
+		Texture2DMSType .
+		Texture2DMSArrayType .
 		Texture3DType .
 		Texture3DArrayType .
 		TextureCubeType .

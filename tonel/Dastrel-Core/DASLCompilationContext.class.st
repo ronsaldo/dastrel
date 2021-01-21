@@ -62,6 +62,11 @@ DASLCompilationContext >> createLineColumnInfoFor: aFileName [
 ]
 
 { #category : #'as yet unclassified' }
+DASLCompilationContext >> explicitMultiShader [
+	compilationTarget := SLVMCompilationTarget multiSpirv_logical32.
+]
+
+{ #category : #'as yet unclassified' }
 DASLCompilationContext >> importTranslationUnit: fileReference [
 	| fullPath |
 	fullPath := fileReference asFileReference asAbsolute fullName.

@@ -11,8 +11,7 @@ Class {
 		'currentFileName',
 		'optimizationLevel',
 		'ssaModule',
-		'astNodesToInject',
-		'compilationTarget'
+		'astNodesToInject'
 	],
 	#category : #'Dastrel-Core-Compiler'
 }
@@ -68,6 +67,11 @@ DASLCompiler >> compile [
 { #category : #targets }
 DASLCompiler >> cppTarget [
 	self target: #cpp
+]
+
+{ #category : #'as yet unclassified' }
+DASLCompiler >> explicitMultiShader [
+	compilationContext explicitMultiShader
 ]
 
 { #category : #accessing }
